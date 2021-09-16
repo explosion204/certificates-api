@@ -1,0 +1,22 @@
+version: '3.3'
+
+volumes:
+  db_data:
+
+services:
+  db:
+    container_name: db
+    image: 'mariadb:latest'
+    volumes:
+      - 'db_data:/var/lib/mysql'
+    ports:
+      - '3306:3306'
+    env_file:
+      - '.env'
+
+  certificates_api:
+    image: 'certificates-api'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - 'db'
