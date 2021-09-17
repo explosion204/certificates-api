@@ -31,13 +31,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             VALUES (:name, :description, :price, :duration, :create_date, :last_update_date);
             """;
 
-    private static final String UPDATE_CERTIFICATE = """
-            UPDATE gift_certificate
-            SET name = :name, description = :description, price = :price, duration = :duration,
-                create_date = :create_date, last_update_date = :last_update_date
-            WHERE id = :id;
-            """;
-
     private static final String DELETE_CERTIFICATE = """
         DELETE FROM gift_certificate
         WHERE id = :id;
@@ -85,17 +78,37 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public void update(GiftCertificate certificate) throws RepositoryException {
-        SqlParameterSource parameters = new MapSqlParameterSource()
+        StringBuilder updateQuery = new StringBuilder("UPDATE gift_certificate SET ");
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, certificate.getId())
-                .addValue(NAME, certificate.getName())
-                .addValue(DESCRIPTION, certificate.getDescription())
-                .addValue(PRICE, certificate.getPrice())
-                .addValue(DURATION, certificate.getDuration())
                 .addValue(CREATE_DATE, certificate.getCreateDate())
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
+        if (certificate.getName() != null) {
+            updateQuery.append("name = :name, ");
+            parameters.addValue(NAME, certificate.getName());
+        }
+
+        if (certificate.getDescription() != null) {
+            updateQuery.append("description = :description, ");
+            parameters.addValue(DESCRIPTION, certificate.getDescription());
+        }
+
+        if (certificate.getPrice() != null) {
+            updateQuery.append("price = :price, ");
+            parameters.addValue(PRICE, certificate.getPrice());
+        }
+
+        if (certificate.getDuration() != null) {
+            updateQuery.append("duration = :duration, ");
+            parameters.addValue(DURATION, certificate.getDuration());
+        }
+
+        updateQuery.append("last_update_date = :last_update_date ");
+        updateQuery.append("WHERE id = :id;");
+
         try {
-            namedJdbcTemplate.update(UPDATE_CERTIFICATE, parameters);
+            namedJdbcTemplate.update(updateQuery.toString(), parameters);
         } catch (DataAccessException e) {
             throw new RepositoryException("An error occurred trying to update certificate", e);
         }
