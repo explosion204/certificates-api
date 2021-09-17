@@ -1,11 +1,11 @@
 package com.epam.esm.config;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -25,13 +25,21 @@ public class DatabaseConfig {
     @Value("${dev.password}")
     private String password;
 
+    @Value("${pool.min}")
+    private int minPoolSize;
+
+    @Value("${pool.max}")
+    private int maxPoolSize;
+
     @Bean
     public DataSource mysqlDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(driverName);
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
+        dataSource.setMinIdle(minPoolSize);
+        dataSource.setMaxTotal(maxPoolSize);
 
         return dataSource;
     }
