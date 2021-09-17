@@ -9,10 +9,14 @@ repositories {
 }
 
 dependencies {
+    def junitVersion = '5.7.2'
     def lombokVersion = '1.18.20'
     def springVersion = '5.3.9'
     def mysqlConnectorVersion = '8.0.25'
     def dbcpVersion = '2.9.0'
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 

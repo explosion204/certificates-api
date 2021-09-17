@@ -1,19 +1,20 @@
 package com.epam.esm.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 @Data
+@Builder
 public class GiftCertificate {
     private long id;
+    private String name;
     private String description;
     private BigDecimal price;
     private Duration duration;
-    private ZonedDateTime creationDate;
+    private ZonedDateTime createDate;
     private ZonedDateTime lastUpdateDate;
-    private Set<Tag> tags;
 }
