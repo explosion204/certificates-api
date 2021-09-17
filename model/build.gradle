@@ -9,9 +9,15 @@ repositories {
 }
 
 dependencies {
+    def lombokVersion = '1.18.20'
     def springVersion = '5.3.9'
+    def mysqlConnectorVersion = '8.0.25'
 
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+    implementation group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
 }
 
 test {
