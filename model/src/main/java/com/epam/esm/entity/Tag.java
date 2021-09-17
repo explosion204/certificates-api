@@ -1,9 +1,11 @@
 package com.epam.esm.entity;
 
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
-public record Tag(
-        long id,
-        String name
-) {}
+@Data
+public class Tag {
+    private long id;
+    private String name;
+}

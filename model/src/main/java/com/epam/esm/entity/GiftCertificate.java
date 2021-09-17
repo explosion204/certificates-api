@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -8,12 +9,13 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Component
-public record GiftCertificate(
-        long id,
-        String description,
-        BigDecimal price,
-        Duration duration,
-        ZonedDateTime creationDate,
-        ZonedDateTime lastUpdateDate,
-        Set<Tag> tags
-) {}
+@Data
+public class GiftCertificate {
+    private long id;
+    private String description;
+    private BigDecimal price;
+    private Duration duration;
+    private ZonedDateTime creationDate;
+    private ZonedDateTime lastUpdateDate;
+    private Set<Tag> tags;
+}
