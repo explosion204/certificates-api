@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 
 @Data
@@ -14,7 +13,7 @@ public class GiftCertificate {
     private String name;
     private String description;
     private BigDecimal price;
-    private Duration duration;
+    private Integer duration;
     private ZonedDateTime createDate;
     private ZonedDateTime lastUpdateDate;
 }
