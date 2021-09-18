@@ -6,8 +6,8 @@ public class TableColumn {
     public static final String DESCRIPTION = "description";
     public static final String PRICE = "price";
     public static final String DURATION = "duration";
-    public static final String CREATE_DATE = "createDate";
-    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    public static final String CREATE_DATE = "create_date";
+    public static final String LAST_UPDATE_DATE = "last_update_date";
 
     private TableColumn() {
 

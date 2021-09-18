@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.repository.TableColumn.ID;
@@ -56,8 +57,8 @@ public class TagRepositoryImpl implements TagRepository {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
 
         try {
-            Tag tag = namedJdbcTemplate.queryForObject(SELECT_TAG_BY_ID, parameters, rowMapper);
-            return Optional.ofNullable(tag);
+            List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_ID, parameters, rowMapper);
+            return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
         } catch (DataAccessException e) {
             throw new RepositoryException("Caught an error trying to find tag by id = " + id, e);
         }
@@ -68,8 +69,8 @@ public class TagRepositoryImpl implements TagRepository {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, name);
 
         try {
-            Tag tag = namedJdbcTemplate.queryForObject(SELECT_TAG_BY_NAME, parameters, rowMapper);
-            return Optional.ofNullable(tag);
+            List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
+            return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
         } catch (DataAccessException e) {
             throw new RepositoryException("Caught an error trying to find tag by name = " + name, e);
         }

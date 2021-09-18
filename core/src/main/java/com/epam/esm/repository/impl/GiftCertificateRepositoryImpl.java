@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.repository.TableColumn.*;
@@ -48,9 +49,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     public Optional<GiftCertificate> findById(long id) throws RepositoryException {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
         try {
-            GiftCertificate certificate = namedJdbcTemplate.queryForObject(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
+            List<GiftCertificate> certificates = namedJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
             // TODO: 9/17/2021 check use-case when id does not exist
-            return Optional.ofNullable(certificate);
+            return Optional.ofNullable(certificates.size() == 1 ? certificates.get(0) : null);
         } catch (DataAccessException e) {
             throw new RepositoryException("An error occurred trying to find certificate by id = " + id, e);
         }

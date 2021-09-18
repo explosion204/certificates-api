@@ -11,7 +11,7 @@ import static com.epam.esm.validator.ValidationError.NAME;
 
 @Component
 public class TagValidator {
-    private static final String NAME_REGEX = "^\\p{Alpha}{3,50}$";
+    private static final String NAME_REGEX = "^\\p{Alnum}{3,50}$";
 
     public Pair<Boolean, EnumSet<ValidationError>> validate(Tag tag) {
         EnumSet<ValidationError> validationErrors = EnumSet.noneOf(ValidationError.class);

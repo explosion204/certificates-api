@@ -16,7 +16,6 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/certificates")
 public class GiftCertificateController {
-    private static final String DATA_FIELD = "data";
     private GiftCertificateService certificateService;
 
     public GiftCertificateController(GiftCertificateService certificateService) {
@@ -40,6 +39,7 @@ public class GiftCertificateController {
     @PatchMapping("/{id}")
     public ResponseEntity<Object> updateCertificate(@PathVariable("id") long id, @RequestBody GiftCertificate certificate)
                 throws ServiceException, EntityNotFoundException, InvalidEntityException {
+        certificate.setId(id);
         certificateService.update(certificate, null);
         return ResponseEntityFactory.createResponseEntity(OK);
     }
