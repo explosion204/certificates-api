@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface TagRepository {
     Optional<Tag> findById(long id) throws RepositoryException;
+    Optional<Tag> findByName(String name) throws RepositoryException;
 
     long create(Tag tag) throws RepositoryException;
-    void delete(long id) throws RepositoryException;
+    boolean delete(long id) throws RepositoryException;
 }

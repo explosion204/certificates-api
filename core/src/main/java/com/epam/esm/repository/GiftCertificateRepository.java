@@ -6,9 +6,9 @@ import com.epam.esm.exception.RepositoryException;
 import java.util.Optional;
 
 public interface GiftCertificateRepository {
-    Optional<GiftCertificate> findById(long id);
+    Optional<GiftCertificate> findById(long id) throws RepositoryException;
 
     long create(GiftCertificate certificate) throws RepositoryException;
-    void update(GiftCertificate certificate) throws RepositoryException;
-    void delete(long id) throws RepositoryException;
+    boolean update(GiftCertificate certificate) throws RepositoryException;
+    boolean delete(long id) throws RepositoryException;
 }

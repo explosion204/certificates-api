@@ -45,11 +45,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Optional<GiftCertificate> findById(long id) {
+    public Optional<GiftCertificate> findById(long id) throws RepositoryException {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
-        GiftCertificate certificate = namedJdbcTemplate.queryForObject(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
-        // TODO: 9/17/2021 check use-case when id does not exist
-        return Optional.ofNullable(certificate);
+        try {
+            GiftCertificate certificate = namedJdbcTemplate.queryForObject(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
+            // TODO: 9/17/2021 check use-case when id does not exist
+            return Optional.ofNullable(certificate);
+        } catch (DataAccessException e) {
+            throw new RepositoryException("An error occurred trying to find certificate by id = " + id, e);
+        }
     }
 
     @Override
@@ -66,18 +70,18 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         try {
             namedJdbcTemplate.update(INSERT_CERTIFICATE, parameters, keyHolder);
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to create certificate", e);
+            throw new RepositoryException("An error occurred trying to create certificate (" + certificate + ")", e);
         }
 
         if (keyHolder.getKey() == null) {
-            throw new RepositoryException("An error occurred trying to get generated key");
+            throw new RepositoryException("An error occurred trying to get generated key for certificate: " + certificate);
         }
 
         return keyHolder.getKey().longValue();
     }
 
     @Override
-    public void update(GiftCertificate certificate) throws RepositoryException {
+    public boolean update(GiftCertificate certificate) throws RepositoryException {
         StringBuilder updateQuery = new StringBuilder("UPDATE gift_certificate SET ");
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, certificate.getId())
@@ -108,21 +112,21 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         updateQuery.append("WHERE id = :id;");
 
         try {
-            namedJdbcTemplate.update(updateQuery.toString(), parameters);
+            return namedJdbcTemplate.update(updateQuery.toString(), parameters) > 0;
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to update certificate", e);
+            throw new RepositoryException("An error occurred trying to update certificate (" + certificate + ")", e);
         }
     }
 
     @Override
-    public void delete(long id) throws RepositoryException {
+    public boolean delete(long id) throws RepositoryException {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, id);
 
         try {
-            namedJdbcTemplate.update(DELETE_CERTIFICATE, parameters);
+            return namedJdbcTemplate.update(DELETE_CERTIFICATE, parameters) > 0;
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to delete certificate", e);
+            throw new RepositoryException("An error occurred trying to delete certificate with id = " + id, e);
         }
     }
 }

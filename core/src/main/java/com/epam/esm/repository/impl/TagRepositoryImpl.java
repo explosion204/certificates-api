@@ -27,6 +27,12 @@ public class TagRepositoryImpl implements TagRepository {
             WHERE id = :id;
             """;
 
+    private static final String SELECT_TAG_BY_NAME = """
+            SELECT id, name
+            FROM tag
+            WHERE name = :name;
+            """;
+
     private static final String INSERT_TAG = """
             INSERT tag (name)
             VALUES (:name);
@@ -48,11 +54,24 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public Optional<Tag> findById(long id) throws RepositoryException {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
+
         try {
             Tag tag = namedJdbcTemplate.queryForObject(SELECT_TAG_BY_ID, parameters, rowMapper);
             return Optional.ofNullable(tag);
         } catch (DataAccessException e) {
-            throw new RepositoryException("Caught an error trying to find tag by id", e);
+            throw new RepositoryException("Caught an error trying to find tag by id = " + id, e);
+        }
+    }
+
+    @Override
+    public Optional<Tag> findByName(String name) throws RepositoryException {
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, name);
+
+        try {
+            Tag tag = namedJdbcTemplate.queryForObject(SELECT_TAG_BY_NAME, parameters, rowMapper);
+            return Optional.ofNullable(tag);
+        } catch (DataAccessException e) {
+            throw new RepositoryException("Caught an error trying to find tag by name = " + name, e);
         }
     }
 
@@ -64,25 +83,25 @@ public class TagRepositoryImpl implements TagRepository {
         try {
             namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to create tag", e);
+            throw new RepositoryException("An error occurred trying to create tag (" + tag + ")", e);
         }
 
         if (keyHolder.getKey() == null) {
-            throw new RepositoryException("An error occurred trying to get generated key");
+            throw new RepositoryException("An error occurred trying to get generated key for tag: " + tag);
         }
 
         return keyHolder.getKey().longValue();
     }
 
     @Override
-    public void delete(long id) throws RepositoryException {
+    public boolean delete(long id) throws RepositoryException {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, id);
 
         try {
-            namedJdbcTemplate.update(DELETE_TAG, parameters);
+            return namedJdbcTemplate.update(DELETE_TAG, parameters) > 0;
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to delete tag", e);
+            throw new RepositoryException("An error occurred trying to delete tag with id = " + id, e);
         }
     }
 }
