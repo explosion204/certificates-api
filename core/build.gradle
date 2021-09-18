@@ -15,6 +15,7 @@ dependencies {
     def mysqlConnectorVersion = '8.0.25'
     def dbcpVersion = '2.9.0'
     def commonsLangVersion = '3.12.0'
+    def jacksonVersion = '2.12.5'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
@@ -22,6 +23,7 @@ dependencies {
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
     implementation group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: dbcpVersion
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
