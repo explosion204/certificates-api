@@ -14,9 +14,11 @@ import static com.epam.esm.repository.TableColumn.NAME;
 public class TagMapper implements RowMapper<Tag> {
     @Override
     public Tag mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
-        return Tag.builder()
-                .id(resultSet.getLong(ID))
-                .name(resultSet.getString(NAME))
-                .build();
+        Tag tag = new Tag();
+
+        tag.setId(resultSet.getLong(ID));
+        tag.setName(resultSet.getString(NAME));
+
+        return tag;
     }
 }

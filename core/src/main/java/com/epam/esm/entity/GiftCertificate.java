@@ -1,14 +1,14 @@
 package com.epam.esm.entity;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class GiftCertificate {
     private long id;
     private String name;
