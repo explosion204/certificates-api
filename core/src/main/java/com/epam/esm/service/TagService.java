@@ -34,7 +34,7 @@ public class TagService {
         EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
 
         if (!tagValidationStatus) {
-            throw new InvalidEntityException(tagValidationErrors);
+            throw new InvalidEntityException(tagValidationErrors, Tag.class);
         }
 
         try {

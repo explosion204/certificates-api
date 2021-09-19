@@ -6,12 +6,18 @@ import java.util.EnumSet;
 
 public class InvalidEntityException extends Exception {
     private EnumSet<ValidationError> validationErrors;
+    private Class<?> causeEntity;
 
-    public InvalidEntityException(EnumSet<ValidationError> validationErrors) {
+    public InvalidEntityException(EnumSet<ValidationError> validationErrors, Class<?> causeEntity) {
         this.validationErrors = validationErrors;
+        this.causeEntity = causeEntity;
     }
 
     public EnumSet<ValidationError> getValidationErrors() {
         return validationErrors;
+    }
+
+    public Class<?> getCauseEntity() {
+        return causeEntity;
     }
 }

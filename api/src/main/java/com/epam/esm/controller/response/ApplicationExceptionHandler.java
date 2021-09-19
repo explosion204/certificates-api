@@ -96,7 +96,9 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
             }
         }
 
-        String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), errorDetails);
+        Class<?> causeEntity = e.getCauseEntity();
+        String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), causeEntity.getSimpleName(),
+                errorDetails);
         return ResponseEntityFactory.createResponseEntity(BAD_REQUEST, errorMessage);
     }
 

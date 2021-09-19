@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.InvalidEntityException;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
-import java.util.Set;
+import java.util.List;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -40,38 +41,42 @@ public class GiftCertificateService {
         this.tagValidator = tagValidator;
     }
 
-    public GiftCertificate findById(long id) throws EntityNotFoundException, ServiceException {
+    public GiftCertificateDto findById(long id) throws EntityNotFoundException, ServiceException {
         try {
-            return certificateRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+            GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
+                    new EntityNotFoundException(id));
+            return GiftCertificateDto.fromCertificate(certificate);
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
     }
 
-    public long create(GiftCertificate certificate, Set<Tag> tags) throws InvalidEntityException, ServiceException {
+    public long create(GiftCertificateDto certificateDto) throws InvalidEntityException, ServiceException {
+        GiftCertificate certificate = certificateDto.toCertificate();
+        List<Tag> tags = certificateDto.getTags();
+
         Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
                 = certificateValidator.validate(certificate, false);
         boolean certificateValidationStatus = certificateValidationResult.getLeft();
         EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
 
         if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors);
+            throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
         }
 
-        // TODO: 9/18/2021 add tags
-//        for (Tag tag : tags) {
-//            Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag);
-//            boolean tagValidationStatus = tagValidationResult.getLeft();
-//            EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
-//
-//            if (!tagValidationStatus) {
-//                throw new InvalidEntityException(tagValidationErrors, tag);
-//            }
-//        }
+        for (Tag tag : tags) {
+            Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag);
+            boolean tagValidationStatus = tagValidationResult.getLeft();
+            EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
+
+            if (!tagValidationStatus) {
+                throw new InvalidEntityException(tagValidationErrors, Tag.class);
+            }
+        }
 
         ZonedDateTime createDate = Instant.now().atZone(UTC);
-        certificate.setCreateDate(createDate);
-        certificate.setLastUpdateDate(createDate);
+        certificateDto.setCreateDate(createDate);
+        certificateDto.setLastUpdateDate(createDate);
         try {
             return certificateRepository.create(certificate);
         } catch (RepositoryException e) {
@@ -79,22 +84,24 @@ public class GiftCertificateService {
         }
     }
 
-    public void update(GiftCertificate certificate, Set<Tag> tags) throws InvalidEntityException,
-            EntityNotFoundException, ServiceException {
+    public void update(GiftCertificateDto certificateDto) throws InvalidEntityException,
+                EntityNotFoundException, ServiceException {
+        GiftCertificate certificate = certificateDto.toCertificate();
+        List<Tag> tags = certificateDto.getTags();
+
         Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
                 = certificateValidator.validate(certificate, true);
         boolean certificateValidationStatus = certificateValidationResult.getLeft();
         EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
 
         if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors);
+            throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
         }
 
         // TODO: 9/18/2021 add tags
 
-        ZonedDateTime createDate = Instant.now().atZone(UTC);
-        certificate.setCreateDate(createDate);
-        certificate.setLastUpdateDate(createDate);
+        ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
+        certificate.setLastUpdateDate(lastUpdateDate);
 
         try {
             boolean certificateExists = certificateRepository.update(certificate);

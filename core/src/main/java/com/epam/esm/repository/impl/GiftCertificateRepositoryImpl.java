@@ -33,9 +33,19 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             """;
 
     private static final String DELETE_CERTIFICATE = """
-        DELETE FROM gift_certificate
-        WHERE id = :id;
-        """;
+            DELETE FROM gift_certificate
+            WHERE id = :id;
+            """;
+
+    private static final String INSERT_CERTIFICATE_TAG_RELATION = """
+            INSERT certificate_tag (id_certificate, id_tag)
+            VALUES (:id_certificate, :id_tag);
+            """;
+
+    private static final String DELETE_CERTIFICATE_TAG_RELATION = """
+            DELETE FROM certificate_tag
+            WHERE id_certificate = :id_certificate AND id_tag = :id_tag
+            """;
 
     private RowMapper<GiftCertificate> rowMapper;
     private NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -54,6 +64,32 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             return Optional.ofNullable(certificates.size() == 1 ? certificates.get(0) : null);
         } catch (DataAccessException e) {
             throw new RepositoryException("An error occurred trying to find certificate by id = " + id, e);
+        }
+    }
+
+    @Override
+    public boolean attachTag(long certificateId, long tagId) throws RepositoryException {
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(CERTIFICATE_ID, certificateId)
+                .addValue(TAG_ID, tagId);
+        try {
+            return namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters) > 0;
+        } catch (DataAccessException e) {
+            throw new RepositoryException("An error occurred trying to attach tag (id = " + tagId + ") to certificate " +
+                    "(id = " + tagId + ")");
+        }
+    }
+
+    @Override
+    public boolean detachTag(long certificateId, long tagId) throws RepositoryException {
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(CERTIFICATE_ID, certificateId)
+                .addValue(TAG_ID, tagId);
+        try {
+            return namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters) > 0;
+        } catch (DataAccessException e) {
+            throw new RepositoryException("An error occurred trying to detach tag (id = " + tagId + ") to certificate " +
+                    "(id = " + tagId + ")");
         }
     }
 
