@@ -14,9 +14,12 @@ dependencies {
     def junitVersion = '5.7.2'
     def servletApiVersion = '4.0.1'
     def springVersion = '5.3.9'
+    def log4jVersion = '2.14.1'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
 
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: servletApiVersion
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
