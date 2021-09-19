@@ -22,7 +22,7 @@ public class TagService {
 
     public Tag findById(long id) throws EntityNotFoundException, ServiceException {
         try {
-            return tagRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+            return tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
@@ -54,7 +54,7 @@ public class TagService {
             boolean tagExists = tagRepository.delete(id);
 
             if (!tagExists) {
-                throw new EntityNotFoundException();
+                throw new EntityNotFoundException(id);
             }
         } catch (RepositoryException e) {
             throw new ServiceException(e);

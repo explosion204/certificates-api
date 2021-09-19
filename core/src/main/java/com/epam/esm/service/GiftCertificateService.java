@@ -42,7 +42,7 @@ public class GiftCertificateService {
 
     public GiftCertificate findById(long id) throws EntityNotFoundException, ServiceException {
         try {
-            return certificateRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+            return certificateRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
@@ -87,7 +87,7 @@ public class GiftCertificateService {
         EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
 
         if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors, certificate);
+            throw new InvalidEntityException(certificateValidationErrors);
         }
 
         // TODO: 9/18/2021 add tags
@@ -100,7 +100,7 @@ public class GiftCertificateService {
             boolean certificateExists = certificateRepository.update(certificate);
 
             if (!certificateExists) {
-                throw new EntityNotFoundException();
+                throw new EntityNotFoundException(certificate.getId());
             }
         } catch (RepositoryException e) {
             throw new ServiceException(e);
@@ -112,7 +112,7 @@ public class GiftCertificateService {
             boolean certificateExists = certificateRepository.delete(id);
 
             if (!certificateExists) {
-                throw new EntityNotFoundException();
+                throw new EntityNotFoundException(id);
             }
         } catch (RepositoryException e) {
             throw new ServiceException(e);
