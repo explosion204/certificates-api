@@ -21,6 +21,8 @@ import static com.epam.esm.repository.TableColumn.*;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+    private static final String UPDATE_DATA_SEPARATOR = ", ";
+
     private static final String SELECT_CERTIFICATE_BY_ID = """
             SELECT id, name, description, price, duration, create_date, last_update_date
             FROM gift_certificate
@@ -126,22 +128,22 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
         if (certificate.getName() != null) {
-            updateQuery.append("name = :name, ");
+            updateQuery.append("name = :").append(NAME).append(UPDATE_DATA_SEPARATOR);
             parameters.addValue(NAME, certificate.getName());
         }
 
         if (certificate.getDescription() != null) {
-            updateQuery.append("description = :description, ");
+            updateQuery.append("description = :").append(DESCRIPTION).append(UPDATE_DATA_SEPARATOR);
             parameters.addValue(DESCRIPTION, certificate.getDescription());
         }
 
         if (certificate.getPrice() != null) {
-            updateQuery.append("price = :price, ");
+            updateQuery.append("price = :").append(PRICE).append(UPDATE_DATA_SEPARATOR);
             parameters.addValue(PRICE, certificate.getPrice());
         }
 
         if (certificate.getDuration() != null) {
-            updateQuery.append("duration = :duration, ");
+            updateQuery.append("duration = :").append(DURATION).append(UPDATE_DATA_SEPARATOR);
             parameters.addValue(DURATION, certificate.getDuration());
         }
 

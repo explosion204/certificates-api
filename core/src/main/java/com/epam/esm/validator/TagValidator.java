@@ -13,10 +13,9 @@ import static com.epam.esm.validator.ValidationError.NAME;
 public class TagValidator {
     private static final String NAME_REGEX = "^\\p{Alnum}{3,50}$";
 
-    public Pair<Boolean, EnumSet<ValidationError>> validate(Tag tag) {
+    public Pair<Boolean, EnumSet<ValidationError>> validate(String tagName) {
         EnumSet<ValidationError> validationErrors = EnumSet.noneOf(ValidationError.class);
-        String name = tag.getName();
-        boolean validationResult = name != null && Pattern.matches(NAME_REGEX, name);
+        boolean validationResult = tagName != null && Pattern.matches(NAME_REGEX, tagName);
 
         if (!validationResult) {
             validationErrors.add(NAME);
@@ -24,4 +23,6 @@ public class TagValidator {
 
         return Pair.of(validationResult, validationErrors);
     }
+
+
 }

@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -45,7 +46,8 @@ public class GiftCertificateService {
         try {
             GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
                     new EntityNotFoundException(id));
-            return GiftCertificateDto.fromCertificate(certificate);
+            List<Tag> tags = tagRepository.findByCertificate(id);
+            return GiftCertificateDto.fromCertificate(certificate, tags);
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
@@ -53,7 +55,7 @@ public class GiftCertificateService {
 
     public long create(GiftCertificateDto certificateDto) throws InvalidEntityException, ServiceException {
         GiftCertificate certificate = certificateDto.toCertificate();
-        List<Tag> tags = certificateDto.getTags();
+        List<String> tagNames = certificateDto.getTags();
 
         Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
                 = certificateValidator.validate(certificate, false);
@@ -64,21 +66,14 @@ public class GiftCertificateService {
             throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
         }
 
-        for (Tag tag : tags) {
-            Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag);
-            boolean tagValidationStatus = tagValidationResult.getLeft();
-            EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
-
-            if (!tagValidationStatus) {
-                throw new InvalidEntityException(tagValidationErrors, Tag.class);
-            }
-        }
-
         ZonedDateTime createDate = Instant.now().atZone(UTC);
         certificateDto.setCreateDate(createDate);
         certificateDto.setLastUpdateDate(createDate);
+
         try {
-            return certificateRepository.create(certificate);
+            long certificateId = certificateRepository.create(certificate);
+            processTags(certificateId, tagNames);
+            return certificateId;
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
@@ -87,7 +82,7 @@ public class GiftCertificateService {
     public void update(GiftCertificateDto certificateDto) throws InvalidEntityException,
                 EntityNotFoundException, ServiceException {
         GiftCertificate certificate = certificateDto.toCertificate();
-        List<Tag> tags = certificateDto.getTags();
+        List<String> tagNames = certificateDto.getTags();
 
         Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
                 = certificateValidator.validate(certificate, true);
@@ -98,8 +93,6 @@ public class GiftCertificateService {
             throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
         }
 
-        // TODO: 9/18/2021 add tags
-
         ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
         certificate.setLastUpdateDate(lastUpdateDate);
 
@@ -109,6 +102,8 @@ public class GiftCertificateService {
             if (!certificateExists) {
                 throw new EntityNotFoundException(certificate.getId());
             }
+
+            processTags(certificate.getId(), tagNames);
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }
@@ -123,6 +118,41 @@ public class GiftCertificateService {
             }
         } catch (RepositoryException e) {
             throw new ServiceException(e);
+        }
+    }
+
+    private void processTags(long certificateId, List<String> tagNames) throws InvalidEntityException,
+                RepositoryException {
+        List<Tag> currentTags = tagRepository.findByCertificate(certificateId);
+
+        // remove old tags
+        for (Tag tag : currentTags) {
+            certificateRepository.detachTag(certificateId, tag.getId());
+        }
+
+        // tag validation
+        for (String tagName : tagNames) {
+            Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tagName);
+            boolean tagValidationStatus = tagValidationResult.getLeft();
+            EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
+
+            if (!tagValidationStatus) {
+                throw new InvalidEntityException(tagValidationErrors, Tag.class);
+            }
+
+            // if tag does not exist, create it in database
+            Optional<Tag> tag = tagRepository.findByName(tagName);
+            long tagId;
+            if (tag.isEmpty()) {
+                Tag newTag = new Tag();
+                newTag.setName(tagName);
+                tagId = tagRepository.create(newTag);
+            } else {
+                tagId = tag.get().getId();
+            }
+
+            // attach tags to certificate
+            certificateRepository.attachTag(certificateId, tagId);
         }
     }
 }

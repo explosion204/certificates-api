@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class GiftCertificateDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX", timezone = "UTC")
     private ZonedDateTime lastUpdateDate;
 
-    private List<String> tags = new ArrayList<>();
+    private List<String> tags;
 
     public GiftCertificate toCertificate() {
         GiftCertificate certificate = new GiftCertificate();
@@ -40,7 +41,7 @@ public class GiftCertificateDto {
         return certificate;
     }
 
-    public static GiftCertificateDto fromCertificate(GiftCertificate certificate) {
+    public static GiftCertificateDto fromCertificate(GiftCertificate certificate, List<Tag> tags) {
         GiftCertificateDto certificateDto = new GiftCertificateDto();
 
         certificateDto.setId(certificate.getId());
@@ -50,6 +51,9 @@ public class GiftCertificateDto {
         certificateDto.setDuration(certificate.getDuration());
         certificateDto.setCreateDate(certificate.getCreateDate());
         certificateDto.setLastUpdateDate(certificate.getLastUpdateDate());
+
+        List<String> tagNames = tags.stream().map(Tag::getName).collect(Collectors.toList());
+        certificateDto.setTags(tagNames);
 
         return certificateDto;
     }

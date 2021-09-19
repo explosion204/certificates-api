@@ -17,8 +17,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.TableColumn.ID;
-import static com.epam.esm.repository.TableColumn.NAME;
+import static com.epam.esm.repository.TableColumn.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
@@ -32,6 +31,14 @@ public class TagRepositoryImpl implements TagRepository {
             SELECT id, name
             FROM tag
             WHERE name = :name;
+            """;
+
+    private static final String SELECT_TAGS_BY_CERTIFICATE = """
+            SELECT tag.id, tag.name
+            FROM tag
+            INNER JOIN certificate_tag AS ct
+            ON tag.id = ct.id_tag
+            WHERE ct.id_certificate = :id_certificate;
             """;
 
     private static final String INSERT_TAG = """
@@ -73,6 +80,17 @@ public class TagRepositoryImpl implements TagRepository {
             return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
         } catch (DataAccessException e) {
             throw new RepositoryException("Caught an error trying to find tag by name = " + name, e);
+        }
+    }
+
+    @Override
+    public List<Tag> findByCertificate(long certificateId) throws RepositoryException {
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(CERTIFICATE_ID, certificateId);
+
+        try {
+            return namedJdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE, parameters, rowMapper);
+        } catch (DataAccessException e) {
+            throw new RepositoryException("Caught an error trying to find tags by certificate id = " + certificateId, e);
         }
     }
 

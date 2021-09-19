@@ -29,7 +29,7 @@ public class TagService {
     }
 
     public long create(Tag tag) throws InvalidEntityException, EntityAlreadyExistsException, ServiceException {
-        Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag);
+        Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag.getName());
         boolean tagValidationStatus = tagValidationResult.getLeft();
         EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
 
