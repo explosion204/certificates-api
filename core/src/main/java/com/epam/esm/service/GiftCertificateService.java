@@ -79,7 +79,7 @@ public class GiftCertificateService {
         }
     }
 
-    public void update(GiftCertificateDto certificateDto) throws InvalidEntityException,
+    public GiftCertificateDto update(GiftCertificateDto certificateDto) throws InvalidEntityException,
                 EntityNotFoundException, ServiceException {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
@@ -104,6 +104,8 @@ public class GiftCertificateService {
             }
 
             processTags(certificate.getId(), tagNames);
+
+            return findById(certificate.getId());
         } catch (RepositoryException e) {
             throw new ServiceException(e);
         }

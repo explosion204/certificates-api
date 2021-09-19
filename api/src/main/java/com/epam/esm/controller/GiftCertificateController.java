@@ -2,7 +2,6 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.response.ResponseEntityFactory;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.ServiceException;
@@ -41,12 +40,12 @@ public class GiftCertificateController {
     public ResponseEntity<Object> updateCertificate(@PathVariable("id") long id, @RequestBody GiftCertificateDto certificateDto)
                 throws ServiceException, EntityNotFoundException, InvalidEntityException {
         certificateDto.setId(id);
-        certificateService.update(certificateDto);
-        return ResponseEntityFactory.createResponseEntity(OK);
+        GiftCertificateDto updatedDto = certificateService.update(certificateDto);
+        return ResponseEntityFactory.createResponseEntity(OK, updatedDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCertificate(@PathVariable("id") long id) throws ServiceException,
+    public ResponseEntity<Object> deleteCertificate(@PathVariable("id") long id) throws ServiceException,
                 EntityNotFoundException {
         certificateService.delete(id);
         return ResponseEntityFactory.createResponseEntity(OK);
