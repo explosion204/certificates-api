@@ -55,7 +55,7 @@ public class GiftCertificateService {
         EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
 
         if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors, certificate);
+            throw new InvalidEntityException(certificateValidationErrors);
         }
 
         // TODO: 9/18/2021 add tags

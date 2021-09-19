@@ -8,6 +8,10 @@ public class InvalidEntityException extends Exception {
     private EnumSet<ValidationError> validationErrors;
     private Object causeEntity;
 
+    public InvalidEntityException(EnumSet<ValidationError> validationErrors) {
+        this(validationErrors, null);
+    }
+
     public InvalidEntityException(EnumSet<ValidationError> validationErrors, Object causeEntity) {
         this.validationErrors = validationErrors;
         this.causeEntity = causeEntity;
