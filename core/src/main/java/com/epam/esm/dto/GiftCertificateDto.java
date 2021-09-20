@@ -1,15 +1,19 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.dto.mapper.DayDurationDeserializer;
+import com.epam.esm.dto.mapper.DayDurationSerializer;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +22,10 @@ public class GiftCertificateDto {
     private String name;
     private String description;
     private BigDecimal price;
-    private Integer duration;
+
+    @JsonSerialize(using = DayDurationSerializer.class)
+    @JsonDeserialize(using = DayDurationDeserializer.class)
+    private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX", timezone = "UTC")
     private ZonedDateTime createDate;
@@ -51,7 +58,7 @@ public class GiftCertificateDto {
         certificateDto.setCreateDate(certificate.getCreateDate());
         certificateDto.setLastUpdateDate(certificate.getLastUpdateDate());
 
-        List<String> tagNames = tags.stream().map(Tag::getName).collect(Collectors.toList());
+        List<String> tagNames = tags.stream().map(Tag::getName).toList();
         certificateDto.setTags(tagNames);
 
         return certificateDto;

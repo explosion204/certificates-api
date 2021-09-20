@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.regex.Pattern;
 
@@ -22,7 +23,7 @@ public class GiftCertificateValidator {
         String name = certificate.getName();
         String description = certificate.getDescription();
         BigDecimal price = certificate.getPrice();
-        Integer duration = certificate.getDuration();
+        Duration duration = certificate.getDuration();
 
         boolean validationResult = nullValid && name == null || name != null && validateName(name);
         if (!validationResult) {
@@ -39,7 +40,7 @@ public class GiftCertificateValidator {
             validationErrors.add(PRICE);
         }
 
-        validationResult &= nullValid && duration == null || price != null && validateDuration(duration);
+        validationResult &= nullValid && duration == null || duration != null && validateDuration(duration);
         if (!validationResult) {
             validationErrors.add(DURATION);
         }
@@ -59,7 +60,7 @@ public class GiftCertificateValidator {
         return price.compareTo(BigDecimal.ZERO) > PRICE_MIN_VALUE;
     }
 
-    private boolean validateDuration(Integer duration) {
-        return duration > DURATION_MIN_VALUE;
+    private boolean validateDuration(Duration duration) {
+        return duration.toDays() > DURATION_MIN_VALUE;
     }
 }

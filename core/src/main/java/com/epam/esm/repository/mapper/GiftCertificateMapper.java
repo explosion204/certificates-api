@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 
 import static com.epam.esm.repository.TableColumn.*;
 import static java.time.ZoneOffset.UTC;
@@ -20,7 +21,7 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         certificate.setName(resultSet.getString(NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getBigDecimal(PRICE));
-        certificate.setDuration(resultSet.getInt(DURATION));
+        certificate.setDuration(Duration.ofDays(resultSet.getInt(DURATION)));
         certificate.setCreateDate(resultSet.getTimestamp(CREATE_DATE).toInstant().atZone(UTC));
         certificate.setLastUpdateDate(resultSet.getTimestamp(LAST_UPDATE_DATE).toInstant().atZone(UTC));
 

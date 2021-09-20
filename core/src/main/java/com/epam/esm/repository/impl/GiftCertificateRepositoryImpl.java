@@ -102,7 +102,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(NAME, certificate.getName())
                 .addValue(DESCRIPTION, certificate.getDescription())
                 .addValue(PRICE, certificate.getPrice())
-                .addValue(DURATION, certificate.getDuration())
+                .addValue(DURATION, certificate.getDuration().toDays())
                 .addValue(CREATE_DATE, certificate.getCreateDate())
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
@@ -144,7 +144,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
         if (certificate.getDuration() != null) {
             updateQuery.append("duration = :").append(DURATION).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(DURATION, certificate.getDuration());
+            parameters.addValue(DURATION, certificate.getDuration().toDays());
         }
 
         updateQuery.append("last_update_date = :last_update_date ");
