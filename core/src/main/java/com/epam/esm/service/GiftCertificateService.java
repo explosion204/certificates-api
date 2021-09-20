@@ -72,7 +72,12 @@ public class GiftCertificateService {
 
         try {
             long certificateId = certificateRepository.create(certificate);
-            processTags(certificateId, tagNames);
+
+            // we do not update tags if it is not specified in request (i.e. tagNames == null)
+            if (tagNames != null) {
+                processTags(certificate.getId(), tagNames);
+            }
+
             return certificateId;
         } catch (RepositoryException e) {
             throw new ServiceException(e);
@@ -103,7 +108,10 @@ public class GiftCertificateService {
                 throw new EntityNotFoundException(certificate.getId());
             }
 
-            processTags(certificate.getId(), tagNames);
+            // we do not update tags if it is not specified in request (i.e. tagNames == null)
+            if (tagNames != null) {
+                processTags(certificate.getId(), tagNames);
+            }
 
             return findById(certificate.getId());
         } catch (RepositoryException e) {
