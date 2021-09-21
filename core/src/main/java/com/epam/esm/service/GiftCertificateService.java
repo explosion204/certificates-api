@@ -82,8 +82,8 @@ public class GiftCertificateService {
         }
 
         ZonedDateTime createDate = Instant.now().atZone(UTC);
-        certificateDto.setCreateDate(createDate);
-        certificateDto.setLastUpdateDate(createDate);
+        certificate.setCreateDate(createDate);
+        certificate.setLastUpdateDate(createDate);
 
         long certificateId = certificateRepository.create(certificate);
 

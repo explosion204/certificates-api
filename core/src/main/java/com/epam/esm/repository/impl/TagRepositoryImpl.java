@@ -42,7 +42,7 @@ public class TagRepositoryImpl implements TagRepository {
             """;
 
     private static final String INSERT_TAG = """
-            INSERT tag (name)
+            INSERT INTO tag (name)
             VALUES (:tag_name);
             """;
 

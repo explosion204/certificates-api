@@ -9,7 +9,7 @@ services:
     image: 'mariadb:latest'
     volumes:
       - 'db_data:/var/lib/mysql'
-      - './schema/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql'
+      - './core/build/resources/main/schema/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql'
     ports:
       - '3306:3306'
     env_file:

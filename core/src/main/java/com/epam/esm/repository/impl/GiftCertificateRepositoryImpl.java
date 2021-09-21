@@ -31,14 +31,28 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String SELECT_CERTIFICATES = """
             SELECT gc.id, gc.name, description, price, duration, create_date, last_update_date
             FROM gift_certificate AS gc
-            INNER JOIN certificate_tag AS ct
+            LEFT OUTER JOIN certificate_tag AS ct
             ON ct.id_certificate = gc.id
-            INNER JOIN tag
+            LEFT OUTER JOIN tag
             ON ct.id_tag = tag.id
             WHERE
-                IF(:tag_name IS NOT NULL, tag.name = :tag_name, true) AND
-                IF(:certificate_name IS NOT NULL, gc.name LIKE CONCAT('%', :certificate_name, '%'), true) AND
-                IF(:description IS NOT NULL, gc.description LIKE CONCAT('%', :description, '%'), true)
+                CASE
+                    WHEN :tag_name IS NOT NULL
+                    THEN tag.name = :tag_name
+                    ELSE true
+                END
+                AND
+                CASE
+                    WHEN :certificate_name IS NOT NULL
+                    THEN gc.name LIKE CONCAT('%', :certificate_name, '%')
+                    ELSE true
+                END
+                AND
+                CASE
+                    WHEN :description IS NOT NULL
+                    THEN gc.description LIKE CONCAT('%', :description, '%')
+                    ELSE true
+                END
             ORDER BY
                 CASE WHEN :order_by_name = 'asc' THEN gc.name END,
                 CASE WHEN :order_by_name = 'desc' THEN gc.name END DESC,
@@ -53,8 +67,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             """;
 
     private static final String INSERT_CERTIFICATE = """
-            INSERT gift_certificate (name, description, price, duration, create_date, last_update_date)
-            VALUES (:certificate_name, :description, :price, :duration, :create_date, :last_update_date);
+            INSERT INTO gift_certificate (name, description, price, duration, create_date, last_update_date)
+            VALUES (:name, :description, :price, :duration, :create_date, :last_update_date);
             """;
 
     private static final String DELETE_CERTIFICATE = """
@@ -63,7 +77,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             """;
 
     private static final String INSERT_CERTIFICATE_TAG_RELATION = """
-            INSERT certificate_tag (id_certificate, id_tag)
+            INSERT INTO certificate_tag (id_certificate, id_tag)
             VALUES (:id_certificate, :id_tag);
             """;
 
