@@ -91,7 +91,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         try {
             return namedJdbcTemplate.query(SELECT_CERTIFICATES, parameters, rowMapper);
         } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to query certificates");
+            throw new RepositoryException("An error occurred trying to query certificates", e);
         }
     }
 
@@ -116,7 +116,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             return namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters) > 0;
         } catch (DataAccessException e) {
             throw new RepositoryException("An error occurred trying to attach tag (id = " + tagId + ") to certificate " +
-                    "(id = " + tagId + ")");
+                    "(id = " + tagId + ")", e);
         }
     }
 
@@ -129,7 +129,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             return namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters) > 0;
         } catch (DataAccessException e) {
             throw new RepositoryException("An error occurred trying to detach tag (id = " + tagId + ") to certificate " +
-                    "(id = " + tagId + ")");
+                    "(id = " + tagId + ")", e);
         }
     }
 
