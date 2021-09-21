@@ -12,9 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -24,12 +25,13 @@ import java.util.Locale;
 
 import static org.springframework.http.HttpStatus.*;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger logger = LogManager.getLogger();
 
     private static final String METHOD_NOT_ALLOWED_MESSAGE = "method_not_allowed";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
+    private static final String INVALID_PARAMS = "invalid_params";
     private static final String INVALID_BODY_FORMAT_MESSAGE = "invalid_body_format";
     private static final String ENTITY_ALREADY_EXISTS_MESSAGE = "entity_already_exists";
     private static final String ENTITY_NOT_FOUND_MESSAGE = "entity_not_found";
@@ -58,6 +60,11 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
                 HttpHeaders headers, HttpStatus status, WebRequest request) {
         return ResponseEntityFactory.createResponseEntity(METHOD_NOT_ALLOWED, getErrorMessage(METHOD_NOT_ALLOWED_MESSAGE));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return ResponseEntityFactory.createResponseEntity(BAD_REQUEST, getErrorMessage(INVALID_PARAMS));
     }
 
     @Override

@@ -1,16 +1,18 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.RepositoryException;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GiftCertificateRepository {
-    Optional<GiftCertificate> findById(long id) throws RepositoryException;
-    boolean attachTag(long certificateId, long tagId) throws RepositoryException;
-    boolean detachTag(long certificateId, long tagId) throws RepositoryException;
+    List<GiftCertificate> find(String tagName, String certificateName, String certificateDescription,
+            OrderingType orderByName, OrderingType orderByCreateDate);
+    Optional<GiftCertificate> findById(long id);
+    boolean attachTag(long certificateId, long tagId);
+    boolean detachTag(long certificateId, long tagId);
 
-    long create(GiftCertificate certificate) throws RepositoryException;
-    boolean update(GiftCertificate certificate) throws RepositoryException;
-    boolean delete(long id) throws RepositoryException;
+    long create(GiftCertificate certificate);
+    boolean update(GiftCertificate certificate);
+    boolean delete(long id);
 }

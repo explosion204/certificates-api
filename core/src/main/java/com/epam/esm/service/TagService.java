@@ -20,15 +20,11 @@ public class TagService {
         this.tagValidator = tagValidator;
     }
 
-    public Tag findById(long id) throws EntityNotFoundException, ServiceException {
-        try {
-            return tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
-        }
+    public Tag findById(long id) {
+        return tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
-    public long create(Tag tag) throws InvalidEntityException, EntityAlreadyExistsException, ServiceException {
+    public long create(Tag tag) {
         Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag.getName());
         boolean tagValidationStatus = tagValidationResult.getLeft();
         EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
@@ -37,27 +33,19 @@ public class TagService {
             throw new InvalidEntityException(tagValidationErrors, Tag.class);
         }
 
-        try {
-            String name = tag.getName();
-            if (tagRepository.findByName(name).isPresent()) {
-                throw new EntityAlreadyExistsException(tag);
-            }
-
-            return tagRepository.create(tag);
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
+        String name = tag.getName();
+        if (tagRepository.findByName(name).isPresent()) {
+            throw new EntityAlreadyExistsException(tag);
         }
+
+        return tagRepository.create(tag);
     }
 
-    public void delete(long id) throws EntityNotFoundException, ServiceException {
-        try {
-            boolean tagExists = tagRepository.delete(id);
+    public void delete(long id) {
+        boolean tagExists = tagRepository.delete(id);
 
-            if (!tagExists) {
-                throw new EntityNotFoundException(id);
-            }
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
+        if (!tagExists) {
+            throw new EntityNotFoundException(id);
         }
     }
 }

@@ -2,9 +2,6 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.response.ResponseEntityFactory;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
 
 import org.springframework.http.ResponseEntity;
@@ -23,30 +20,27 @@ public class GiftCertificateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getCertificate(@PathVariable("id") long id) throws ServiceException,
-                EntityNotFoundException {
+    public ResponseEntity<Object> getCertificate(@PathVariable("id") long id) {
         GiftCertificateDto certificateDto = certificateService.findById(id);
         return ResponseEntityFactory.createResponseEntity(OK, certificateDto);
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCertificate(@RequestBody GiftCertificateDto certificateDto) throws ServiceException,
-                InvalidEntityException {
+    public ResponseEntity<Object> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
         long id = certificateService.create(certificateDto);
         return ResponseEntityFactory.createResponseEntity(CREATED, id);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateCertificate(@PathVariable("id") long id, @RequestBody GiftCertificateDto certificateDto)
-                throws ServiceException, EntityNotFoundException, InvalidEntityException {
+    public ResponseEntity<Object> updateCertificate(@PathVariable("id") long id,
+                @RequestBody GiftCertificateDto certificateDto) {
         certificateDto.setId(id);
         GiftCertificateDto updatedDto = certificateService.update(certificateDto);
         return ResponseEntityFactory.createResponseEntity(OK, updatedDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteCertificate(@PathVariable("id") long id) throws ServiceException,
-                EntityNotFoundException {
+    public ResponseEntity<Object> deleteCertificate(@PathVariable("id") long id) {
         certificateService.delete(id);
         return ResponseEntityFactory.createResponseEntity(OK);
     }

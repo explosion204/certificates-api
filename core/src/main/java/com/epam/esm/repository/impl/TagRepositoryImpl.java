@@ -30,7 +30,7 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String SELECT_TAG_BY_NAME = """
             SELECT id, name
             FROM tag
-            WHERE name = :name;
+            WHERE name = :tag_name;
             """;
 
     private static final String SELECT_TAGS_BY_CERTIFICATE = """
@@ -43,7 +43,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     private static final String INSERT_TAG = """
             INSERT tag (name)
-            VALUES (:name);
+            VALUES (:tag_name);
             """;
 
     private static final String DELETE_TAG = """
@@ -60,7 +60,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Optional<Tag> findById(long id) throws RepositoryException {
+    public Optional<Tag> findById(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
 
         try {
@@ -72,8 +72,8 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Optional<Tag> findByName(String name) throws RepositoryException {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, name);
+    public Optional<Tag> findByName(String name) {
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(TAG_NAME, name);
 
         try {
             List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
@@ -84,7 +84,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> findByCertificate(long certificateId) throws RepositoryException {
+    public List<Tag> findByCertificate(long certificateId) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(CERTIFICATE_ID, certificateId);
 
         try {
@@ -95,9 +95,9 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public long create(Tag tag) throws RepositoryException {
+    public long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, tag.getName());
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(TAG_NAME, tag.getName());
 
         try {
             namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
@@ -113,7 +113,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public boolean delete(long id) throws RepositoryException {
+    public boolean delete(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, id);
 

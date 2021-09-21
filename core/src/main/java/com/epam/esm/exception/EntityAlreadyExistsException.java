@@ -1,6 +1,6 @@
 package com.epam.esm.exception;
 
-public class EntityAlreadyExistsException extends Exception {
+public class EntityAlreadyExistsException extends RuntimeException {
     private Object causeEntity;
 
     public EntityAlreadyExistsException(Object causeEntity) {

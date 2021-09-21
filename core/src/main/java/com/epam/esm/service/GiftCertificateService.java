@@ -5,8 +5,6 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.RepositoryException;
-import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
@@ -42,18 +40,14 @@ public class GiftCertificateService {
         this.tagValidator = tagValidator;
     }
 
-    public GiftCertificateDto findById(long id) throws EntityNotFoundException, ServiceException {
-        try {
-            GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
-                    new EntityNotFoundException(id));
-            List<Tag> tags = tagRepository.findByCertificate(id);
-            return GiftCertificateDto.fromCertificate(certificate, tags);
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
-        }
+    public GiftCertificateDto findById(long id) {
+        GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException(id));
+        List<Tag> tags = tagRepository.findByCertificate(id);
+        return GiftCertificateDto.fromCertificate(certificate, tags);
     }
 
-    public long create(GiftCertificateDto certificateDto) throws InvalidEntityException, ServiceException {
+    public long create(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
 
@@ -70,22 +64,17 @@ public class GiftCertificateService {
         certificateDto.setCreateDate(createDate);
         certificateDto.setLastUpdateDate(createDate);
 
-        try {
-            long certificateId = certificateRepository.create(certificate);
+        long certificateId = certificateRepository.create(certificate);
 
-            // we do not update tags if it is not specified in request (i.e. tagNames == null)
-            if (tagNames != null) {
-                processTags(certificate.getId(), tagNames);
-            }
-
-            return certificateId;
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
+        // we do not update tags if it is not specified in request (i.e. tagNames == null)
+        if (tagNames != null) {
+            processTags(certificate.getId(), tagNames);
         }
+
+        return certificateId;
     }
 
-    public GiftCertificateDto update(GiftCertificateDto certificateDto) throws InvalidEntityException,
-                EntityNotFoundException, ServiceException {
+    public GiftCertificateDto update(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
 
@@ -101,38 +90,29 @@ public class GiftCertificateService {
         ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
         certificate.setLastUpdateDate(lastUpdateDate);
 
-        try {
-            boolean certificateExists = certificateRepository.update(certificate);
+        boolean certificateExists = certificateRepository.update(certificate);
 
-            if (!certificateExists) {
-                throw new EntityNotFoundException(certificate.getId());
-            }
+        if (!certificateExists) {
+            throw new EntityNotFoundException(certificate.getId());
+        }
 
-            // we do not update tags if it is not specified in request (i.e. tagNames == null)
-            if (tagNames != null) {
-                processTags(certificate.getId(), tagNames);
-            }
+        // we do not update tags if it is not specified in request (i.e. tagNames == null)
+        if (tagNames != null) {
+            processTags(certificate.getId(), tagNames);
+        }
 
-            return findById(certificate.getId());
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
+        return findById(certificate.getId());
+    }
+
+    public void delete(long id) {
+        boolean certificateExists = certificateRepository.delete(id);
+
+        if (!certificateExists) {
+            throw new EntityNotFoundException(id);
         }
     }
 
-    public void delete(long id) throws EntityNotFoundException, ServiceException {
-        try {
-            boolean certificateExists = certificateRepository.delete(id);
-
-            if (!certificateExists) {
-                throw new EntityNotFoundException(id);
-            }
-        } catch (RepositoryException e) {
-            throw new ServiceException(e);
-        }
-    }
-
-    private void processTags(long certificateId, List<String> tagNames) throws InvalidEntityException,
-                RepositoryException {
+    private void processTags(long certificateId, List<String> tagNames) {
         List<Tag> currentTags = tagRepository.findByCertificate(certificateId);
 
         // remove old tags

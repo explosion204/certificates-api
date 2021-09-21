@@ -1,4 +1,4 @@
-package com.epam.esm.repository.mapper;
+package com.epam.esm.repository.mapping;
 
 import com.epam.esm.entity.GiftCertificate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,7 +18,7 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         GiftCertificate certificate = new GiftCertificate();
 
         certificate.setId(resultSet.getLong(ID));
-        certificate.setName(resultSet.getString(NAME));
+        certificate.setName(resultSet.getString(CERTIFICATE_NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getBigDecimal(PRICE));
         certificate.setDuration(Duration.ofDays(resultSet.getInt(DURATION)));

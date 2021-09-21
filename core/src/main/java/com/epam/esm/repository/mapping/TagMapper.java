@@ -1,4 +1,4 @@
-package com.epam.esm.repository.mapper;
+package com.epam.esm.repository.mapping;
 
 import com.epam.esm.entity.Tag;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.epam.esm.repository.TableColumn.ID;
-import static com.epam.esm.repository.TableColumn.NAME;
+import static com.epam.esm.repository.TableColumn.CERTIFICATE_NAME;
 
 @Component
 public class TagMapper implements RowMapper<Tag> {
@@ -17,7 +17,7 @@ public class TagMapper implements RowMapper<Tag> {
         Tag tag = new Tag();
 
         tag.setId(resultSet.getLong(ID));
-        tag.setName(resultSet.getString(NAME));
+        tag.setName(resultSet.getString(CERTIFICATE_NAME));
 
         return tag;
     }

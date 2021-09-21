@@ -31,7 +31,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     private static final String INSERT_CERTIFICATE = """
             INSERT gift_certificate (name, description, price, duration, create_date, last_update_date)
-            VALUES (:name, :description, :price, :duration, :create_date, :last_update_date);
+            VALUES (:certificate_name, :description, :price, :duration, :create_date, :last_update_date);
             """;
 
     private static final String DELETE_CERTIFICATE = """
@@ -58,7 +58,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public Optional<GiftCertificate> findById(long id) throws RepositoryException {
+    public Optional<GiftCertificate> findById(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
         try {
             List<GiftCertificate> certificates = namedJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
@@ -70,7 +70,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean attachTag(long certificateId, long tagId) throws RepositoryException {
+    public boolean attachTag(long certificateId, long tagId) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID, certificateId)
                 .addValue(TAG_ID, tagId);
@@ -83,7 +83,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean detachTag(long certificateId, long tagId) throws RepositoryException {
+    public boolean detachTag(long certificateId, long tagId) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID, certificateId)
                 .addValue(TAG_ID, tagId);
@@ -96,10 +96,10 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public long create(GiftCertificate certificate) throws RepositoryException {
+    public long create(GiftCertificate certificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(NAME, certificate.getName())
+                .addValue(CERTIFICATE_NAME, certificate.getName())
                 .addValue(DESCRIPTION, certificate.getDescription())
                 .addValue(PRICE, certificate.getPrice())
                 .addValue(DURATION, certificate.getDuration().toDays())
@@ -120,7 +120,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean update(GiftCertificate certificate) throws RepositoryException {
+    public boolean update(GiftCertificate certificate) {
         StringBuilder updateQuery = new StringBuilder("UPDATE gift_certificate SET ");
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, certificate.getId())
@@ -128,8 +128,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
         if (certificate.getName() != null) {
-            updateQuery.append("name = :").append(NAME).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(NAME, certificate.getName());
+            updateQuery.append("name = :").append(CERTIFICATE_NAME).append(UPDATE_DATA_SEPARATOR);
+            parameters.addValue(CERTIFICATE_NAME, certificate.getName());
         }
 
         if (certificate.getDescription() != null) {
@@ -147,8 +147,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             parameters.addValue(DURATION, certificate.getDuration().toDays());
         }
 
-        updateQuery.append("last_update_date = :last_update_date ");
-        updateQuery.append("WHERE id = :id;");
+        updateQuery.append("last_update_date = :").append(LAST_UPDATE_DATE);
+        updateQuery.append(" WHERE id = :").append(ID);
 
         try {
             return namedJdbcTemplate.update(updateQuery.toString(), parameters) > 0;
@@ -158,7 +158,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean delete(long id) throws RepositoryException {
+    public boolean delete(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, id);
 
