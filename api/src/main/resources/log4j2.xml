@@ -15,7 +15,7 @@
             <PatternLayout pattern="${pattern_layout_file}" />
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" />
-                <SizeBasedTriggeringPolicy size="20 KB" />
+                <SizeBasedTriggeringPolicy size="512 KB" />
             </Policies>
         </RollingFile>
     </Appenders>
