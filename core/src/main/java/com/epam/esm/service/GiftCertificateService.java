@@ -1,11 +1,13 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.OrderingType;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
@@ -38,6 +40,23 @@ public class GiftCertificateService {
         this.tagRepository = tagRepository;
         this.certificateValidator = certificateValidator;
         this.tagValidator = tagValidator;
+    }
+
+    public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto) {
+        String tagName = searchParamsDto.getTagName();
+        String certificateName = searchParamsDto.getCertificateName();
+        String certificateDescription = searchParamsDto.getCertificateDescription();
+        OrderingType orderByName = searchParamsDto.getOrderByName();
+        OrderingType orderByCreateDate = searchParamsDto.getOrderByCreateDate();
+
+        List<GiftCertificate> certificates = certificateRepository.find(tagName, certificateName, certificateDescription,
+                orderByName, orderByCreateDate);
+
+        return certificates.stream().map(certificate -> {
+            long certificateId = certificate.getId();
+            List<Tag> tags = tagRepository.findByCertificate(certificateId);
+            return GiftCertificateDto.fromCertificate(certificate, tags);
+        }).toList();
     }
 
     public GiftCertificateDto findById(long id) {
