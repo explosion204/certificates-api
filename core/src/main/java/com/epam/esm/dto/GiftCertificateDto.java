@@ -1,7 +1,7 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dto.mapper.DayDurationDeserializer;
-import com.epam.esm.dto.mapper.DayDurationSerializer;
+import com.epam.esm.dto.mapping.DayDurationDeserializer;
+import com.epam.esm.dto.mapping.DayDurationSerializer;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
