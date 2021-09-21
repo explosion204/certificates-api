@@ -1,7 +1,6 @@
 dependencies {
     implementation group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: dbcpVersion
-    implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion

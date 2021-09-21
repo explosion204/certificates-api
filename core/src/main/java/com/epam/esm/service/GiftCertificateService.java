@@ -14,6 +14,7 @@ import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -66,6 +67,7 @@ public class GiftCertificateService {
         return GiftCertificateDto.fromCertificate(certificate, tags);
     }
 
+    @Transactional
     public long create(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
@@ -93,6 +95,7 @@ public class GiftCertificateService {
         return certificateId;
     }
 
+    @Transactional
     public GiftCertificateDto update(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
