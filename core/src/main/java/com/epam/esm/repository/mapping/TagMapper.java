@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.epam.esm.repository.TableColumn.ID;
-import static com.epam.esm.repository.TableColumn.CERTIFICATE_NAME;
+import static com.epam.esm.repository.TableColumn.NAME;
 
 @Component
 public class TagMapper implements RowMapper<Tag> {
@@ -17,7 +17,7 @@ public class TagMapper implements RowMapper<Tag> {
         Tag tag = new Tag();
 
         tag.setId(resultSet.getLong(ID));
-        tag.setName(resultSet.getString(CERTIFICATE_NAME));
+        tag.setName(resultSet.getString(NAME));
 
         return tag;
     }

@@ -23,9 +23,11 @@ import static com.epam.esm.repository.TableColumn.*;
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String UPDATE_DATA_SEPARATOR = ", ";
-
+    private static final String TAG_NAME = "tag_name";
+    private static final String CERTIFICATE_NAME = "certificate_name";
     private static final String ORDER_BY_NAME = "order_by_name";
     private static final String ORDER_BY_CREATE_DATE = "order_by_create_date";
+
     private static final String SELECT_CERTIFICATES = """
             SELECT gc.id, gc.name, description, price, duration, create_date, last_update_date
             FROM gift_certificate AS gc
@@ -85,8 +87,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(TAG_NAME, tagName)
                 .addValue(CERTIFICATE_NAME, certificateName)
                 .addValue(DESCRIPTION, certificateDescription)
-                .addValue(ORDER_BY_NAME, orderByName)
-                .addValue(ORDER_BY_CREATE_DATE, orderByCreateDate);
+                .addValue(ORDER_BY_NAME, orderByName != null ? orderByName.name() : null)
+                .addValue(ORDER_BY_CREATE_DATE, orderByCreateDate != null ? orderByCreateDate.name() : null);
 
         try {
             return namedJdbcTemplate.query(SELECT_CERTIFICATES, parameters, rowMapper);
@@ -137,7 +139,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     public long create(GiftCertificate certificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(CERTIFICATE_NAME, certificate.getName())
+                .addValue(NAME, certificate.getName())
                 .addValue(DESCRIPTION, certificate.getDescription())
                 .addValue(PRICE, certificate.getPrice())
                 .addValue(DURATION, certificate.getDuration().toDays())
@@ -166,8 +168,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
         if (certificate.getName() != null) {
-            updateQuery.append("name = :").append(CERTIFICATE_NAME).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(CERTIFICATE_NAME, certificate.getName());
+            updateQuery.append("name = :").append(NAME).append(UPDATE_DATA_SEPARATOR);
+            parameters.addValue(NAME, certificate.getName());
         }
 
         if (certificate.getDescription() != null) {

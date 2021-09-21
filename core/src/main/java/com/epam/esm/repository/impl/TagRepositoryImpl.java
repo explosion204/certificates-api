@@ -73,7 +73,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findByName(String name) {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(TAG_NAME, name);
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, name);
 
         try {
             List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
@@ -97,7 +97,7 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(TAG_NAME, tag.getName());
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, tag.getName());
 
         try {
             namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);

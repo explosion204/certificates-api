@@ -2,10 +2,13 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.response.ResponseEntityFactory;
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.service.GiftCertificateService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -17,6 +20,12 @@ public class GiftCertificateController {
 
     public GiftCertificateController(GiftCertificateService certificateService) {
         this.certificateService = certificateService;
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getCertificates(GiftCertificateSearchParamsDto searchParamsDto) {
+        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto);
+        return ResponseEntityFactory.createResponseEntity(OK, certificates);
     }
 
     @GetMapping("/{id}")
