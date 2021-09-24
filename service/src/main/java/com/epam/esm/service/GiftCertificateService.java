@@ -128,14 +128,11 @@ public class GiftCertificateService {
 
     private void processTags(long certificateId, List<String> tagNames) {
         List<Tag> currentTags = tagRepository.findByCertificate(certificateId);
-
         // remove old tags
-        for (Tag tag : currentTags) {
-            certificateRepository.detachTag(certificateId, tag.getId());
-        }
+        currentTags.forEach(tag -> certificateRepository.detachTag(certificateId, tag.getId()));
 
         // tag validation
-        for (String tagName : tagNames) {
+        tagNames.forEach(tagName -> {
             List<ValidationError> validationErrors = tagValidator.validate(tagName);
 
             if (!validationErrors.isEmpty()) {
@@ -155,6 +152,6 @@ public class GiftCertificateService {
 
             // attach tags to certificate
             certificateRepository.attachTag(certificateId, tagId);
-        }
+        });
     }
 }
