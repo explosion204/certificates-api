@@ -1,7 +1,9 @@
 package com.epam.esm.service;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.*;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;

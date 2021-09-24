@@ -1,7 +1,6 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.RepositoryException;
 import com.epam.esm.repository.TagRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -63,64 +62,37 @@ public class TagRepositoryImpl implements TagRepository {
     public Optional<Tag> findById(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
 
-        try {
-            List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_ID, parameters, rowMapper);
-            return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("Caught an error trying to find tag by id = " + id, e);
-        }
+        List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_ID, parameters, rowMapper);
+        return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
     }
 
     @Override
     public Optional<Tag> findByName(String name) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, name);
 
-        try {
-            List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
-            return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("Caught an error trying to find tag by name = " + name, e);
-        }
+        List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
+        return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
     }
 
     @Override
     public List<Tag> findByCertificate(long certificateId) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(CERTIFICATE_ID, certificateId);
-
-        try {
-            return namedJdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE, parameters, rowMapper);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("Caught an error trying to find tags by certificate id = " + certificateId, e);
-        }
+        return namedJdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE, parameters, rowMapper);
     }
 
     @Override
     public long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME, tag.getName());
-
-        try {
-            namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to create tag (" + tag + ")", e);
-        }
-
-        if (keyHolder.getKey() == null) {
-            throw new RepositoryException("An error occurred trying to get generated key for tag: " + tag);
-        }
+        namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
 
         return keyHolder.getKey().longValue();
     }
 
     @Override
     public boolean delete(long id) {
-        SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(ID, id);
+        SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
 
-        try {
-            return namedJdbcTemplate.update(DELETE_TAG, parameters) > 0;
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to delete tag with id = " + id, e);
-        }
+        return namedJdbcTemplate.update(DELETE_TAG, parameters) > 0;
     }
 }

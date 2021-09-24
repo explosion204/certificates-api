@@ -1,6 +1,5 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.entity.Tag;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 

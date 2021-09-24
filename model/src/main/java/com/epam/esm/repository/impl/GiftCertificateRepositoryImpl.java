@@ -1,10 +1,8 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.RepositoryException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -104,23 +102,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(ORDER_BY_NAME, orderByName != null ? orderByName.name() : null)
                 .addValue(ORDER_BY_CREATE_DATE, orderByCreateDate != null ? orderByCreateDate.name() : null);
 
-        try {
-            return namedJdbcTemplate.query(SELECT_CERTIFICATES, parameters, rowMapper);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to query certificates", e);
-        }
+        return namedJdbcTemplate.query(SELECT_CERTIFICATES, parameters, rowMapper);
     }
 
     @Override
     public Optional<GiftCertificate> findById(long id) {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID, id);
-        try {
-            List<GiftCertificate> certificates = namedJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
-            // TODO: 9/17/2021 check use-case when id does not exist
-            return Optional.ofNullable(certificates.size() == 1 ? certificates.get(0) : null);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to find certificate by id = " + id, e);
-        }
+        List<GiftCertificate> certificates = namedJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameters, rowMapper);
+        // TODO: 9/17/2021 check use-case when id does not exist
+        return Optional.ofNullable(certificates.size() == 1 ? certificates.get(0) : null);
     }
 
     @Override
@@ -128,12 +118,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID, certificateId)
                 .addValue(TAG_ID, tagId);
-        try {
-            return namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters) > 0;
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to attach tag (id = " + tagId + ") to certificate " +
-                    "(id = " + tagId + ")", e);
-        }
+
+        return namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters) > 0;
     }
 
     @Override
@@ -141,12 +127,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID, certificateId)
                 .addValue(TAG_ID, tagId);
-        try {
-            return namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters) > 0;
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to detach tag (id = " + tagId + ") to certificate " +
-                    "(id = " + tagId + ")", e);
-        }
+
+        return namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters) > 0;
     }
 
     @Override
@@ -160,21 +142,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(CREATE_DATE, certificate.getCreateDate())
                 .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 
-        try {
-            namedJdbcTemplate.update(INSERT_CERTIFICATE, parameters, keyHolder);
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to create certificate (" + certificate + ")", e);
-        }
-
-        if (keyHolder.getKey() == null) {
-            throw new RepositoryException("An error occurred trying to get generated key for certificate: " + certificate);
-        }
+        namedJdbcTemplate.update(INSERT_CERTIFICATE, parameters, keyHolder);
 
         return keyHolder.getKey().longValue();
     }
 
     @Override
     public boolean update(GiftCertificate certificate) {
+        // TODO: 9/23/2021
         StringBuilder updateQuery = new StringBuilder("UPDATE gift_certificate SET ");
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, certificate.getId())
@@ -204,11 +179,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         updateQuery.append("last_update_date = :").append(LAST_UPDATE_DATE);
         updateQuery.append(" WHERE id = :").append(ID);
 
-        try {
-            return namedJdbcTemplate.update(updateQuery.toString(), parameters) > 0;
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to update certificate (" + certificate + ")", e);
-        }
+        return namedJdbcTemplate.update(updateQuery.toString(), parameters) > 0;
     }
 
     @Override
@@ -216,10 +187,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(ID, id);
 
-        try {
-            return namedJdbcTemplate.update(DELETE_CERTIFICATE, parameters) > 0;
-        } catch (DataAccessException e) {
-            throw new RepositoryException("An error occurred trying to delete certificate with id = " + id, e);
-        }
+        return namedJdbcTemplate.update(DELETE_CERTIFICATE, parameters) > 0;
     }
 }
