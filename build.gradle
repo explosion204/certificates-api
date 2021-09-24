@@ -7,7 +7,6 @@ allprojects {
 
     dependencies {
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
         implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
         implementation group: 'org.springframework', name: 'spring-context', version: springVersion
         implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
