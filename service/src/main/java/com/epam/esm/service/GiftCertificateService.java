@@ -72,13 +72,10 @@ public class GiftCertificateService {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
 
-        Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
-                = certificateValidator.validate(certificate, false);
-        boolean certificateValidationStatus = certificateValidationResult.getLeft();
-        EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
+        List<ValidationError> validationErrors = certificateValidator.validate(certificate, false);
 
-        if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
+        if (!validationErrors.isEmpty()) {
+            throw new InvalidEntityException(validationErrors, GiftCertificate.class);
         }
 
         ZonedDateTime createDate = Instant.now().atZone(UTC);
@@ -100,13 +97,10 @@ public class GiftCertificateService {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
 
-        Pair<Boolean, EnumSet<ValidationError>> certificateValidationResult
-                = certificateValidator.validate(certificate, true);
-        boolean certificateValidationStatus = certificateValidationResult.getLeft();
-        EnumSet<ValidationError> certificateValidationErrors = certificateValidationResult.getRight();
+        List<ValidationError> validationErrors = certificateValidator.validate(certificate, true);
 
-        if (!certificateValidationStatus) {
-            throw new InvalidEntityException(certificateValidationErrors, GiftCertificate.class);
+        if (!validationErrors.isEmpty()) {
+            throw new InvalidEntityException(validationErrors, GiftCertificate.class);
         }
 
         ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
@@ -144,12 +138,10 @@ public class GiftCertificateService {
 
         // tag validation
         for (String tagName : tagNames) {
-            Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tagName);
-            boolean tagValidationStatus = tagValidationResult.getLeft();
-            EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
+            List<ValidationError> validationErrors = tagValidator.validate(tagName);
 
-            if (!tagValidationStatus) {
-                throw new InvalidEntityException(tagValidationErrors, Tag.class);
+            if (!validationErrors.isEmpty()) {
+                throw new InvalidEntityException(validationErrors, Tag.class);
             }
 
             // if tag does not exist, create it in database

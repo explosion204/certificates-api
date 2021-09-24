@@ -3,17 +3,18 @@ package com.epam.esm.exception;
 import com.epam.esm.validator.ValidationError;
 
 import java.util.EnumSet;
+import java.util.List;
 
 public class InvalidEntityException extends RuntimeException {
-    private EnumSet<ValidationError> validationErrors;
+    private List<ValidationError> validationErrors;
     private Class<?> causeEntity;
 
-    public InvalidEntityException(EnumSet<ValidationError> validationErrors, Class<?> causeEntity) {
+    public InvalidEntityException(List<ValidationError> validationErrors, Class<?> causeEntity) {
         this.validationErrors = validationErrors;
         this.causeEntity = causeEntity;
     }
 
-    public EnumSet<ValidationError> getValidationErrors() {
+    public List<ValidationError> getValidationErrors() {
         return validationErrors;
     }
 

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumSet;
+import java.util.List;
 
 @Service
 public class TagService {
@@ -30,12 +31,10 @@ public class TagService {
 
     public long create(TagDto tagDto) {
         Tag tag = tagDto.toTag();
-        Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag.getName());
-        boolean tagValidationStatus = tagValidationResult.getLeft();
-        EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();
+        List<ValidationError> validationErrors = tagValidator.validate(tag.getName());
 
-        if (!tagValidationStatus) {
-            throw new InvalidEntityException(tagValidationErrors, Tag.class);
+        if (!validationErrors.isEmpty()) {
+            throw new InvalidEntityException(validationErrors, Tag.class);
         }
 
         String name = tag.getName();

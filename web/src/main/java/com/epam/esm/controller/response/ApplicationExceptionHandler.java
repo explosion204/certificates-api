@@ -36,10 +36,10 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     private static final String ENTITY_ALREADY_EXISTS_MESSAGE = "entity_already_exists";
     private static final String ENTITY_NOT_FOUND_MESSAGE = "entity_not_found";
     private static final String INVALID_ENTITY_MESSAGE = "invalid_entity";
-    private static final String INVALID_NAME = "invalid_entity.name";
-    private static final String INVALID_DESCRIPTION = "invalid_entity.description";
-    private static final String INVALID_PRICE = "invalid_entity.price";
-    private static final String INVALID_DURATION = "invalid_entity.duration";
+    private static final String INVALID_NAME_MESSAGE = "invalid_entity.name";
+    private static final String INVALID_DESCRIPTION_MESSAGE = "invalid_entity.description";
+    private static final String INVALID_PRICE_MESSAGE = "invalid_entity.price";
+    private static final String INVALID_DURATION_MESSAGE = "invalid_entity.duration";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "internal_server_error";
 
     private static final String ERROR_SEPARATOR = ", ";
@@ -92,10 +92,10 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         while (iterator.hasNext()) {
             ValidationError error = iterator.next();
             errorDetails.append(switch (error) {
-                case NAME -> getErrorMessage(INVALID_NAME);
-                case DESCRIPTION -> getErrorMessage(INVALID_DESCRIPTION);
-                case PRICE -> getErrorMessage(INVALID_PRICE);
-                case DURATION -> getErrorMessage(INVALID_DURATION);
+                case INVALID_NAME -> getErrorMessage(INVALID_NAME_MESSAGE);
+                case INVALID_DESCRIPTION -> getErrorMessage(INVALID_DESCRIPTION_MESSAGE);
+                case INVALID_PRICE -> getErrorMessage(INVALID_PRICE_MESSAGE);
+                case INVALID_DURATION -> getErrorMessage(INVALID_DURATION_MESSAGE);
             });
 
             if (iterator.hasNext()) {

@@ -1,5 +1,5 @@
 package com.epam.esm.validator;
 
 public enum ValidationError {
-    NAME, DESCRIPTION, PRICE, DURATION
+    INVALID_NAME, INVALID_DESCRIPTION, INVALID_PRICE, INVALID_DURATION
 }

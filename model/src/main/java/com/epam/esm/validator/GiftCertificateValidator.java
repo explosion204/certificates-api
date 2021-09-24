@@ -1,12 +1,12 @@
 package com.epam.esm.validator;
 
 import com.epam.esm.entity.GiftCertificate;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.epam.esm.validator.ValidationError.*;
@@ -18,8 +18,8 @@ public class GiftCertificateValidator {
     private static final int PRICE_MIN_VALUE = 0;
     private static final int DURATION_MIN_VALUE = 0;
 
-    public Pair<Boolean, EnumSet<ValidationError>> validate(GiftCertificate certificate, boolean nullValid) {
-        EnumSet<ValidationError> validationErrors = EnumSet.noneOf(ValidationError.class);
+    public List<ValidationError> validate(GiftCertificate certificate, boolean nullValid) {
+        List<ValidationError> validationErrors = new ArrayList<>();
         String name = certificate.getName();
         String description = certificate.getDescription();
         BigDecimal price = certificate.getPrice();
@@ -27,26 +27,26 @@ public class GiftCertificateValidator {
 
         boolean nameIsValid = nullValid && name == null || name != null && validateName(name);
         if (!nameIsValid) {
-            validationErrors.add(NAME);
+            validationErrors.add(INVALID_NAME);
         }
 
         boolean descriptionIsValid = nullValid && description == null || description != null
                 && validateDescription(description);
         if (!descriptionIsValid) {
-            validationErrors.add(DESCRIPTION);
+            validationErrors.add(INVALID_DESCRIPTION);
         }
 
         boolean priceIsValid = nullValid && price == null || price != null && validatePrice(price);
         if (!priceIsValid) {
-            validationErrors.add(PRICE);
+            validationErrors.add(INVALID_PRICE);
         }
 
         boolean durationIsValid = nullValid && duration == null || duration != null && validateDuration(duration);
         if (!durationIsValid) {
-            validationErrors.add(DURATION);
+            validationErrors.add(INVALID_DURATION);
         }
 
-        return Pair.of(nameIsValid && descriptionIsValid && priceIsValid && durationIsValid, validationErrors);
+        return validationErrors;
     }
 
     private boolean validateName(String name) {
