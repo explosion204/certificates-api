@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +22,6 @@ import static com.epam.esm.repository.TableColumn.*;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
-    private static final String UPDATE_DATA_SEPARATOR = ", ";
     private static final String TAG_NAME = "tag_name";
     private static final String CERTIFICATE_NAME = "certificate_name";
     private static final String ORDER_BY_NAME = "order_by_name";
@@ -67,6 +68,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String INSERT_CERTIFICATE = """
             INSERT INTO gift_certificate (name, description, price, duration, create_date, last_update_date)
             VALUES (:name, :description, :price, :duration, :create_date, :last_update_date);
+            """;
+
+    private static final String UPDATE_CERTIFICATE = """
+            UPDATE gift_certificate
+            SET name = :name, description = :description, price = :price, duration = :duration, 
+                last_update_date = :last_update_date
+            WHERE id = :id;
             """;
 
     private static final String DELETE_CERTIFICATE = """
@@ -149,37 +157,29 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public boolean update(GiftCertificate certificate) {
-        // TODO: 9/23/2021
-        StringBuilder updateQuery = new StringBuilder("UPDATE gift_certificate SET ");
-        MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(ID, certificate.getId())
-                .addValue(CREATE_DATE, certificate.getCreateDate())
-                .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
+        Optional<GiftCertificate> optionalCertificate = findById(certificate.getId());
 
-        if (certificate.getName() != null) {
-            updateQuery.append("name = :").append(NAME).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(NAME, certificate.getName());
+        if (optionalCertificate.isPresent()) {
+            GiftCertificate currentCertificate = optionalCertificate.get();
+
+            String name = certificate.getName();
+            String description = certificate.getDescription();
+            BigDecimal price = certificate.getPrice();
+            Duration duration = certificate.getDuration();
+
+            MapSqlParameterSource parameters = new MapSqlParameterSource()
+                    .addValue(ID, certificate.getId())
+                    .addValue(NAME, name != null ? name : currentCertificate.getName())
+                    .addValue(DESCRIPTION, description != null ? description : currentCertificate.getDescription())
+                    .addValue(PRICE, price != null ? price : currentCertificate.getPrice())
+                    .addValue(DURATION, duration != null ? duration : currentCertificate.getDuration())
+                    .addValue(CREATE_DATE, certificate.getCreateDate())
+                    .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
+
+            return namedJdbcTemplate.update(UPDATE_CERTIFICATE, parameters) > 0;
         }
 
-        if (certificate.getDescription() != null) {
-            updateQuery.append("description = :").append(DESCRIPTION).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(DESCRIPTION, certificate.getDescription());
-        }
-
-        if (certificate.getPrice() != null) {
-            updateQuery.append("price = :").append(PRICE).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(PRICE, certificate.getPrice());
-        }
-
-        if (certificate.getDuration() != null) {
-            updateQuery.append("duration = :").append(DURATION).append(UPDATE_DATA_SEPARATOR);
-            parameters.addValue(DURATION, certificate.getDuration().toDays());
-        }
-
-        updateQuery.append("last_update_date = :").append(LAST_UPDATE_DATE);
-        updateQuery.append(" WHERE id = :").append(ID);
-
-        return namedJdbcTemplate.update(updateQuery.toString(), parameters) > 0;
+        return false;
     }
 
     @Override
