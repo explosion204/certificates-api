@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -22,11 +23,13 @@ public class TagService {
         this.tagValidator = tagValidator;
     }
 
-    public Tag findById(long id) {
-        return tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+    public TagDto findById(long id) {
+        Tag tag = tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        return TagDto.fromTag(tag);
     }
 
-    public long create(Tag tag) {
+    public long create(TagDto tagDto) {
+        Tag tag = tagDto.toTag();
         Pair<Boolean, EnumSet<ValidationError>> tagValidationResult = tagValidator.validate(tag.getName());
         boolean tagValidationStatus = tagValidationResult.getLeft();
         EnumSet<ValidationError> tagValidationErrors = tagValidationResult.getRight();

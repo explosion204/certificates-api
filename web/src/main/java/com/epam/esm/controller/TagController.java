@@ -1,7 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.controller.response.ResponseEntityFactory;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +20,13 @@ public class TagController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTag(@PathVariable("id") long id) {
-        Tag tag = tagService.findById(id);
-        return ResponseEntityFactory.createResponseEntity(OK, tag);
+        TagDto tagDto = tagService.findById(id);
+        return ResponseEntityFactory.createResponseEntity(OK, tagDto);
     }
 
     @PostMapping
-    public ResponseEntity<Object> createTag(@RequestBody Tag tag) {
-        long id = tagService.create(tag);
+    public ResponseEntity<Object> createTag(@RequestBody TagDto tagDto) {
+        long id = tagService.create(tagDto);
         return ResponseEntityFactory.createResponseEntity(CREATED, id);
     }
 
