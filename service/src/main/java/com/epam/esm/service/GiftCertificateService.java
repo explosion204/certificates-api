@@ -89,7 +89,7 @@ public class GiftCertificateService {
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
-            processTags(certificate.getId(), tagNames);
+            processTags(certificateId, tagNames);
         }
 
         return certificateId;

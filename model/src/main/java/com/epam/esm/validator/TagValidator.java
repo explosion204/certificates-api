@@ -14,13 +14,13 @@ public class TagValidator {
 
     public Pair<Boolean, EnumSet<ValidationError>> validate(String tagName) {
         EnumSet<ValidationError> validationErrors = EnumSet.noneOf(ValidationError.class);
-        boolean validationResult = tagName != null && Pattern.matches(NAME_REGEX, tagName);
+        boolean nameIsValid = tagName != null && Pattern.matches(NAME_REGEX, tagName);
 
-        if (!validationResult) {
+        if (!nameIsValid) {
             validationErrors.add(NAME);
         }
 
-        return Pair.of(validationResult, validationErrors);
+        return Pair.of(nameIsValid, validationErrors);
     }
 
 

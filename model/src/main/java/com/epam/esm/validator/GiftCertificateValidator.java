@@ -13,8 +13,8 @@ import static com.epam.esm.validator.ValidationError.*;
 
 @Component
 public class GiftCertificateValidator {
-    private static final String NAME_REGEX = "^[\\w\\s,.]{3,50}$";
-    private static final String DESCRIPTION_REGEX = "^[\\w\\s,.]{10,100}$";
+    private static final String NAME_REGEX = "^[\\p{Alnum}\\s,.]{3,50}$";
+    private static final String DESCRIPTION_REGEX = "^[\\p{Alnum}\\s,.]{10,100}$";
     private static final int PRICE_MIN_VALUE = 0;
     private static final int DURATION_MIN_VALUE = 0;
 
@@ -25,27 +25,28 @@ public class GiftCertificateValidator {
         BigDecimal price = certificate.getPrice();
         Duration duration = certificate.getDuration();
 
-        boolean validationResult = nullValid && name == null || name != null && validateName(name);
-        if (!validationResult) {
+        boolean nameIsValid = nullValid && name == null || name != null && validateName(name);
+        if (!nameIsValid) {
             validationErrors.add(NAME);
         }
 
-        validationResult &= nullValid && description == null || description != null && validateDescription(description);
-        if (!validationResult) {
+        boolean descriptionIsValid = nullValid && description == null || description != null
+                && validateDescription(description);
+        if (!descriptionIsValid) {
             validationErrors.add(DESCRIPTION);
         }
 
-        validationResult &= nullValid && price == null || price != null && validatePrice(price);
-        if (!validationResult) {
+        boolean priceIsValid = nullValid && price == null || price != null && validatePrice(price);
+        if (!priceIsValid) {
             validationErrors.add(PRICE);
         }
 
-        validationResult &= nullValid && duration == null || duration != null && validateDuration(duration);
-        if (!validationResult) {
+        boolean durationIsValid = nullValid && duration == null || duration != null && validateDuration(duration);
+        if (!durationIsValid) {
             validationErrors.add(DURATION);
         }
 
-        return Pair.of(validationResult, validationErrors);
+        return Pair.of(nameIsValid && descriptionIsValid && priceIsValid && durationIsValid, validationErrors);
     }
 
     private boolean validateName(String name) {

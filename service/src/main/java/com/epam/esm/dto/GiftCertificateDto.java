@@ -1,8 +1,12 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.dto.mapping.DayDurationDeserializer;
+import com.epam.esm.dto.mapping.DayDurationSerializer;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +22,10 @@ public class GiftCertificateDto {
     private String name;
     private String description;
     private BigDecimal price;
-    private long duration;
+
+    @JsonSerialize(using = DayDurationSerializer.class)
+    @JsonDeserialize(using = DayDurationDeserializer.class)
+    private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX", timezone = "UTC")
     private ZonedDateTime createDate;
@@ -35,7 +42,7 @@ public class GiftCertificateDto {
         certificate.setName(name);
         certificate.setDescription(description);
         certificate.setPrice(price);
-        certificate.setDuration(Duration.ofDays(duration));
+        certificate.setDuration(duration);
 
         return certificate;
     }
@@ -47,7 +54,7 @@ public class GiftCertificateDto {
         certificateDto.setName(certificate.getName());
         certificateDto.setDescription(certificate.getDescription());
         certificateDto.setPrice(certificate.getPrice());
-        certificateDto.setDuration(certificate.getDuration().toDays());
+        certificateDto.setDuration(certificate.getDuration());
         certificateDto.setCreateDate(certificate.getCreateDate());
         certificateDto.setLastUpdateDate(certificate.getLastUpdateDate());
 

@@ -27,8 +27,16 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String ORDER_BY_NAME = "order_by_name";
     private static final String ORDER_BY_CREATE_DATE = "order_by_create_date";
 
+    private static final String BASE_SELECT_CERTIFICATES = """
+            SELECT DISTINCT gc.id, gc.name, description, price, duration, create_date, last_update_date
+            FROM gift_certificate AS gc
+            LEFT OUTER JOIN certificate_tag AS ct
+            ON ct.id_certificate = gc.id
+            LEFT OUTER JOIN tag
+            ON ct.id_tag = tag.id;
+            """;
     private static final String SELECT_CERTIFICATES = """
-            SELECT gc.id, gc.name, description, price, duration, create_date, last_update_date
+            SELECT DISTINCT gc.id, gc.name, description, price, duration, create_date, last_update_date
             FROM gift_certificate AS gc
             LEFT OUTER JOIN certificate_tag AS ct
             ON ct.id_certificate = gc.id
@@ -111,6 +119,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .addValue(ORDER_BY_CREATE_DATE, orderByCreateDate != null ? orderByCreateDate.name() : null);
 
         return namedJdbcTemplate.query(SELECT_CERTIFICATES, parameters, rowMapper);
+//        StringBuilder selectQuery = new StringBuilder(BASE_SELECT_CERTIFICATES);
+//        SqlParameterSource parameters = new MapSqlParameterSource();
+//        boolean hasWhereCondition = false;
+//
+//        if (hasWhereCondition = (tagName != null)) {
+//            selectQuery.append(" id = :").append(TAG_NAME).
+//        }
     }
 
     @Override
@@ -172,7 +187,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                     .addValue(NAME, name != null ? name : currentCertificate.getName())
                     .addValue(DESCRIPTION, description != null ? description : currentCertificate.getDescription())
                     .addValue(PRICE, price != null ? price : currentCertificate.getPrice())
-                    .addValue(DURATION, duration != null ? duration : currentCertificate.getDuration())
+                    .addValue(DURATION, duration != null ? duration : currentCertificate.getDuration().toDays())
                     .addValue(CREATE_DATE, certificate.getCreateDate())
                     .addValue(LAST_UPDATE_DATE, certificate.getLastUpdateDate());
 

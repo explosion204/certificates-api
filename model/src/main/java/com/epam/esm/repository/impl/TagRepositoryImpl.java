@@ -28,7 +28,7 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String SELECT_TAG_BY_NAME = """
             SELECT id, name
             FROM tag
-            WHERE name = :tag_name;
+            WHERE name = :name;
             """;
 
     private static final String SELECT_TAGS_BY_CERTIFICATE = """
@@ -41,7 +41,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     private static final String INSERT_TAG = """
             INSERT INTO tag (name)
-            VALUES (:tag_name);
+            VALUES (:name);
             """;
 
     private static final String DELETE_TAG = """
