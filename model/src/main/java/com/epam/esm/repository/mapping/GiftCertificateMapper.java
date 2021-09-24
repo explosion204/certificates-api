@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 
-import static com.epam.esm.repository.TableColumn.*;
+import static com.epam.esm.repository.mapping.TableColumn.*;
 import static java.time.ZoneOffset.UTC;
 
 @Component
@@ -18,12 +18,12 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         GiftCertificate certificate = new GiftCertificate();
 
         certificate.setId(resultSet.getLong(ID));
-        certificate.setName(resultSet.getString(NAME));
-        certificate.setDescription(resultSet.getString(DESCRIPTION));
-        certificate.setPrice(resultSet.getBigDecimal(PRICE));
-        certificate.setDuration(Duration.ofDays(resultSet.getInt(DURATION)));
-        certificate.setCreateDate(resultSet.getTimestamp(CREATE_DATE).toInstant().atZone(UTC));
-        certificate.setLastUpdateDate(resultSet.getTimestamp(LAST_UPDATE_DATE).toInstant().atZone(UTC));
+        certificate.setName(resultSet.getString(CERTIFICATE_NAME));
+        certificate.setDescription(resultSet.getString(CERTIFICATE_DESCRIPTION));
+        certificate.setPrice(resultSet.getBigDecimal(CERTIFICATE_PRICE));
+        certificate.setDuration(Duration.ofDays(resultSet.getInt(CERTIFICATE_DURATION)));
+        certificate.setCreateDate(resultSet.getTimestamp(CERTIFICATE_CREATE_DATE).toInstant().atZone(UTC));
+        certificate.setLastUpdateDate(resultSet.getTimestamp(CERTIFICATE_LAST_UPDATE_DATE).toInstant().atZone(UTC));
 
         return certificate;
     }

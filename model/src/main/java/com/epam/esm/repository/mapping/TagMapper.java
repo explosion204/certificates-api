@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.epam.esm.repository.TableColumn.ID;
-import static com.epam.esm.repository.TableColumn.NAME;
+import static com.epam.esm.repository.mapping.TableColumn.*;
 
 @Component
 public class TagMapper implements RowMapper<Tag> {
@@ -17,7 +16,7 @@ public class TagMapper implements RowMapper<Tag> {
         Tag tag = new Tag();
 
         tag.setId(resultSet.getLong(ID));
-        tag.setName(resultSet.getString(NAME));
+        tag.setName(resultSet.getString(TAG_NAME));
 
         return tag;
     }
