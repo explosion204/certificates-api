@@ -12,13 +12,11 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 

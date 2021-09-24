@@ -6,6 +6,8 @@ import com.epam.esm.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -16,6 +18,12 @@ public class TagController {
 
     public TagController(TagService tagService) {
         this.tagService = tagService;
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getTags() {
+        List<TagDto> tags = tagService.findAll();
+        return ResponseEntityFactory.createResponseEntity(OK, tags);
     }
 
     @GetMapping("/{id}")

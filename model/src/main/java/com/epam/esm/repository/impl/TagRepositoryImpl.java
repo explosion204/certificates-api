@@ -21,6 +21,10 @@ public class TagRepositoryImpl implements TagRepository {
     private static final String NAME_PARAM = "name";
     private static final String CERTIFICATE_ID_PARAM = "certificate_id";
 
+    private static final String SELECT_ALL_TAGS = """
+            SELECT id, name
+            FROM tag;
+            """;
 
     private static final String SELECT_TAG_BY_ID = """
             SELECT id, name
@@ -58,6 +62,11 @@ public class TagRepositoryImpl implements TagRepository {
     public TagRepositoryImpl(DataSource dataSource, RowMapper<Tag> rowMapper) {
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.rowMapper = rowMapper;
+    }
+
+    @Override
+    public List<Tag> findAll() {
+        return namedJdbcTemplate.query(SELECT_ALL_TAGS, rowMapper);
     }
 
     @Override

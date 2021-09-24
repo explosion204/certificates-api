@@ -8,10 +8,8 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -22,6 +20,13 @@ public class TagService {
     public TagService(TagRepository tagRepository, TagValidator tagValidator) {
         this.tagRepository = tagRepository;
         this.tagValidator = tagValidator;
+    }
+
+    public List<TagDto> findAll() {
+        return tagRepository.findAll()
+                .stream()
+                .map(TagDto::fromTag)
+                .toList();
     }
 
     public TagDto findById(long id) {
