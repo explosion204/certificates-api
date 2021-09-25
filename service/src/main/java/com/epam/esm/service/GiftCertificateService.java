@@ -92,9 +92,32 @@ public class GiftCertificateService {
 
     @Transactional
     public GiftCertificateDto update(GiftCertificateDto certificateDto) {
-        GiftCertificate certificate = certificateDto.toCertificate();
-        List<String> tagNames = certificateDto.getTags();
+        long certificateId = certificateDto.getId();
+        Optional<GiftCertificate> optionalCertificate = certificateRepository.findById(certificateId);
 
+        if (optionalCertificate.isEmpty()) {
+            throw new EntityNotFoundException(certificateId);
+        }
+
+        GiftCertificate certificate = optionalCertificate.get();
+
+        if (certificateDto.getName() != null) {
+            certificate.setName(certificateDto.getName());
+        }
+
+        if (certificateDto.getDescription() != null) {
+            certificate.setDescription(certificateDto.getDescription());
+        }
+
+        if (certificateDto.getDuration() != null) {
+            certificate.setDuration(certificateDto.getDuration());
+        }
+
+        if (certificateDto.getPrice() != null) {
+            certificate.setPrice(certificateDto.getPrice());
+        }
+
+        List<String> tagNames = certificateDto.getTags();
         List<ValidationError> validationErrors = certificateValidator.validate(certificate, true);
 
         if (!validationErrors.isEmpty()) {

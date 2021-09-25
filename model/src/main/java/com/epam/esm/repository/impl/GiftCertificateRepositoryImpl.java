@@ -13,8 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
-import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,29 +163,16 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public boolean update(GiftCertificate certificate) {
-        Optional<GiftCertificate> optionalCertificate = findById(certificate.getId());
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(ID_PARAM, certificate.getId())
+                .addValue(NAME_PARAM, certificate.getName())
+                .addValue(DESCRIPTION_PARAM, certificate.getDescription())
+                .addValue(PRICE_PARAM, certificate.getPrice())
+                .addValue(DURATION_PARAM, certificate.getDuration().toDays())
+                .addValue(CREATE_DATE_PARAM, certificate.getCreateDate())
+                .addValue(LAST_UPDATE_DATE_PARAM, certificate.getLastUpdateDate());
 
-        if (optionalCertificate.isPresent()) {
-            GiftCertificate currentCertificate = optionalCertificate.get();
-
-            String name = certificate.getName();
-            String description = certificate.getDescription();
-            BigDecimal price = certificate.getPrice();
-            Duration duration = certificate.getDuration();
-
-            MapSqlParameterSource parameters = new MapSqlParameterSource()
-                    .addValue(ID_PARAM, certificate.getId())
-                    .addValue(NAME_PARAM, name != null ? name : currentCertificate.getName())
-                    .addValue(DESCRIPTION_PARAM, description != null ? description : currentCertificate.getDescription())
-                    .addValue(PRICE_PARAM, price != null ? price : currentCertificate.getPrice())
-                    .addValue(DURATION_PARAM, duration != null ? duration : currentCertificate.getDuration().toDays())
-                    .addValue(CREATE_DATE_PARAM, certificate.getCreateDate())
-                    .addValue(LAST_UPDATE_DATE_PARAM, certificate.getLastUpdateDate());
-
-            return namedJdbcTemplate.update(UPDATE_CERTIFICATE, parameters) > 0;
-        }
-
-        return false;
+        return namedJdbcTemplate.update(UPDATE_CERTIFICATE, parameters) > 0;
     }
 
     @Override
