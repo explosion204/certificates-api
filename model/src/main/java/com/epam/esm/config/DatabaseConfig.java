@@ -3,11 +3,15 @@ package com.epam.esm.config;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("com.epam.esm")
+@EnableTransactionManagement
 @PropertySource("classpath:db-${spring.profiles.active}.properties")
 public class DatabaseConfig {
     @Value("${db.driver}")
@@ -39,5 +43,10 @@ public class DatabaseConfig {
         dataSource.setMaxTotal(maxPoolSize);
 
         return dataSource;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 }
