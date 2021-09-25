@@ -10,22 +10,22 @@ import javax.sql.DataSource;
 @ComponentScan("com.epam.esm")
 @PropertySource("classpath:db-${spring.profiles.active}.properties")
 public class DatabaseConfig {
-    @Value("${driver}")
+    @Value("${db.driver}")
     private String driverName;
 
-    @Value("${dev.url}")
+    @Value("${db.url}")
     private String url;
 
-    @Value("${dev.username}")
+    @Value("${db.username}")
     private String username;
 
-    @Value("${dev.password}")
+    @Value("${db.password}")
     private String password;
 
-    @Value("${pool.min}")
+    @Value("${db.pool.min}")
     private int minPoolSize;
 
-    @Value("${pool.max}")
+    @Value("${db.pool.max}")
     private int maxPoolSize;
 
     @Bean
