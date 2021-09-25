@@ -9,8 +9,8 @@ public interface GiftCertificateRepository {
     List<GiftCertificate> find(String tagName, String certificateName, String certificateDescription,
             OrderingType orderByName, OrderingType orderByCreateDate);
     Optional<GiftCertificate> findById(long id);
-    boolean attachTag(long certificateId, long tagId);
-    boolean detachTag(long certificateId, long tagId);
+    void attachTag(long certificateId, long tagId);
+    void detachTag(long certificateId, long tagId);
 
     long create(GiftCertificate certificate);
     boolean update(GiftCertificate certificate);

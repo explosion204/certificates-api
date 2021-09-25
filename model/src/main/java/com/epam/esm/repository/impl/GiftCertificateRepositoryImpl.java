@@ -130,21 +130,21 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public boolean attachTag(long certificateId, long tagId) {
+    public void attachTag(long certificateId, long tagId) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID_PARAM, certificateId)
                 .addValue(TAG_ID_PARAM, tagId);
 
-        return namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters) > 0;
+        namedJdbcTemplate.update(INSERT_CERTIFICATE_TAG_RELATION, parameters);
     }
 
     @Override
-    public boolean detachTag(long certificateId, long tagId) {
+    public void detachTag(long certificateId, long tagId) {
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(CERTIFICATE_ID_PARAM, certificateId)
                 .addValue(TAG_ID_PARAM, tagId);
 
-        return namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters) > 0;
+        namedJdbcTemplate.update(DELETE_CERTIFICATE_TAG_RELATION, parameters);
     }
 
     @Override
