@@ -10,7 +10,7 @@ import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 
 @Component
 public class TagValidator {
-    private static final String NAME_REGEX = "^\\p{Alnum}{3,50}$";
+    private static final String NAME_REGEX = "^\\p{LD}{3,50}$";
 
     public List<ValidationError> validate(String tagName) {
         List<ValidationError> validationErrors = new ArrayList<>();

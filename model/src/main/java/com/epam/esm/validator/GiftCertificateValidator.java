@@ -13,8 +13,8 @@ import static com.epam.esm.validator.ValidationError.*;
 
 @Component
 public class GiftCertificateValidator {
-    private static final String NAME_REGEX = "^[\\p{Alnum}\\s,.]{3,50}$";
-    private static final String DESCRIPTION_REGEX = "^[\\p{Alnum}\\s,.]{10,100}$";
+    private static final String NAME_REGEX = "^[\\p{LD}\\s,.]{3,50}$";
+    private static final String DESCRIPTION_REGEX = "^[\\p{LD}\\s,.]{10,100}$";
     private static final int PRICE_MIN_VALUE = 0;
     private static final int DURATION_MIN_VALUE = 0;
 
