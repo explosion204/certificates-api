@@ -1,6 +1,6 @@
 package com.epam.esm.config;
 
-import com.epam.esm.controller.converter.StringToSortingTypeConverter;
+import com.epam.esm.controller.converter.StringToOrderingTypeConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +29,6 @@ public class ApplicationConfig extends AcceptHeaderLocaleResolver implements Web
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToSortingTypeConverter());
+        registry.addConverter(new StringToOrderingTypeConverter());
     }
 }
