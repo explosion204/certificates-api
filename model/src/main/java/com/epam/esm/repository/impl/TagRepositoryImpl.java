@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -97,7 +98,8 @@ public class TagRepositoryImpl implements TagRepository {
         SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME_PARAM, tag.getName());
         namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        Number generatedKey = Objects.requireNonNull(keyHolder).getKey();
+        return Objects.requireNonNull(generatedKey).longValue();
     }
 
     @Override

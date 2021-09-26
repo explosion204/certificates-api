@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -158,7 +159,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
         namedJdbcTemplate.update(INSERT_CERTIFICATE, parameters, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        Number generatedKey = Objects.requireNonNull(keyHolder).getKey();
+        return Objects.requireNonNull(generatedKey).longValue();
     }
 
     @Override
