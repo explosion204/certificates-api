@@ -22,6 +22,11 @@ import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
 
+/**
+ * This service class encapsulated business logic related to {@link GiftCertificate} entity.
+ *
+ * @author Dmitry Karnyshov
+ */
 @Service
 public class GiftCertificateService {
     private GiftCertificateRepository certificateRepository;
@@ -41,6 +46,13 @@ public class GiftCertificateService {
         this.tagValidator = tagValidator;
     }
 
+    /**
+     * Retrieve certificates according to specified parameters encapsulated in DTO object.
+     * All parameters are optional, so if they are not present, all certificates will be retrieved.
+     *
+     * @param searchParamsDto {@link GiftCertificateSearchParamsDto} object with specified search parameters
+     * @return list of {@link GiftCertificateDto}
+     */
     public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto) {
         String tagName = searchParamsDto.getTagName();
         String certificateName = searchParamsDto.getCertificateName();
@@ -58,6 +70,13 @@ public class GiftCertificateService {
         }).toList();
     }
 
+    /**
+     * Retrieve certificate by its unique id.
+     *
+     * @param id certificate id
+     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @return {@link GiftCertificateDto} object
+     */
     public GiftCertificateDto findById(long id) {
         GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(id));
@@ -65,6 +84,13 @@ public class GiftCertificateService {
         return GiftCertificateDto.fromCertificate(certificate, tags);
     }
 
+    /**
+     * Create a new certificate.
+     *
+     * @param certificateDto {@link GiftCertificateDto} instance
+     * @throws InvalidEntityException in case when passed DTO object contains invalid data
+     * @return unique id of the saved {@link GiftCertificate}
+     */
     @Transactional
     public long create(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
@@ -90,6 +116,14 @@ public class GiftCertificateService {
         return certificateId;
     }
 
+    /**
+     * Update an existing certificate.
+     *
+     * @param certificateDto {@link GiftCertificateDto} instance
+     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @throws InvalidEntityException in case when passed DTO object contains invalid data
+     * @return updated {@link GiftCertificateDto} object
+     */
     @Transactional
     public GiftCertificateDto update(GiftCertificateDto certificateDto) {
         long certificateId = certificateDto.getId();
@@ -129,6 +163,7 @@ public class GiftCertificateService {
 
         boolean certificateExists = certificateRepository.update(certificate);
 
+        // TODO: 9/26/2021
         if (!certificateExists) {
             throw new EntityNotFoundException(certificate.getId());
         }
@@ -141,6 +176,12 @@ public class GiftCertificateService {
         return findById(certificate.getId());
     }
 
+    /**
+     * Delete an existing certificate.
+     *
+     * @param id certificate id
+     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     */
     public void delete(long id) {
         boolean certificateExists = certificateRepository.delete(id);
 
