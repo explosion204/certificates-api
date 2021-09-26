@@ -44,7 +44,7 @@ public class TagService {
 
         String name = tag.getName();
         if (tagRepository.findByName(name).isPresent()) {
-            throw new EntityAlreadyExistsException(tag);
+            throw new EntityAlreadyExistsException();
         }
 
         return tagRepository.create(tag);

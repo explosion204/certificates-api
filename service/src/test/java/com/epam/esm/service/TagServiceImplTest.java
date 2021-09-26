@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,7 +50,7 @@ class TagServiceImplTest {
         List<TagDto> expectedDtoList = provideTagDtoList();
         List<TagDto> actualDtoList = tagService.findAll();
 
-        Assertions.assertEquals(expectedDtoList, actualDtoList);
+        assertEquals(expectedDtoList, actualDtoList);
     }
 
     @Test
@@ -59,7 +61,7 @@ class TagServiceImplTest {
         TagDto expectedDto = provideTagDto();
         TagDto actualDto = tagService.findById(tagId);
 
-        Assertions.assertEquals(expectedDto, actualDto);
+        assertEquals(expectedDto, actualDto);
     }
 
     @Test
@@ -67,7 +69,7 @@ class TagServiceImplTest {
         when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         int tagId = 1;
-        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.findById(tagId));
+        assertThrows(EntityNotFoundException.class, () -> tagService.findById(tagId));
     }
 
     @Test
@@ -89,7 +91,7 @@ class TagServiceImplTest {
         TagDto tagDto = provideTagDto();
         tagDto.setName("");
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> tagService.create(tagDto));
+        assertThrows(InvalidEntityException.class, () -> tagService.create(tagDto));
     }
 
     @Test
@@ -97,7 +99,7 @@ class TagServiceImplTest {
         TagDto tagDto = provideTagDto();
 
         when(tagRepository.findByName(anyString())).thenReturn(Optional.of(provideTag()));
-        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> tagService.create(tagDto));
+        assertThrows(EntityAlreadyExistsException.class, () -> tagService.create(tagDto));
 
         int expectedInteractions = 1;
         verify(tagValidator, times(expectedInteractions)).validate(anyString());
@@ -119,7 +121,7 @@ class TagServiceImplTest {
         when(tagRepository.delete(anyLong())).thenReturn(false);
 
         int tagId = 1;
-        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.delete(tagId));
+        assertThrows(EntityNotFoundException.class, () -> tagService.delete(tagId));
 
         int expectedInteractions = 1;
         verify(tagRepository, times(expectedInteractions)).delete(anyLong());

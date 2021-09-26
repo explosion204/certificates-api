@@ -11,6 +11,10 @@ public class ResponseEntityFactory {
     private static final String DATA = "data";
     private static final String ERROR_MESSAGE = "errorMessage";
 
+    private ResponseEntityFactory() {
+
+    }
+
     public static ResponseEntity<Object> createResponseEntity(HttpStatus status, Object data) {
         Map<String, Object> body = new HashMap<>();
         body.put(STATUS, status.value());

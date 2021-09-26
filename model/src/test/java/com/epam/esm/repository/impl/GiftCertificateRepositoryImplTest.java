@@ -125,7 +125,7 @@ class GiftCertificateRepositoryImplTest {
         certificateRepository.attachTag(2, 2);
         List<Tag> tags = tagRepository.findByCertificate(2);
 
-        assertEquals(tags.size(), 1);
+        assertEquals(1, tags.size());
     }
 
     @Test

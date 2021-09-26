@@ -27,7 +27,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger applicationLogger = LogManager.getLogger();
 
     private static final String METHOD_NOT_ALLOWED_MESSAGE = "method_not_allowed";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
@@ -111,7 +111,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleDefault(Exception e) {
-        logger.error("Uncaught exception", e);
+        applicationLogger.error("Uncaught exception", e);
         return ResponseEntityFactory.createResponseEntity(INTERNAL_SERVER_ERROR,
                 getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE));
     }

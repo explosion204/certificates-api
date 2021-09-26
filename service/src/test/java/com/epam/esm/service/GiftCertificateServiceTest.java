@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -76,7 +78,7 @@ class GiftCertificateServiceTest {
         verify(certificateRepository, times(expectedInteractions)).find(anyString(), anyString(), anyString(),
                 any(OrderingType.class), any(OrderingType.class));
 
-        Assertions.assertEquals(certificateDtoList, actualDtoList);
+        assertEquals(certificateDtoList, actualDtoList);
     }
 
     @Test
@@ -97,7 +99,7 @@ class GiftCertificateServiceTest {
         verify(certificateRepository, times(expectedInteractions)).findById(anyLong());
         verify(tagRepository, times(expectedInteractions)).findByCertificate(anyLong());
 
-        Assertions.assertEquals(expectedCertificateDto, actualCertificateDto);
+        assertEquals(expectedCertificateDto, actualCertificateDto);
     }
 
     @Test
@@ -105,7 +107,7 @@ class GiftCertificateServiceTest {
         int certificateId = 1;
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.findById(certificateId));
+        assertThrows(EntityNotFoundException.class, () -> certificateService.findById(certificateId));
     }
 
     @Test
@@ -124,7 +126,7 @@ class GiftCertificateServiceTest {
         GiftCertificateDto certificateDto = provideCertificateDto();
         certificateDto.setName(null);
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.create(certificateDto));
+        assertThrows(InvalidEntityException.class, () -> certificateService.create(certificateDto));
     }
 
     @Test
@@ -157,7 +159,7 @@ class GiftCertificateServiceTest {
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
 
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.update(updatedCertificateDto));
+        assertThrows(EntityNotFoundException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
@@ -168,7 +170,7 @@ class GiftCertificateServiceTest {
 
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
+        assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
@@ -180,7 +182,7 @@ class GiftCertificateServiceTest {
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
         when(certificateRepository.update(any(GiftCertificate.class))).thenReturn(true);
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
+        assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
@@ -199,7 +201,7 @@ class GiftCertificateServiceTest {
         when(certificateRepository.delete(anyLong())).thenReturn(false);
 
         int certificateId = 1;
-        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.delete(certificateId));
+        assertThrows(EntityNotFoundException.class, () -> certificateService.delete(certificateId));
 
         int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).delete(anyLong());
