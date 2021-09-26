@@ -21,12 +21,6 @@ class TableColumn {
      * */
     static final String TAG_NAME = "name";
 
-    /**
-     * TABLE certificate_tag
-     * */
-    static final String CERTIFICATE_ID = "id_certificate";
-    static final String TAG_ID = "id_tag";
-
     private TableColumn() {
 
     }
