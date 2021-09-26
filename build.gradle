@@ -21,7 +21,6 @@ allprojects {
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
-        testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
     }
 
     test {
