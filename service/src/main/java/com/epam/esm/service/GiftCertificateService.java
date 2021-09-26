@@ -160,13 +160,7 @@ public class GiftCertificateService {
 
         ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
         certificate.setLastUpdateDate(lastUpdateDate);
-
-        boolean certificateExists = certificateRepository.update(certificate);
-
-        // TODO: 9/26/2021
-        if (!certificateExists) {
-            throw new EntityNotFoundException(certificate.getId());
-        }
+        certificateRepository.update(certificate);
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
