@@ -25,23 +25,23 @@ public class GiftCertificateValidator {
         BigDecimal price = certificate.getPrice();
         Duration duration = certificate.getDuration();
 
-        boolean nameIsValid = nullValid && name == null || name != null && validateName(name);
+        boolean nameIsValid = (nullValid && name == null) || (name != null && validateName(name));
         if (!nameIsValid) {
             validationErrors.add(INVALID_NAME);
         }
 
-        boolean descriptionIsValid = nullValid && description == null || description != null
-                && validateDescription(description);
+        boolean descriptionIsValid = (nullValid && description == null) || (description != null
+                && validateDescription(description));
         if (!descriptionIsValid) {
             validationErrors.add(INVALID_DESCRIPTION);
         }
 
-        boolean priceIsValid = nullValid && price == null || price != null && validatePrice(price);
+        boolean priceIsValid = (nullValid && price == null) || (price != null && validatePrice(price));
         if (!priceIsValid) {
             validationErrors.add(INVALID_PRICE);
         }
 
-        boolean durationIsValid = nullValid && duration == null || duration != null && validateDuration(duration);
+        boolean durationIsValid = (nullValid && duration == null) || (duration != null && validateDuration(duration));
         if (!durationIsValid) {
             validationErrors.add(INVALID_DURATION);
         }
