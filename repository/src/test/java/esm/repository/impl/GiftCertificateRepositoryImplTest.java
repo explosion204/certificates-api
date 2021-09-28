@@ -1,6 +1,6 @@
-package com.epam.esm.repository.impl;
+package esm.repository.impl;
 
-import com.epam.esm.TestProfileResolver;
+import esm.TestProfileResolver;
 import com.epam.esm.config.DatabaseConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
