@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.response.ResponseEntityFactory;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
@@ -8,11 +7,12 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.GiftCertificateService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -25,6 +25,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/certificates")
 public class GiftCertificateController {
+    private static final String ENTITY_ID = "entityId";
     private GiftCertificateService certificateService;
 
     public GiftCertificateController(GiftCertificateService certificateService) {
@@ -35,14 +36,14 @@ public class GiftCertificateController {
      * Retrieve certificates according to specified parameters.
      * All parameters are optional, so if they are not present, all certificates will be retrieved.
      *
-     * @param searchParamsDto {@link GiftCertificateDto} instance
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and list of {@link GiftCertificateDto}
+     * @param searchParamsDto {@link GiftCertificateSearchParamsDto} instance
+     * @return JSON {@link ResponseEntity} object that contains list of {@link GiftCertificateDto}
      */
     @GetMapping
-    public ResponseEntity<Object> getCertificates(GiftCertificateSearchParamsDto searchParamsDto) {
+    public ResponseEntity<List<GiftCertificateDto>> getCertificates(
+                @RequestParam GiftCertificateSearchParamsDto searchParamsDto) {
         List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto);
-        return ResponseEntityFactory.createResponseEntity(OK, certificates);
+        return new ResponseEntity<>(certificates, OK);
     }
 
     /**
@@ -50,13 +51,12 @@ public class GiftCertificateController {
      *
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and {@link GiftCertificateDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link GiftCertificateDto} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getCertificate(@PathVariable("id") long id) {
+    public ResponseEntity<GiftCertificateDto> getCertificate(@PathVariable("id") long id) {
         GiftCertificateDto certificateDto = certificateService.findById(id);
-        return ResponseEntityFactory.createResponseEntity(OK, certificateDto);
+        return new ResponseEntity<>(certificateDto, OK);
     }
 
     /**
@@ -64,13 +64,14 @@ public class GiftCertificateController {
      *
      * @param certificateDto {@link GiftCertificateDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and unique id of the created {@link GiftCertificate}
+     * @return JSON {@link ResponseEntity} object that contains unique id of the created {@link GiftCertificate}
      */
     @PostMapping
-    public ResponseEntity<Object> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
+    public ResponseEntity<Map<String, Object>> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
         long id = certificateService.create(certificateDto);
-        return ResponseEntityFactory.createResponseEntity(CREATED, id);
+        Map<String, Object> body = new HashMap<>();
+        body.put(ENTITY_ID, id);
+        return new ResponseEntity<>(body, CREATED);
     }
 
     /**
@@ -80,15 +81,14 @@ public class GiftCertificateController {
      * @param certificateDto {@link GiftCertificateDto} instance
      * @throws EntityNotFoundException in case when certificate with this id does not exist
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and updated {@link GiftCertificateDto} object
+     * @return JSON {@link ResponseEntity} object that contains updated {@link GiftCertificateDto} object
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateCertificate(@PathVariable("id") long id,
+    public ResponseEntity<GiftCertificateDto> updateCertificate(@PathVariable("id") long id,
                 @RequestBody GiftCertificateDto certificateDto) {
         certificateDto.setId(id);
         GiftCertificateDto updatedDto = certificateService.update(certificateDto);
-        return ResponseEntityFactory.createResponseEntity(OK, updatedDto);
+        return new ResponseEntity<>(updatedDto, OK);
     }
 
     /**
@@ -96,11 +96,11 @@ public class GiftCertificateController {
      *
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
+     * @return empty {@link ResponseEntity}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteCertificate(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteCertificate(@PathVariable("id") long id) {
         certificateService.delete(id);
-        return ResponseEntityFactory.createResponseEntity(OK);
+        return new ResponseEntity<>(OK);
     }
 }

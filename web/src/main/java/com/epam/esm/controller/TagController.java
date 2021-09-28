@@ -1,17 +1,17 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.response.ResponseEntityFactory;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.TagService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -24,6 +24,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/tags")
 public class TagController {
+    private static final String ENTITY_ID = "entityId";
     private TagService tagService;
 
     public TagController(TagService tagService) {
@@ -33,13 +34,12 @@ public class TagController {
     /**
      * Retrieve all tags.
      *
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and list of {@link TagDto}
+     * @return JSON {@link ResponseEntity} object that contains list of {@link TagDto}
      */
     @GetMapping
-    public ResponseEntity<Object> getTags() {
+    public ResponseEntity<List<TagDto>> getTags() {
         List<TagDto> tags = tagService.findAll();
-        return ResponseEntityFactory.createResponseEntity(OK, tags);
+        return new ResponseEntity<>(tags, OK);
     }
 
     /**
@@ -47,13 +47,12 @@ public class TagController {
      *
      * @param id tag id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and {@link TagDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link TagDto} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getTag(@PathVariable("id") long id) {
+    public ResponseEntity<TagDto> getTag(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findById(id);
-        return ResponseEntityFactory.createResponseEntity(OK, tagDto);
+        return new ResponseEntity<>(tagDto, OK);
     }
 
     /**
@@ -62,13 +61,14 @@ public class TagController {
      * @param tagDto {@link TagDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      * @throws EntityAlreadyExistsException in case when tag with specified name already exists
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
-     * and unique id of the created {@link Tag}
+     * @return JSON {@link ResponseEntity} object that contains unique id of the created {@link Tag}
      */
     @PostMapping
-    public ResponseEntity<Object> createTag(@RequestBody TagDto tagDto) {
+    public ResponseEntity<Map<String, Object>> createTag(@RequestBody TagDto tagDto) {
         long id = tagService.create(tagDto);
-        return ResponseEntityFactory.createResponseEntity(CREATED, id);
+        Map<String, Object> body = new HashMap<>();
+        body.put(ENTITY_ID, id);
+        return new ResponseEntity<>(body, CREATED);
     }
 
     /**
@@ -76,11 +76,11 @@ public class TagController {
      *
      * @param id tag id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link HttpStatus} code
+     * @return empty {@link ResponseEntity}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTag(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteTag(@PathVariable("id") long id) {
         tagService.delete(id);
-        return ResponseEntityFactory.createResponseEntity(OK);
+        return new ResponseEntity<>(OK);
     }
 }

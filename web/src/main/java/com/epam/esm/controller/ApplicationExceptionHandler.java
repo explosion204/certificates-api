@@ -1,4 +1,4 @@
-package com.epam.esm.controller.response;
+package com.epam.esm.controller;
 
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -20,8 +20,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -29,6 +31,7 @@ import static org.springframework.http.HttpStatus.*;
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger applicationLogger = LogManager.getLogger();
 
+    private static final String ERROR_MESSAGE = "errorMessage";
     private static final String METHOD_NOT_ALLOWED_MESSAGE = "method_not_allowed";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
     private static final String INVALID_PARAMS = "invalid_params";
@@ -53,35 +56,40 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     @Override
     public ResponseEntity<Object> handleNoHandlerFoundException(
                 NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return ResponseEntityFactory.createResponseEntity(NOT_FOUND, getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE));
+        String errorMessage = getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
+        return buildErrorResponseEntity(NOT_FOUND, errorMessage);
     }
 
     @Override
     public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
                 HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return ResponseEntityFactory.createResponseEntity(METHOD_NOT_ALLOWED, getErrorMessage(METHOD_NOT_ALLOWED_MESSAGE));
+        String errorMessage = getErrorMessage(METHOD_NOT_ALLOWED_MESSAGE);
+        return buildErrorResponseEntity(METHOD_NOT_ALLOWED, errorMessage);
     }
 
     @Override
     protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return ResponseEntityFactory.createResponseEntity(BAD_REQUEST, getErrorMessage(INVALID_PARAMS));
+        String errorMessage = getErrorMessage(INVALID_PARAMS);
+        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers,
                 HttpStatus status, WebRequest request) {
-        return ResponseEntityFactory.createResponseEntity(BAD_REQUEST, getErrorMessage(INVALID_BODY_FORMAT_MESSAGE));
+        String errorMessage = getErrorMessage(INVALID_BODY_FORMAT_MESSAGE);
+        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<Object> handleEntityAlreadyExists() {
-        return ResponseEntityFactory.createResponseEntity(CONFLICT, getErrorMessage(ENTITY_ALREADY_EXISTS_MESSAGE));
+        String errorMessage = getErrorMessage(ENTITY_ALREADY_EXISTS_MESSAGE);
+        return buildErrorResponseEntity(CONFLICT, errorMessage);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException e) {
         String errorMessage = String.format(getErrorMessage(ENTITY_NOT_FOUND_MESSAGE), e.getEntityId());
-        return ResponseEntityFactory.createResponseEntity(NOT_FOUND, errorMessage);
+        return buildErrorResponseEntity(NOT_FOUND, errorMessage);
     }
 
     @ExceptionHandler(InvalidEntityException.class)
@@ -106,18 +114,25 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         Class<?> causeEntity = e.getCauseEntity();
         String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), causeEntity.getSimpleName(),
                 errorDetails);
-        return ResponseEntityFactory.createResponseEntity(BAD_REQUEST, errorMessage);
+        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleDefault(Exception e) {
         applicationLogger.error("Uncaught exception", e);
-        return ResponseEntityFactory.createResponseEntity(INTERNAL_SERVER_ERROR,
-                getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE));
+        String errorMessage = getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
+        return buildErrorResponseEntity(INTERNAL_SERVER_ERROR, errorMessage);
     }
 
-    private String getErrorMessage(String messageName) {
+    private String getErrorMessage(String errorMessageName) {
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(messageName, null, locale);
+        return messageSource.getMessage(errorMessageName, null, locale);
+    }
+
+    private ResponseEntity<Object> buildErrorResponseEntity(HttpStatus status, String errorMessage) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(ERROR_MESSAGE, errorMessage);
+
+        return new ResponseEntity<>(body, status);
     }
 }
