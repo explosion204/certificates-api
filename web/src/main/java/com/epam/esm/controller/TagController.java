@@ -13,8 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * This class contains public REST API endpoints related to {@link Tag} entity.
@@ -81,6 +80,6 @@ public class TagController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable("id") long id) {
         tagService.delete(id);
-        return new ResponseEntity<>(OK);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }
