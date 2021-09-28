@@ -14,7 +14,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/",
+							"raw": "http://localhost:8080/api/certificates/?tagName=tag1&certificateName=cert&certificateDescription=desc&orderByName=asc&orderByCreateDate=desc",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -24,6 +24,28 @@
 								"api",
 								"certificates",
 								""
+							],
+							"query": [
+								{
+									"key": "tagName",
+									"value": "tag1"
+								},
+								{
+									"key": "certificateName",
+									"value": "cert"
+								},
+								{
+									"key": "certificateDescription",
+									"value": "desc"
+								},
+								{
+									"key": "orderByName",
+									"value": "asc"
+								},
+								{
+									"key": "orderByCreateDate",
+									"value": "desc"
+								}
 							]
 						}
 					},
@@ -33,9 +55,15 @@
 					"name": "Get certificate by id",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "ru",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/1",
+							"raw": "http://localhost:8080/api/certificates/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -44,7 +72,7 @@
 							"path": [
 								"api",
 								"certificates",
-								"1"
+								"2"
 							]
 						}
 					},
