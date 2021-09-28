@@ -9,15 +9,18 @@ services:
     image: 'mariadb:latest'
     volumes:
       - 'db_data:/var/lib/mysql'
-      - './model/build/resources/main/schema/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql'
-    ports:
-      - '3306:3306'
+      - './repository/build/resources/main/schema/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql'
     env_file:
-      - '.env'
+      - '.db.env'
 
   certificates_api:
     image: 'certificates-api'
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - '8080:8080'
+    env_file:
+      - '.web.env'
     depends_on:
       - 'db'
