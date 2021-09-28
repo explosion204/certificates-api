@@ -11,7 +11,7 @@ allprojects {
         implementation group: 'org.springframework', name: 'spring-context', version: springVersion
         implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
         implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
-        implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion // TODO: remove
+        implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
 
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
 
