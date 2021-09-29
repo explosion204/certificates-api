@@ -57,9 +57,9 @@ public class TagService {
      * @param tagDto {@link TagDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      * @throws EntityAlreadyExistsException in case when tag with specified name already exists
-     * @return unique id of the saved {@link Tag}
+     * @return {@link TagDto} object that represents created tag
      */
-    public long create(TagDto tagDto) {
+    public TagDto create(TagDto tagDto) {
         Tag tag = tagDto.toTag();
         List<ValidationError> validationErrors = tagValidator.validate(tag.getName());
 
@@ -72,7 +72,10 @@ public class TagService {
             throw new EntityAlreadyExistsException();
         }
 
-        return tagRepository.create(tag);
+        long tagId = tagRepository.create(tag);
+        tagDto.setId(tagId);
+
+        return tagDto;
     }
 
     /**

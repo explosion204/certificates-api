@@ -10,9 +10,7 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -24,7 +22,6 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 @RequestMapping("/api/certificates")
 public class GiftCertificateController {
-    private static final String ENTITY_ID = "entityId";
     private GiftCertificateService certificateService;
 
     public GiftCertificateController(GiftCertificateService certificateService) {
@@ -63,14 +60,12 @@ public class GiftCertificateController {
      *
      * @param certificateDto {@link GiftCertificateDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @return JSON {@link ResponseEntity} object that contains unique id of the created {@link GiftCertificate}
+     * @return JSON {@link ResponseEntity} object that contains created {@link GiftCertificateDto} object
      */
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
-        long id = certificateService.create(certificateDto);
-        Map<String, Object> body = new HashMap<>();
-        body.put(ENTITY_ID, id);
-        return new ResponseEntity<>(body, CREATED);
+    public ResponseEntity<GiftCertificateDto> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
+        GiftCertificateDto createdCertificateDto = certificateService.create(certificateDto);
+        return new ResponseEntity<>(createdCertificateDto, CREATED);
     }
 
     /**

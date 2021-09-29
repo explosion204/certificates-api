@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -33,7 +34,7 @@ public class GiftCertificateDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime lastUpdateDate;
 
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
 
     public GiftCertificate toCertificate() {
         GiftCertificate certificate = new GiftCertificate();

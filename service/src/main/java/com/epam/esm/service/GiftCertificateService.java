@@ -88,10 +88,10 @@ public class GiftCertificateService {
      *
      * @param certificateDto {@link GiftCertificateDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @return unique id of the saved {@link GiftCertificate}
+     * @return {@link GiftCertificateDto} object that represents created {@link GiftCertificate}
      */
     @Transactional
-    public long create(GiftCertificateDto certificateDto) {
+    public GiftCertificateDto create(GiftCertificateDto certificateDto) {
         GiftCertificate certificate = certificateDto.toCertificate();
         List<String> tagNames = certificateDto.getTags();
 
@@ -106,13 +106,15 @@ public class GiftCertificateService {
         certificate.setLastUpdateDate(createDate);
 
         long certificateId = certificateRepository.create(certificate);
+        certificateDto.setId(certificateId);
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
             processTags(certificateId, tagNames);
+            certificateDto.setTags(tagNames);
         }
 
-        return certificateId;
+        return certificateDto;
     }
 
     /**
