@@ -37,7 +37,7 @@ public class GiftCertificateController {
      */
     @GetMapping
     public ResponseEntity<List<GiftCertificateDto>> getCertificates(
-                @RequestParam GiftCertificateSearchParamsDto searchParamsDto) {
+                @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto) {
         List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto);
         return new ResponseEntity<>(certificates, OK);
     }
