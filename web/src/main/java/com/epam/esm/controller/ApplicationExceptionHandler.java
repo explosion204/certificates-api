@@ -11,9 +11,6 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -32,10 +29,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     private static final Logger applicationLogger = LogManager.getLogger();
 
     private static final String ERROR_MESSAGE = "errorMessage";
-    private static final String METHOD_NOT_ALLOWED_MESSAGE = "method_not_allowed";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
-    private static final String INVALID_PARAMS = "invalid_params";
-    private static final String INVALID_BODY_FORMAT_MESSAGE = "invalid_body_format";
     private static final String ENTITY_ALREADY_EXISTS_MESSAGE = "entity_already_exists";
     private static final String ENTITY_NOT_FOUND_MESSAGE = "entity_not_found";
     private static final String INVALID_ENTITY_MESSAGE = "invalid_entity";
@@ -58,26 +52,6 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
                 NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String errorMessage = getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
         return buildErrorResponseEntity(NOT_FOUND, errorMessage);
-    }
-
-    @Override
-    public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String errorMessage = getErrorMessage(METHOD_NOT_ALLOWED_MESSAGE);
-        return buildErrorResponseEntity(METHOD_NOT_ALLOWED, errorMessage);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String errorMessage = getErrorMessage(INVALID_PARAMS);
-        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
-    }
-
-    @Override
-    public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers,
-                HttpStatus status, WebRequest request) {
-        String errorMessage = getErrorMessage(INVALID_BODY_FORMAT_MESSAGE);
-        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
