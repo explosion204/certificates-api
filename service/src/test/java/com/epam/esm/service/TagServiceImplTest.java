@@ -7,6 +7,7 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
+import com.epam.esm.validator.ValidationError;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -34,7 +36,7 @@ class TagServiceImplTest {
     @Mock
     private TagRepository tagRepository;
 
-    @Spy
+    @Mock
     private TagValidator tagValidator;
 
     @BeforeAll
@@ -89,6 +91,9 @@ class TagServiceImplTest {
     void testCreateWhenTagInvalid() {
         TagDto tagDto = provideTagDto();
         tagDto.setName("");
+
+        List<ValidationError> errorList = List.of(INVALID_NAME);
+        when(tagValidator.validate(anyString())).thenReturn(errorList);
 
         assertThrows(InvalidEntityException.class, () -> tagService.create(tagDto));
     }

@@ -11,6 +11,7 @@ import com.epam.esm.repository.OrderingType;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
+import com.epam.esm.validator.ValidationError;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -46,10 +48,10 @@ class GiftCertificateServiceTest {
     @Mock
     private TagRepository tagRepository;
 
-    @Spy
+    @Mock
     private GiftCertificateValidator certificateValidator;
 
-    @Spy
+    @Mock
     private TagValidator tagValidator;
 
     @BeforeAll
@@ -126,13 +128,14 @@ class GiftCertificateServiceTest {
         GiftCertificateDto certificateDto = provideCertificateDto();
         certificateDto.setName(null);
 
+        List<ValidationError> errorList = List.of(INVALID_NAME);
+        when(certificateValidator.validate(any(GiftCertificate.class), anyBoolean())).thenReturn(errorList);
+
         assertThrows(InvalidEntityException.class, () -> certificateService.create(certificateDto));
     }
 
     @Test
     void testUpdate() {
-        Tag tag = provideTags().get(0);
-
         long certificateId = 1;
         GiftCertificate certificate = provideCertificate();
         certificate.setId(certificateId);
@@ -168,6 +171,8 @@ class GiftCertificateServiceTest {
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setName("");
 
+        List<ValidationError> errorList = List.of(INVALID_NAME);
+        when(certificateValidator.validate(any(GiftCertificate.class), anyBoolean())).thenReturn(errorList);
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
 
         assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
@@ -179,6 +184,8 @@ class GiftCertificateServiceTest {
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setTags(new ArrayList<>() {{ add(""); }});
 
+        List<ValidationError> errorList = List.of(INVALID_NAME);
+        when(tagValidator.validate(anyString())).thenReturn(errorList);
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
         when(certificateRepository.update(any(GiftCertificate.class))).thenReturn(true);
 
