@@ -20,7 +20,6 @@ CREATE TABLE tag (
 CREATE TABLE certificate_tag (
    id_certificate BIGINT UNSIGNED NOT NULL,
    id_tag BIGINT UNSIGNED NOT NULL,
-   PRIMARY KEY (id),
    CONSTRAINT certificate_fk FOREIGN KEY (id_certificate) REFERENCES gift_certificate (id) ON DELETE CASCADE,
    CONSTRAINT tag_fk FOREIGN KEY (id_tag) REFERENCES tag (id) ON DELETE CASCADE
 );
