@@ -23,8 +23,6 @@ import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,9 +54,9 @@ class TagServiceImplTest {
 
     @Test
     void testFindById() {
-        when(tagRepository.findById(anyLong())).thenReturn(Optional.of(provideTag()));
+        long tagId = 1;
+        when(tagRepository.findById(tagId)).thenReturn(Optional.of(provideTag()));
 
-        int tagId = 1;
         TagDto expectedDto = provideTagDto();
         TagDto actualDto = tagService.findById(tagId);
 
@@ -67,33 +65,34 @@ class TagServiceImplTest {
 
     @Test
     void testFindByIdWhenTagNotFound() {
-        when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
+        long tagId = 1;
+        when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
-        int tagId = 1;
         assertThrows(EntityNotFoundException.class, () -> tagService.findById(tagId));
     }
 
     @Test
     void testCreate() {
         TagDto tagDto = provideTagDto();
+        Tag tag = provideTag();
 
-        when(tagRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
 
         tagService.create(tagDto);
 
-        int expectedInteractions = 1;
-        verify(tagValidator, times(expectedInteractions)).validate(anyString());
-        verify(tagRepository, times(expectedInteractions)).findByName(anyString());
-        verify(tagRepository, times(expectedInteractions)).create(any(Tag.class));
+        verify(tagValidator).validate(tag.getName());
+        verify(tagRepository).findByName(tag.getName());
+        verify(tagRepository).create(tag);
     }
 
     @Test
     void testCreateWhenTagInvalid() {
+        String tagName = "";
         TagDto tagDto = provideTagDto();
-        tagDto.setName("");
+        tagDto.setName(tagName);
 
         List<ValidationError> errorList = List.of(INVALID_NAME);
-        when(tagValidator.validate(anyString())).thenReturn(errorList);
+        when(tagValidator.validate(tagName)).thenReturn(errorList);
 
         assertThrows(InvalidEntityException.class, () -> tagService.create(tagDto));
     }
@@ -101,34 +100,32 @@ class TagServiceImplTest {
     @Test
     void testCreateWhenTagAlreadyExists() {
         TagDto tagDto = provideTagDto();
+        Tag tag = provideTag();
 
-        when(tagRepository.findByName(anyString())).thenReturn(Optional.of(provideTag()));
+        when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.of(tag));
         assertThrows(EntityAlreadyExistsException.class, () -> tagService.create(tagDto));
 
-        int expectedInteractions = 1;
-        verify(tagValidator, times(expectedInteractions)).validate(anyString());
+        verify(tagValidator).validate(tag.getName());
     }
 
     @Test
     void testDelete() {
-        when(tagRepository.delete(anyLong())).thenReturn(true);
-
         int tagId = 1;
+        when(tagRepository.delete(tagId)).thenReturn(true);
+
         tagService.delete(tagId);
 
-        int expectedInteractions = 1;
-        verify(tagRepository, times(expectedInteractions)).delete(anyLong());
+        verify(tagRepository).delete(tagId);
     }
 
     @Test
     void testDeleteWhenTagNotFound() {
-        when(tagRepository.delete(anyLong())).thenReturn(false);
-
         int tagId = 1;
+        when(tagRepository.delete(tagId)).thenReturn(false);
+
         assertThrows(EntityNotFoundException.class, () -> tagService.delete(tagId));
 
-        int expectedInteractions = 1;
-        verify(tagRepository, times(expectedInteractions)).delete(anyLong());
+        verify(tagRepository).delete(tagId);
     }
 
     private Tag provideTag() {

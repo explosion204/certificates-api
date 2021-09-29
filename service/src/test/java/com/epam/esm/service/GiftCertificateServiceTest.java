@@ -29,8 +29,6 @@ import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +51,9 @@ class GiftCertificateServiceTest {
     @Mock
     private TagValidator tagValidator;
 
+    @Captor
+    private ArgumentCaptor<GiftCertificate> certificateCaptor;
+
     @BeforeAll
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -68,16 +69,21 @@ class GiftCertificateServiceTest {
             add(provideCertificateDto());
         }};
 
-        when(certificateRepository.find(anyString(), anyString(), anyString(), any(OrderingType.class),
-                any(OrderingType.class))).thenReturn(certificateList);
-        when(tagRepository.findByCertificate(anyLong())).thenReturn(provideTags());
+        long certificateId = 1;
+        String tagName = "tag";
+        String certificateName = "certificate";
+        String certificateDescription = "description";
+        OrderingType orderByName = OrderingType.ASC;
+        OrderingType orderByCreateDate = OrderingType.DESC;
+        when(certificateRepository.find(tagName, certificateName, certificateDescription, orderByName,
+                orderByCreateDate)).thenReturn(certificateList);
+        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
 
         GiftCertificateSearchParamsDto searchParamsDto = provideSearchParamsDto();
         List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto);
 
-        int expectedInteractions = 1;
-        verify(certificateRepository, times(expectedInteractions)).find(anyString(), anyString(), anyString(),
-                any(OrderingType.class), any(OrderingType.class));
+        verify(certificateRepository).find(tagName, certificateName, certificateDescription,
+               orderByName, orderByCreateDate);
 
         assertEquals(certificateDtoList, actualDtoList);
     }
@@ -86,19 +92,15 @@ class GiftCertificateServiceTest {
     void testFindById() {
         long certificateId = 1;
         GiftCertificate certificate = provideCertificate();
-        certificate.setId(certificateId);
-
         GiftCertificateDto expectedCertificateDto = provideCertificateDto();
-        expectedCertificateDto.setId(certificateId);
 
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(tagRepository.findByCertificate(anyLong())).thenReturn(provideTags());
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
+        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
 
         GiftCertificateDto actualCertificateDto = certificateService.findById(certificateId);
 
-        int expectedInteractions = 1;
-        verify(certificateRepository, times(expectedInteractions)).findById(anyLong());
-        verify(tagRepository, times(expectedInteractions)).findByCertificate(anyLong());
+        verify(certificateRepository).findById(anyLong());
+        verify(tagRepository).findByCertificate(anyLong());
 
         assertEquals(expectedCertificateDto, actualCertificateDto);
     }
@@ -106,7 +108,7 @@ class GiftCertificateServiceTest {
     @Test
     void testFindByIdWhenCertificateNotFound() {
         int certificateId = 1;
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> certificateService.findById(certificateId));
     }
@@ -117,9 +119,9 @@ class GiftCertificateServiceTest {
 
         certificateService.create(certificateDto);
 
-        int expectedInteractions = 1;
-        verify(certificateValidator, times(expectedInteractions)).validate(any(GiftCertificate.class), eq(false));
-        verify(certificateRepository, times(expectedInteractions)).create(any());
+        verify(certificateValidator).validate(certificateCaptor.capture(), eq(false));
+        GiftCertificate certificate = certificateCaptor.getValue();
+        verify(certificateRepository).create(certificate);
     }
 
     @Test
@@ -127,8 +129,13 @@ class GiftCertificateServiceTest {
         GiftCertificateDto certificateDto = provideCertificateDto();
         certificateDto.setName(null);
 
+        GiftCertificate certificate = provideCertificate();
+        certificate.setName(null);
+        certificate.setCreateDate(null);
+        certificate.setLastUpdateDate(null);
+
         List<ValidationError> errorList = List.of(INVALID_NAME);
-        when(certificateValidator.validate(any(GiftCertificate.class), anyBoolean())).thenReturn(errorList);
+        when(certificateValidator.validate(certificate, false)).thenReturn(errorList);
 
         assertThrows(InvalidEntityException.class, () -> certificateService.create(certificateDto));
     }
@@ -136,85 +143,93 @@ class GiftCertificateServiceTest {
     @Test
     void testUpdate() {
         long certificateId = 1;
+        long tagId = 1;
+        String tagName = "tag";
         GiftCertificate certificate = provideCertificate();
-        certificate.setId(certificateId);
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setId(certificateId);
 
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(certificateRepository.update(any(GiftCertificate.class))).thenReturn(true);
-        when(tagRepository.findByCertificate(anyLong())).thenReturn(provideTags());
-        when(tagRepository.findByName(anyString())).thenReturn(Optional.empty());
+        Tag newTag = new Tag();
+        newTag.setName(tagName);
+
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
+        when(certificateRepository.update(certificate)).thenReturn(true);
+        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
+        when(tagRepository.findByName(tagName)).thenReturn(Optional.empty());
+        when(tagRepository.create(newTag)).thenReturn(tagId);
 
         certificateService.update(updatedCertificateDto);
 
-        int expectedInteractions = 1;
-        verify(certificateValidator, times(expectedInteractions)).validate(any(GiftCertificate.class), eq(true));
-        verify(certificateRepository, times(expectedInteractions)).update(any(GiftCertificate.class));
-        verify(tagValidator, times(expectedInteractions)).validate(anyString());
-        verify(tagRepository, times(expectedInteractions)).findByName(anyString());
-        verify(certificateRepository, times(expectedInteractions)).attachTag(anyLong(), anyLong());
+        verify(certificateValidator).validate(certificateCaptor.capture(), eq(true));
+        GiftCertificate capturedCertificate = certificateCaptor.getValue();
+        verify(certificateRepository).update(capturedCertificate);
+        verify(tagValidator).validate(tagName);
+        verify(tagRepository).findByName(tagName);
+        verify(certificateRepository).attachTag(certificateId, tagId);
     }
 
     @Test
     void testUpdateWhenCertificateNotFound() {
+        long certificateId = 1;
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
 
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
     void testUpdateWhenCertificateInvalid() {
+        long certificateId = 1;
         GiftCertificate certificate = provideCertificate();
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setName("");
 
         List<ValidationError> errorList = List.of(INVALID_NAME);
-        when(certificateValidator.validate(any(GiftCertificate.class), anyBoolean())).thenReturn(errorList);
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
+        when(certificateValidator.validate(certificate, true)).thenReturn(errorList);
 
         assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
     void testUpdateWhenTagInvalid() {
+        String tagName = "";
+        long certificateId = 1;
         GiftCertificate certificate = provideCertificate();
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setTags(new ArrayList<>() {{ add(""); }});
 
         List<ValidationError> errorList = List.of(INVALID_NAME);
-        when(tagValidator.validate(anyString())).thenReturn(errorList);
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(certificateRepository.update(any(GiftCertificate.class))).thenReturn(true);
+        when(tagValidator.validate(tagName)).thenReturn(errorList);
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
 
         assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
     }
 
     @Test
     void testDelete() {
-        when(certificateRepository.delete(anyLong())).thenReturn(true);
+        long certificateId = 1;
+        when(certificateRepository.delete(certificateId)).thenReturn(true);
 
-        int certificateId = 1;
         certificateRepository.delete(certificateId);
 
-        int expectedInteractions = 1;
-        verify(certificateRepository, times(expectedInteractions)).delete(anyLong());
+        verify(certificateRepository).delete(certificateId);
     }
 
     @Test
     void testDeleteWhenCertificateNotFound() {
-        when(certificateRepository.delete(anyLong())).thenReturn(false);
+        long certificateId = 1;
+        when(certificateRepository.delete(certificateId)).thenReturn(false);
 
-        int certificateId = 1;
         assertThrows(EntityNotFoundException.class, () -> certificateService.delete(certificateId));
 
-        int expectedInteractions = 1;
-        verify(certificateRepository, times(expectedInteractions)).delete(anyLong());
+        verify(certificateRepository).delete(certificateId);
     }
 
     private GiftCertificate provideCertificate() {
         GiftCertificate certificate = new GiftCertificate();
+
+        certificate.setId(1);
         certificate.setName("certificate");
         certificate.setDescription("description");
         certificate.setPrice(BigDecimal.ONE);
@@ -227,6 +242,8 @@ class GiftCertificateServiceTest {
 
     private GiftCertificateDto provideCertificateDto() {
         GiftCertificateDto certificateDto = new GiftCertificateDto();
+
+        certificateDto.setId(1);
         certificateDto.setName("certificate");
         certificateDto.setDescription("description");
         certificateDto.setPrice(BigDecimal.ONE);
@@ -244,7 +261,7 @@ class GiftCertificateServiceTest {
         searchParamsDto.setTagName("tag");
         searchParamsDto.setCertificateName("certificate");
         searchParamsDto.setCertificateDescription("description");
-        searchParamsDto.setOrderByCreateDate(OrderingType.ASC);
+        searchParamsDto.setOrderByCreateDate(OrderingType.DESC);
         searchParamsDto.setOrderByName(OrderingType.ASC);
 
         return searchParamsDto;
