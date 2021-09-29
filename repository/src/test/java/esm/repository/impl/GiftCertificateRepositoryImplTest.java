@@ -9,7 +9,6 @@ import com.epam.esm.repository.OrderingType;
 import com.epam.esm.repository.TagRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,13 +29,11 @@ import java.util.stream.Stream;
 
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DatabaseConfig.class)
 @Transactional
 @ActiveProfiles(resolver = TestProfileResolver.class)
-@TestInstance(PER_CLASS)
 class GiftCertificateRepositoryImplTest {
     @Autowired
     private GiftCertificateRepository certificateRepository;
@@ -181,7 +178,7 @@ class GiftCertificateRepositoryImplTest {
         assertFalse(result);
     }
 
-    private Stream<Arguments> provideCertificateSearchParams() {
+    private static Stream<Arguments> provideCertificateSearchParams() {
         return Stream.of(
                 Arguments.of(4, null, null, null),
                 Arguments.of(1, "tag1", null, null),

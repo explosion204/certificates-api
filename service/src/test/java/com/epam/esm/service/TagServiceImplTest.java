@@ -10,7 +10,6 @@ import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,11 +21,9 @@ import java.util.Optional;
 import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(PER_CLASS)
 class TagServiceImplTest {
     @InjectMocks
     private TagService tagService;
@@ -38,8 +35,8 @@ class TagServiceImplTest {
     private TagValidator tagValidator;
 
     @BeforeAll
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    static void setUp() {
+        MockitoAnnotations.openMocks(TagServiceImplTest.class);
     }
 
     @Test

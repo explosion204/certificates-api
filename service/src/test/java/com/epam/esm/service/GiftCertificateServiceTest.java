@@ -28,11 +28,9 @@ import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(PER_CLASS)
 class GiftCertificateServiceTest {
     private static final LocalDateTime INITIAL_DATE = LocalDateTime.now(UTC);
 
@@ -55,8 +53,8 @@ class GiftCertificateServiceTest {
     private ArgumentCaptor<GiftCertificate> certificateCaptor;
 
     @BeforeAll
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    static void setUp() {
+        MockitoAnnotations.openMocks(GiftCertificateServiceTest.class);
     }
 
     @Test
