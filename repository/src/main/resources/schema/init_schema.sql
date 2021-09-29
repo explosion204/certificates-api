@@ -13,14 +13,13 @@ CREATE TABLE gift_certificate (
 
 CREATE TABLE tag (
    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE,
-   name VARCHAR(50),
+   name VARCHAR(50) UNIQUE,
    PRIMARY KEY (id)
 );
 
 CREATE TABLE certificate_tag (
-   id bigint(20) unsigned NOT NULL AUTO_INCREMENT UNIQUE,
-   id_certificate bigint(20) unsigned NOT NULL,
-   id_tag bigint(20) unsigned NOT NULL,
+   id_certificate BIGINT UNSIGNED NOT NULL,
+   id_tag BIGINT UNSIGNED NOT NULL,
    PRIMARY KEY (id),
    CONSTRAINT certificate_fk FOREIGN KEY (id_certificate) REFERENCES gift_certificate (id) ON DELETE CASCADE,
    CONSTRAINT tag_fk FOREIGN KEY (id_tag) REFERENCES tag (id) ON DELETE CASCADE
