@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
@@ -196,8 +197,8 @@ class GiftCertificateRepositoryImplTest {
         certificate.setDescription("test");
         certificate.setPrice(BigDecimal.ONE);
         certificate.setDuration(Duration.ofDays(1));
-        certificate.setCreateDate(LocalDateTime.now().atZone(ZoneOffset.UTC));
-        certificate.setLastUpdateDate(LocalDateTime.now().atZone(ZoneOffset.UTC));
+        certificate.setCreateDate(LocalDateTime.now(UTC));
+        certificate.setLastUpdateDate(LocalDateTime.now(UTC));
 
         return certificate;
     }

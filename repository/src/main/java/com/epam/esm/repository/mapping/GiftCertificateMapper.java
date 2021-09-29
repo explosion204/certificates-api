@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.time.Duration;
 
 import static com.epam.esm.repository.mapping.TableColumn.*;
-import static java.time.ZoneOffset.UTC;
 
 @Component
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
@@ -22,8 +21,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         certificate.setDescription(resultSet.getString(CERTIFICATE_DESCRIPTION));
         certificate.setPrice(resultSet.getBigDecimal(CERTIFICATE_PRICE));
         certificate.setDuration(Duration.ofDays(resultSet.getInt(CERTIFICATE_DURATION)));
-        certificate.setCreateDate(resultSet.getTimestamp(CERTIFICATE_CREATE_DATE).toInstant().atZone(UTC));
-        certificate.setLastUpdateDate(resultSet.getTimestamp(CERTIFICATE_LAST_UPDATE_DATE).toInstant().atZone(UTC));
+        certificate.setCreateDate(resultSet.getTimestamp(CERTIFICATE_CREATE_DATE).toLocalDateTime());
+        certificate.setLastUpdateDate(resultSet.getTimestamp(CERTIFICATE_LAST_UPDATE_DATE).toLocalDateTime());
 
         return certificate;
     }

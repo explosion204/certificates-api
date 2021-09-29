@@ -15,8 +15,7 @@ import com.epam.esm.validator.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +101,7 @@ public class GiftCertificateService {
             throw new InvalidEntityException(validationErrors, GiftCertificate.class);
         }
 
-        ZonedDateTime createDate = Instant.now().atZone(UTC);
+        LocalDateTime createDate = LocalDateTime.now(UTC);
         certificate.setCreateDate(createDate);
         certificate.setLastUpdateDate(createDate);
 
@@ -158,7 +157,7 @@ public class GiftCertificateService {
             throw new InvalidEntityException(validationErrors, GiftCertificate.class);
         }
 
-        ZonedDateTime lastUpdateDate = Instant.now().atZone(UTC);
+        LocalDateTime lastUpdateDate = LocalDateTime.now(UTC);
         certificate.setLastUpdateDate(lastUpdateDate);
         certificateRepository.update(certificate);
 
