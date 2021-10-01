@@ -113,13 +113,16 @@ class GiftCertificateServiceTest {
 
     @Test
     void testCreate() {
+        long certificateId = 1;
         GiftCertificateDto certificateDto = provideCertificateDto();
+        GiftCertificate certificate = provideCertificate();
 
+        when(certificateRepository.create(any(GiftCertificate.class))).thenReturn(certificateId);
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
         certificateService.create(certificateDto);
 
         verify(certificateValidator).validate(certificateCaptor.capture(), eq(false));
-        GiftCertificate certificate = certificateCaptor.getValue();
-        verify(certificateRepository).create(certificate);
+        verify(certificateRepository).findById(certificateId);
     }
 
     @Test

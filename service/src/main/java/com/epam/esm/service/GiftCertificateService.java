@@ -106,7 +106,6 @@ public class GiftCertificateService {
         certificate.setLastUpdateDate(createDate);
 
         long certificateId = certificateRepository.create(certificate);
-        certificateDto.setId(certificateId);
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
@@ -114,7 +113,7 @@ public class GiftCertificateService {
             certificateDto.setTags(tagNames);
         }
 
-        return certificateDto;
+        return findById(certificateId);
     }
 
     /**
