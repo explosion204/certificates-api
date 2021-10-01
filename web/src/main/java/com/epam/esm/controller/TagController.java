@@ -42,7 +42,7 @@ public class TagController {
      * Retrieve tag by its unique id.
      *
      * @param id tag id
-     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @throws EntityNotFoundException in case when tag with this id does not exist
      * @return JSON {@link ResponseEntity} object that contains {@link TagDto} object
      */
     @GetMapping("/{id}")
@@ -69,7 +69,7 @@ public class TagController {
      * Delete an existing tag.
      *
      * @param id tag id
-     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @throws EntityNotFoundException in case when tag with this id does not exist
      * @return empty {@link ResponseEntity}
      */
     @DeleteMapping("/{id}")

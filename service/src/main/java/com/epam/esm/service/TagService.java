@@ -43,7 +43,7 @@ public class TagService {
      * Retrieve tag by its unique id.
      *
      * @param id tag id
-     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @throws EntityNotFoundException in case when tag with this id does not exist
      * @return {@link TagDto} object
      */
     public TagDto findById(long id) {
@@ -82,7 +82,7 @@ public class TagService {
      * Delete an existing tag.
      *
      * @param id tag id
-     * @throws EntityNotFoundException in case when certificate with this id does not exist
+     * @throws EntityNotFoundException in case when tag with this id does not exist
      */
     public void delete(long id) {
         boolean tagExists = tagRepository.delete(id);
