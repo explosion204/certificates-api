@@ -1,4 +1,4 @@
-package esm;
+package com.epam.esm;
 
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.test.context.ActiveProfilesResolver;

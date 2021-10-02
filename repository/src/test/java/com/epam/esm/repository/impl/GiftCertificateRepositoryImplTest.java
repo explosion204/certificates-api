@@ -1,6 +1,7 @@
-package esm.repository.impl;
+package com.epam.esm.repository.impl;
 
-import esm.TestProfileResolver;
+import com.epam.esm.TestConfig;
+import com.epam.esm.TestProfileResolver;
 import com.epam.esm.config.DatabaseConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
@@ -9,14 +10,13 @@ import com.epam.esm.repository.OrderingType;
 import com.epam.esm.repository.TagRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -30,8 +30,8 @@ import java.util.stream.Stream;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DatabaseConfig.class)
+@SpringBootTest
+@ContextConfiguration(classes = { TestConfig.class, DatabaseConfig.class })
 @Transactional
 @ActiveProfiles(resolver = TestProfileResolver.class)
 class GiftCertificateRepositoryImplTest {

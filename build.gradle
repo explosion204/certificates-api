@@ -6,11 +6,7 @@ allprojects {
     }
 
     dependencies {
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
-        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
-        implementation group: 'org.springframework', name: 'spring-context', version: springVersion
         implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
         implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
 
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
@@ -18,9 +14,10 @@ allprojects {
         compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
         annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: bootVersion
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
+
+        testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: bootVersion
     }
 
     test {
