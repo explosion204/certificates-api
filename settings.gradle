@@ -1,0 +1,6 @@
+rootProject.name = 'certificates-api'
+include 'web'
+include 'service'
+include 'model'
+include 'repository'
+

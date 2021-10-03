@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="pattern_layout_console">%d{dd MMM yyyy HH:mm:ss} %p %c{1} - %m%n</Property>
+        <Property name="pattern_layout_file">%d %p [%t] (%F:%L) - %m%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console"
+                 target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern_layout_console}" />
+        </Console>
+        <RollingFile name="file"
+                     fileName="${sys:catalina.home}/logs/recent.log"
+                     filePattern="${sys:catalina.home}/logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${pattern_layout_file}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+                <SizeBasedTriggeringPolicy size="512 KB" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="warn" includeLocation="true">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="file" />
+        </Root>
+    </Loggers>
+</Configuration>

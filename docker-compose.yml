@@ -1,0 +1,26 @@
+version: '3.3'
+
+volumes:
+  db_data:
+
+services:
+  db:
+    container_name: db
+    image: 'mariadb:latest'
+    volumes:
+      - 'db_data:/var/lib/mysql'
+      - './repository/build/resources/main/schema/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql'
+    env_file:
+      - '.db.env'
+
+  certificates_api:
+    image: 'certificates-api'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    env_file:
+      - '.web.env'
+    depends_on:
+      - 'db'

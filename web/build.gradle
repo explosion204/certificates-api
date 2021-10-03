@@ -1,0 +1,18 @@
+plugins {
+    id 'war'
+}
+
+group 'com.karnyshov'
+version '1.0'
+
+dependencies {
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: servletApiVersion
+    implementation group: 'org.springframework', name: 'spring-web', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: springVersion
+
+    implementation project(':service')
+}
+
+war {
+    archiveName 'certificates.war'
+}

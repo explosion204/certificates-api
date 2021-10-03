@@ -8,6 +8,8 @@
 *.tar.gz
 *.rar
 
-/.gradle/
-/.idea/
-/build/
+.gradle/
+.idea/
+build/
+
+!gradle/wrapper/gradle-wrapper.jar
