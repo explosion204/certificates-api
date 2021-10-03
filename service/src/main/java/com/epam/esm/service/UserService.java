@@ -1,7 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.UserRepository;
+import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
