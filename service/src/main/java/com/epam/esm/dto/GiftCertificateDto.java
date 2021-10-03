@@ -48,7 +48,7 @@ public class GiftCertificateDto {
         return certificate;
     }
 
-    public static GiftCertificateDto fromCertificate(GiftCertificate certificate, List<Tag> tags) {
+    public static GiftCertificateDto fromCertificate(GiftCertificate certificate) {
         GiftCertificateDto certificateDto = new GiftCertificateDto();
 
         certificateDto.setId(certificate.getId());
@@ -59,7 +59,10 @@ public class GiftCertificateDto {
         certificateDto.setCreateDate(certificate.getCreateDate());
         certificateDto.setLastUpdateDate(certificate.getLastUpdateDate());
 
-        List<String> tagNames = tags.stream().map(Tag::getName).toList();
+        List<String> tagNames = certificate.getTags()
+                .stream()
+                .map(Tag::getName)
+                .toList();
         certificateDto.setTags(tagNames);
 
         return certificateDto;

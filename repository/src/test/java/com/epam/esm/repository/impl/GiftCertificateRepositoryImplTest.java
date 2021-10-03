@@ -1,23 +1,18 @@
-package esm.repository.impl;
+package com.epam.esm.repository.impl;
 
-import esm.TestProfileResolver;
-import com.epam.esm.config.DatabaseConfig;
+import com.epam.esm.TestConfig;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
-import com.epam.esm.repository.TagRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 import java.time.*;
@@ -30,16 +25,15 @@ import java.util.stream.Stream;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DatabaseConfig.class)
-@Transactional // this annotation is VITAL to rollback changes done by each test execution
-@ActiveProfiles(resolver = TestProfileResolver.class)
+@DataJpaTest
+@ContextConfiguration(classes = TestConfig.class)
+@TestPropertySource(properties = {
+        // this makes JPA generate database schema before init script is called
+        "spring.jpa.defer-datasource-initialization=true"
+})
 class GiftCertificateRepositoryImplTest {
     @Autowired
     private GiftCertificateRepository certificateRepository;
-
-    @Autowired
-    private TagRepository tagRepository;
 
     @ParameterizedTest
     @MethodSource("provideCertificateSearchParams")
@@ -119,63 +113,30 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
-    void testAttachTag() {
-        certificateRepository.attachTag(2, 2);
-        List<Tag> tags = tagRepository.findByCertificate(2);
-
-        assertEquals(1, tags.size());
-    }
-
-    @Test
-    void testDetachTag() {
-        certificateRepository.detachTag(1, 1);
-        List<Tag> tags = tagRepository.findByCertificate(1);
-
-        assertTrue(tags.isEmpty());
-    }
-
-    @Test
     void testCreate() {
-        GiftCertificate newCertificate = provideCertificate();
+        GiftCertificate expectedCertificate = provideCertificate();
 
-        long expectedId = 5;
-        long actualId = certificateRepository.create(newCertificate);
+        GiftCertificate actualCertificate = certificateRepository.create(expectedCertificate);
 
-        assertEquals(expectedId, actualId);
+        assertEquals(expectedCertificate, actualCertificate);
     }
 
     @Test
     void testUpdate() {
-        GiftCertificate updatedCertificate = provideCertificate();
-        updatedCertificate.setId(1);
+        GiftCertificate expectedCertificate = provideCertificate();
+        expectedCertificate.setId(1);
 
-        boolean result = certificateRepository.update(updatedCertificate);
+        GiftCertificate actualCertificate = certificateRepository.update(expectedCertificate);
 
-        assertTrue(result);
-    }
-
-    @Test
-    void testUpdateNotFound() {
-        GiftCertificate updatedCertificate = provideCertificate();
-        updatedCertificate.setId(0);
-
-        boolean result = certificateRepository.update(updatedCertificate);
-
-        assertFalse(result);
+        assertEquals(expectedCertificate, actualCertificate);
     }
 
     @Test
     void testDelete() {
-        boolean result = certificateRepository.delete(1);
+        GiftCertificate certificate = certificateRepository.findById(1).get();
+        certificateRepository.delete(certificate);
 
-        assertTrue(result);
-    }
-
-    @Test
-    void testDeleteNotFound() {
-        boolean result = certificateRepository.delete(0);
-
-        assertFalse(result);
+        assertTrue(certificateRepository.findById(1).isEmpty());
     }
 
     private static Stream<Arguments> provideCertificateSearchParams() {

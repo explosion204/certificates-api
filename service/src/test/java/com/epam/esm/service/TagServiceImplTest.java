@@ -74,6 +74,7 @@ class TagServiceImplTest {
         Tag tag = provideTag();
 
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
+        when(tagRepository.create(tag)).thenReturn(tag);
 
         tagService.create(tagDto);
 
@@ -107,22 +108,21 @@ class TagServiceImplTest {
 
     @Test
     void testDelete() {
+        Tag tag = provideTag();
         int tagId = 1;
-        when(tagRepository.delete(tagId)).thenReturn(true);
+        when(tagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
         tagService.delete(tagId);
 
-        verify(tagRepository).delete(tagId);
+        verify(tagRepository).delete(tag);
     }
 
     @Test
     void testDeleteWhenTagNotFound() {
         int tagId = 1;
-        when(tagRepository.delete(tagId)).thenReturn(false);
+        when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> tagService.delete(tagId));
-
-        verify(tagRepository).delete(tagId);
     }
 
     private Tag provideTag() {
