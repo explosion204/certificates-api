@@ -67,7 +67,6 @@ class GiftCertificateServiceTest {
             add(provideCertificateDto());
         }};
 
-        long certificateId = 1;
         String tagName = "tag";
         String certificateName = "certificate";
         String certificateDescription = "description";
@@ -75,7 +74,6 @@ class GiftCertificateServiceTest {
         OrderingType orderByCreateDate = OrderingType.DESC;
         when(certificateRepository.find(tagName, certificateName, certificateDescription, orderByName,
                 orderByCreateDate)).thenReturn(certificateList);
-        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
 
         GiftCertificateSearchParamsDto searchParamsDto = provideSearchParamsDto();
         List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto);
@@ -91,21 +89,17 @@ class GiftCertificateServiceTest {
         long certificateId = 1;
         GiftCertificate certificate = provideCertificate();
         GiftCertificateDto expectedCertificateDto = provideCertificateDto();
-
         when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
-        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
 
         GiftCertificateDto actualCertificateDto = certificateService.findById(certificateId);
 
-        verify(certificateRepository).findById(anyLong());
-        verify(tagRepository).findByCertificate(anyLong());
-
+        verify(certificateRepository).findById(certificateId);
         assertEquals(expectedCertificateDto, actualCertificateDto);
     }
 
     @Test
     void testFindByIdWhenCertificateNotFound() {
-        int certificateId = 1;
+        long certificateId = 1;
         when(certificateRepository.findById(certificateId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> certificateService.findById(certificateId));
@@ -113,16 +107,15 @@ class GiftCertificateServiceTest {
 
     @Test
     void testCreate() {
-        long certificateId = 1;
-        GiftCertificateDto certificateDto = provideCertificateDto();
+        GiftCertificateDto expectedDto = provideCertificateDto();
         GiftCertificate certificate = provideCertificate();
 
-        when(certificateRepository.create(any(GiftCertificate.class))).thenReturn(certificateId);
-        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
-        certificateService.create(certificateDto);
+        when(certificateRepository.create(any(GiftCertificate.class))).thenReturn(certificate);
+        GiftCertificateDto actualDto = certificateService.create(expectedDto);
 
         verify(certificateValidator).validate(certificateCaptor.capture(), eq(false));
-        verify(certificateRepository).findById(certificateId);
+        verify(certificateRepository).create(certificateCaptor.getValue());
+        assertEquals(expectedDto, actualDto);
     }
 
     @Test
@@ -144,7 +137,6 @@ class GiftCertificateServiceTest {
     @Test
     void testUpdate() {
         long certificateId = 1;
-        long tagId = 1;
         String tagName = "tag";
         GiftCertificate certificate = provideCertificate();
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
@@ -154,19 +146,16 @@ class GiftCertificateServiceTest {
         newTag.setName(tagName);
 
         when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
-        when(certificateRepository.update(certificate)).thenReturn(true);
-        when(tagRepository.findByCertificate(certificateId)).thenReturn(provideTags());
+        when(certificateRepository.update(certificate)).thenReturn(certificate);
         when(tagRepository.findByName(tagName)).thenReturn(Optional.empty());
-        when(tagRepository.create(newTag)).thenReturn(tagId);
+        when(tagRepository.create(newTag)).thenReturn(newTag);
 
         certificateService.update(updatedCertificateDto);
 
         verify(certificateValidator).validate(certificateCaptor.capture(), eq(true));
-        GiftCertificate capturedCertificate = certificateCaptor.getValue();
-        verify(certificateRepository).update(capturedCertificate);
+        verify(certificateRepository).update(certificateCaptor.getValue());
         verify(tagValidator).validate(tagName);
         verify(tagRepository).findByName(tagName);
-        verify(certificateRepository).attachTag(certificateId, tagId);
     }
 
     @Test
@@ -209,22 +198,21 @@ class GiftCertificateServiceTest {
 
     @Test
     void testDelete() {
+        GiftCertificate certificate = provideCertificate();
         long certificateId = 1;
-        when(certificateRepository.delete(certificateId)).thenReturn(true);
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
 
-        certificateRepository.delete(certificateId);
+        certificateService.delete(certificateId);
 
-        verify(certificateRepository).delete(certificateId);
+        verify(certificateRepository).delete(certificate);
     }
 
     @Test
     void testDeleteWhenCertificateNotFound() {
         long certificateId = 1;
-        when(certificateRepository.delete(certificateId)).thenReturn(false);
+        when(certificateRepository.findById(certificateId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> certificateService.delete(certificateId));
-
-        verify(certificateRepository).delete(certificateId);
     }
 
     private GiftCertificate provideCertificate() {
@@ -237,6 +225,9 @@ class GiftCertificateServiceTest {
         certificate.setDuration(Duration.ofDays(1));
         certificate.setCreateDate(INITIAL_DATE);
         certificate.setLastUpdateDate(INITIAL_DATE);
+
+        Tag tag = provideTags().get(0);
+        certificate.setTags(new ArrayList<>() {{ add(tag); }});
 
         return certificate;
     }

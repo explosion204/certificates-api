@@ -1,6 +1,5 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 
 import java.util.List;
@@ -36,26 +35,17 @@ public interface TagRepository {
     Optional<Tag> findByName(String name);
 
     /**
-     * Retrieve all tags attached to a certain certificate.
-     *
-     * @param certificateId certificate id
-     * @return list of {@link Tag} attached to the {@link GiftCertificate}
-     */
-    List<Tag> findByCertificate(long certificateId);
-
-    /**
      * Create a new tag in the storage.
      *
      * @param tag {@link Tag} instance
-     * @return unique id of the saved {@link Tag}
+     * @return created {@link Tag}
      */
-    long create(Tag tag);
+    Tag create(Tag tag);
 
     /**
      * Delete an existing tag from the storage.
      *
-     * @param id tag id
-     * @return {@code true} if {@link Tag} existed and was deleted, otherwise {@code false}
+     * @param tag entity to delete
      */
-    boolean delete(long id);
+    void delete(Tag tag);
 }

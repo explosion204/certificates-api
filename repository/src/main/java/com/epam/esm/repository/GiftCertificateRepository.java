@@ -34,42 +34,25 @@ public interface GiftCertificateRepository {
     Optional<GiftCertificate> findById(long id);
 
     /**
-     * Attach tag to existing certificate.
-     *
-     * @param certificateId certificate id
-     * @param tagId         tag id
-     */
-    void attachTag(long certificateId, long tagId);
-
-    /**
-     * Detach tag from existing certificate.
-     *
-     * @param certificateId certificate id
-     * @param tagId         tag id
-     */
-    void detachTag(long certificateId, long tagId);
-
-    /**
      * Create a new certificate in the storage.
      *
      * @param certificate {@link GiftCertificate} instance
-     * @return unique id of the saved {@link GiftCertificate}
+     * @return created {@link GiftCertificate}
      */
-    long create(GiftCertificate certificate);
+    GiftCertificate create(GiftCertificate certificate);
 
     /**
      * Update an existing certificate in the storage.
      *
      * @param certificate {@link GiftCertificate} instance
-     * @return {@code true} if {@link GiftCertificate} existed and was updated, otherwise {@code false}
+     * @return updated {@link GiftCertificate}
      */
-    boolean update(GiftCertificate certificate);
+    GiftCertificate update(GiftCertificate certificate);
 
     /**
      * Delete an existing certificate from the storage.
      *
-     * @param id certificate id
-     * @return {@code true} if {@link GiftCertificate} existed and was deleted, otherwise {@code false}
+     * @param certificate entity to delete
      */
-    boolean delete(long id);
+    void delete(GiftCertificate certificate);
 }

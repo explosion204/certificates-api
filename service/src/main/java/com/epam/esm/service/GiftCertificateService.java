@@ -16,8 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -62,11 +64,9 @@ public class GiftCertificateService {
         List<GiftCertificate> certificates = certificateRepository.find(tagName, certificateName, certificateDescription,
                 orderByName, orderByCreateDate);
 
-        return certificates.stream().map(certificate -> {
-            long certificateId = certificate.getId();
-            List<Tag> tags = tagRepository.findByCertificate(certificateId);
-            return GiftCertificateDto.fromCertificate(certificate, tags);
-        }).toList();
+        return certificates.stream()
+                .map(GiftCertificateDto::fromCertificate)
+                .toList();
     }
 
     /**
@@ -79,8 +79,8 @@ public class GiftCertificateService {
     public GiftCertificateDto findById(long id) {
         GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(id));
-        List<Tag> tags = tagRepository.findByCertificate(id);
-        return GiftCertificateDto.fromCertificate(certificate, tags);
+
+        return GiftCertificateDto.fromCertificate(certificate);
     }
 
     /**
@@ -105,15 +105,20 @@ public class GiftCertificateService {
         certificate.setCreateDate(createDate);
         certificate.setLastUpdateDate(createDate);
 
-        long certificateId = certificateRepository.create(certificate);
+        GiftCertificate createdCertificate = certificateRepository.create(certificate);
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
-            processTags(certificateId, tagNames);
-            certificateDto.setTags(tagNames);
+            // it's important to make an ArrayList object: Hibernate requires MODIFIABLE collection
+            // so .toList() is erroneous solution!
+            List<Tag> tags = certificateDto.getTags()
+                    .stream()
+                    .map(this::processTag)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            certificate.setTags(tags);
         }
 
-        return findById(certificateId);
+        return GiftCertificateDto.fromCertificate(createdCertificate);
     }
 
     /**
@@ -127,13 +132,8 @@ public class GiftCertificateService {
     @Transactional
     public GiftCertificateDto update(GiftCertificateDto certificateDto) {
         long certificateId = certificateDto.getId();
-        Optional<GiftCertificate> optionalCertificate = certificateRepository.findById(certificateId);
-
-        if (optionalCertificate.isEmpty()) {
-            throw new EntityNotFoundException(certificateId);
-        }
-
-        GiftCertificate certificate = optionalCertificate.get();
+        GiftCertificate certificate = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new EntityNotFoundException(certificateId));
 
         if (certificateDto.getName() != null) {
             certificate.setName(certificateDto.getName());
@@ -151,7 +151,6 @@ public class GiftCertificateService {
             certificate.setPrice(certificateDto.getPrice());
         }
 
-        List<String> tagNames = certificateDto.getTags();
         List<ValidationError> validationErrors = certificateValidator.validate(certificate, true);
 
         if (!validationErrors.isEmpty()) {
@@ -160,14 +159,19 @@ public class GiftCertificateService {
 
         LocalDateTime lastUpdateDate = LocalDateTime.now(UTC);
         certificate.setLastUpdateDate(lastUpdateDate);
-        certificateRepository.update(certificate);
+        List<String> tagNames = certificateDto.getTags();
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
-            processTags(certificate.getId(), tagNames);
+            List<Tag> tags = certificateDto.getTags()
+                    .stream()
+                    .map(this::processTag)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            certificate.setTags(tags);
         }
 
-        return findById(certificate.getId());
+        GiftCertificate updatedCertificate = certificateRepository.update(certificate);
+        return GiftCertificateDto.fromCertificate(updatedCertificate);
     }
 
     /**
@@ -176,40 +180,31 @@ public class GiftCertificateService {
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
      */
+    @Transactional
     public void delete(long id) {
-        boolean certificateExists = certificateRepository.delete(id);
-
-        if (!certificateExists) {
-            throw new EntityNotFoundException(id);
-        }
+        GiftCertificate certificate = certificateRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(id));
+        certificateRepository.delete(certificate);
     }
 
-    private void processTags(long certificateId, List<String> tagNames) {
-        List<Tag> currentTags = tagRepository.findByCertificate(certificateId);
-        // remove old tags
-        currentTags.forEach(tag -> certificateRepository.detachTag(certificateId, tag.getId()));
+    private Tag processTag(String tagName) {
+        List<ValidationError> validationErrors = tagValidator.validate(tagName);
 
-        // tag validation
-        tagNames.forEach(tagName -> {
-            List<ValidationError> validationErrors = tagValidator.validate(tagName);
+        if (!validationErrors.isEmpty()) {
+            throw new InvalidEntityException(validationErrors, Tag.class);
+        }
 
-            if (!validationErrors.isEmpty()) {
-                throw new InvalidEntityException(validationErrors, Tag.class);
-            }
+        Optional<Tag> optionalTag = tagRepository.findByName(tagName);
+        Tag tag;
 
-            // if tag does not exist, create it in database
-            Optional<Tag> tag = tagRepository.findByName(tagName);
-            long tagId;
-            if (tag.isEmpty()) {
-                Tag newTag = new Tag();
-                newTag.setName(tagName);
-                tagId = tagRepository.create(newTag);
-            } else {
-                tagId = tag.get().getId();
-            }
+        if (optionalTag.isEmpty()) {
+            tag = new Tag();
+            tag.setName(tagName);
+            tagRepository.create(tag);
+        } else {
+            tag = optionalTag.get();
+        }
 
-            // attach tags to certificate
-            certificateRepository.attachTag(certificateId, tagId);
-        });
+        return tag;
     }
 }
