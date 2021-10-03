@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ContextConfiguration(classes = TestConfig.class)
 @TestPropertySource(properties = {
+        // this makes JPA generate database schema before init script is called
         "spring.jpa.defer-datasource-initialization=true"
 })
 class GiftCertificateRepositoryImplTest {
