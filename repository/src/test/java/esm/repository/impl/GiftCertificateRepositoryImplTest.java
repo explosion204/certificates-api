@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DatabaseConfig.class)
-@Transactional
+@Transactional // this annotation is VITAL to rollback changes done by each test execution
 @ActiveProfiles(resolver = TestProfileResolver.class)
 class GiftCertificateRepositoryImplTest {
     @Autowired
