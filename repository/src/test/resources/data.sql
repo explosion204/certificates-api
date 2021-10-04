@@ -21,3 +21,6 @@ VALUES ('tag3');
 
 INSERT INTO certificate_tag (id_certificate, id_tag)
 VALUES (1, 1);
+
+INSERT INTO certificate_tag (id_certificate, id_tag)
+VALUES (1, 2);
