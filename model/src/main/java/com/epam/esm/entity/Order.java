@@ -21,7 +21,7 @@ public class Order {
     private BigDecimal cost;
     private LocalDateTime purchaseDate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

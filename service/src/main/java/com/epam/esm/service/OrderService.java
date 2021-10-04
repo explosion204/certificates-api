@@ -50,6 +50,22 @@ public class OrderService {
                 .toList();
     }
 
+
+    /**
+     * Retrieve all orders of specified user.
+     *
+     * @param userId user id
+     * @return list of {@link OrderDto}
+     */
+    public List<OrderDto> findByUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+        return user.getOrders()
+                .stream()
+                .map(OrderDto::fromOrder)
+                .toList();
+    }
+
     /**
      * Retrieve order by its unique id.
      *

@@ -1,9 +1,12 @@
 package com.epam.esm.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +19,9 @@ public class User {
 
     @Column(unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Order> orders;
 }

@@ -27,13 +27,16 @@ public class OrderController {
     }
 
     /**
-     * Retrieve all tags.
+     * Retrieve all orders or orders of specified user.
      *
+     * @param userId user id (optional)
      * @return JSON {@link ResponseEntity} object that contains list of {@link OrderDto}
      */
     @GetMapping
-    public ResponseEntity<List<OrderDto>> getOrders() {
-        List<OrderDto> orders = orderService.findAll();
+    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam(required = false) Long userId) {
+        List<OrderDto> orders = userId != null
+                ? orderService.findByUser(userId)
+                : orderService.findAll();
         return new ResponseEntity<>(orders, OK);
     }
 
