@@ -15,7 +15,7 @@ allprojects {
         annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
         // required dependency for production deployment (via Docker)
-        implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+        implementation group: 'javax.xml.bind', name: 'jaxb-api', version: jaxbApiVersion
 
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: bootVersion
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion

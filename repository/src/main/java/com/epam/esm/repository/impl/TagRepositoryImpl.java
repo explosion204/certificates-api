@@ -32,7 +32,7 @@ public class TagRepositoryImpl implements TagRepository {
                 LIMIT 1
             )
             GROUP BY t.id, t.name
-            ORDER BY COUNT(t.name)
+            ORDER BY COUNT(t.name) DESC
             LIMIT 1;
             """;
 
