@@ -15,9 +15,13 @@ import java.util.Optional;
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String TAGS = "tags";
+    private static final String ID = "id";
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
+    private static final String PRICE = "price";
+    private static final String DURATION = "duration";
     private static final String CREATE_DATE = "createDate";
+    private static final String LAST_UPDATE_DATE = "lastUpdateDate";
     private static final String PARTIAL_STRING = "%%%s%%";
 
     private EntityManager entityManager;
@@ -27,44 +31,73 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificate> find(String tagName, String certificateName, String certificateDescription,
+    public List<GiftCertificate> find(List<String> tagNames, String certificateName, String certificateDescription,
                 OrderingType orderByName, OrderingType orderByCreateDate) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
         Root<GiftCertificate> certificateRoot = criteriaQuery.from(GiftCertificate.class);
         List<Predicate> predicates = new ArrayList<>();
         Join<GiftCertificate, Tag> join = certificateRoot.join(TAGS, JoinType.LEFT);
+        criteriaQuery = criteriaQuery.select(certificateRoot);
 
-        if (tagName != null) {
-            Predicate tagNamePredicate = criteriaBuilder.equal(join.get(NAME), tagName);
-            predicates.add(tagNamePredicate);
-        }
-
+        // set up condition for search by certificate name
         if (certificateName != null) {
-            String partialName = String.format(PARTIAL_STRING, certificateName);
-            Predicate certificateNamePredicate = criteriaBuilder.like(certificateRoot.get(NAME),
-                    partialName);
+            Predicate certificateNamePredicate = createPartialStringPredicate(certificateName, NAME, criteriaBuilder,
+                    certificateRoot);
             predicates.add(certificateNamePredicate);
         }
 
+        // set up condition for search by certificate description
         if (certificateDescription != null) {
-            String partialDescription = String.format(PARTIAL_STRING, certificateDescription);
-            Predicate certificateDescriptionPredicate = criteriaBuilder.like(certificateRoot.get(DESCRIPTION),
-                    partialDescription);
+            Predicate certificateDescriptionPredicate = createPartialStringPredicate(certificateDescription, DESCRIPTION,
+                    criteriaBuilder, certificateRoot);
             predicates.add(certificateDescriptionPredicate);
         }
 
+        // set up ordering by certificate name
         if (orderByName != null) {
             setOrdering(orderByName, NAME, certificateRoot, criteriaBuilder, criteriaQuery);
         }
 
+        // set up ordering by certificate create date
         if (orderByCreateDate != null) {
             setOrdering(orderByCreateDate, CREATE_DATE, certificateRoot, criteriaBuilder, criteriaQuery);
         }
 
+        // select gift certificates
         criteriaQuery = criteriaQuery.select(certificateRoot)
-                .where(predicates.toArray(new Predicate[0]))
                 .distinct(true);
+
+        if (tagNames != null) {
+            // firstly we need only records related to specified tags
+            Predicate inPredicate = join.get(NAME).in(tagNames);
+            // we must not forget about other conditions
+            predicates.add(inPredicate);
+
+            criteriaQuery = criteriaQuery
+                    .where(predicates.toArray(new Predicate[0]))
+                    // group records by certificates
+                    // we need all columns without aggregation function to be in GROUP BY clause
+                    .groupBy(
+                            certificateRoot.get(ID),
+                            certificateRoot.get(NAME),
+                            certificateRoot.get(DESCRIPTION),
+                            certificateRoot.get(PRICE),
+                            certificateRoot.get(DURATION),
+                            certificateRoot.get(CREATE_DATE),
+                            certificateRoot.get(LAST_UPDATE_DATE)
+                    )
+                    // groups that fulfill that condition are sought-for
+                    .having(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.countDistinct(join.get(ID)),
+                                    tagNames.size()
+                            )
+                    );
+        } else {
+            // otherwise, we just apply remaining conditions
+            criteriaQuery = criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        }
 
         return entityManager.createQuery(criteriaQuery)
                 .getResultList();
@@ -90,6 +123,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public void delete(GiftCertificate certificate) {
         entityManager.remove(certificate);
+    }
+
+    private Predicate createPartialStringPredicate(String initialString, String attributeName,
+                CriteriaBuilder criteriaBuilder, Root<GiftCertificate> certificateRoot) {
+        String partialName = String.format(PARTIAL_STRING, initialString);
+        return criteriaBuilder.like(certificateRoot.get(attributeName),
+                partialName);
     }
 
     private void setOrdering(OrderingType orderingType, String orderingAttribute, Root<GiftCertificate> certificateRoot,

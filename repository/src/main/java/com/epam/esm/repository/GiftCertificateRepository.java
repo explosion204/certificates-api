@@ -15,14 +15,14 @@ public interface GiftCertificateRepository {
      * Retrieve certificates according to specified parameters. All parameters are optional, so
      * if they are not present, all certificates will be retrieved
      *
-     * @param tagName                precise tag name
+     * @param tagNames               precise tag names
      * @param certificateName        certificate name (can be partly qualified)
      * @param certificateDescription certificate description (can be partly qualified)
      * @param orderByName            name ordering approach
      * @param orderByCreateDate      creation date ordering approach
      * @return list of {@link GiftCertificate}
      */
-    List<GiftCertificate> find(String tagName, String certificateName, String certificateDescription,
+    List<GiftCertificate> find(List<String> tagNames, String certificateName, String certificateDescription,
             OrderingType orderByName, OrderingType orderByCreateDate);
 
     /**

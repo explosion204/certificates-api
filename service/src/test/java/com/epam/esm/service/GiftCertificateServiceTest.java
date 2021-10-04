@@ -67,18 +67,18 @@ class GiftCertificateServiceTest {
             add(provideCertificateDto());
         }};
 
-        String tagName = "tag";
+        List<String> tagNames = List.of("tag1", "tag2");
         String certificateName = "certificate";
         String certificateDescription = "description";
         OrderingType orderByName = OrderingType.ASC;
         OrderingType orderByCreateDate = OrderingType.DESC;
-        when(certificateRepository.find(tagName, certificateName, certificateDescription, orderByName,
+        when(certificateRepository.find(tagNames, certificateName, certificateDescription, orderByName,
                 orderByCreateDate)).thenReturn(certificateList);
 
         GiftCertificateSearchParamsDto searchParamsDto = provideSearchParamsDto();
         List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto);
 
-        verify(certificateRepository).find(tagName, certificateName, certificateDescription,
+        verify(certificateRepository).find(tagNames, certificateName, certificateDescription,
                orderByName, orderByCreateDate);
 
         assertEquals(certificateDtoList, actualDtoList);
@@ -137,7 +137,7 @@ class GiftCertificateServiceTest {
     @Test
     void testUpdate() {
         long certificateId = 1;
-        String tagName = "tag";
+        String tagName = "tag1";
         GiftCertificate certificate = provideCertificate();
         GiftCertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setId(certificateId);
@@ -226,8 +226,7 @@ class GiftCertificateServiceTest {
         certificate.setCreateDate(INITIAL_DATE);
         certificate.setLastUpdateDate(INITIAL_DATE);
 
-        Tag tag = provideTags().get(0);
-        certificate.setTags(new ArrayList<>() {{ add(tag); }});
+        certificate.setTags(provideTags());
 
         return certificate;
     }
@@ -250,7 +249,7 @@ class GiftCertificateServiceTest {
     private GiftCertificateSearchParamsDto provideSearchParamsDto() {
         GiftCertificateSearchParamsDto searchParamsDto = new GiftCertificateSearchParamsDto();
 
-        searchParamsDto.setTagName("tag");
+        searchParamsDto.setTagNames(List.of("tag1", "tag2"));
         searchParamsDto.setCertificateName("certificate");
         searchParamsDto.setCertificateDescription("description");
         searchParamsDto.setOrderByCreateDate(OrderingType.DESC);
@@ -260,19 +259,24 @@ class GiftCertificateServiceTest {
     }
 
     private List<Tag> provideTags() {
-        Tag tag = new Tag();
+        Tag firstTag = new Tag();
+        firstTag.setId(1);
+        firstTag.setName("tag1");
 
-        tag.setId(1);
-        tag.setName("tag");
+        Tag secondTag = new Tag();
+        secondTag.setId(1);
+        secondTag.setName("tag2");
 
         return new ArrayList<>() {{
-            add(tag);
+            add(firstTag);
+            add(secondTag);
         }};
     }
 
     private List<String> provideTagNames() {
         return new ArrayList<>() {{
-           add("tag");
+           add("tag1");
+           add("tag2");
         }};
     }
 }

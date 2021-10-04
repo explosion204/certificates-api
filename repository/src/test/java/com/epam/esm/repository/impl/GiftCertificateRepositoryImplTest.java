@@ -37,8 +37,8 @@ class GiftCertificateRepositoryImplTest {
 
     @ParameterizedTest
     @MethodSource("provideCertificateSearchParams")
-    void testFindByParams(long expectedSize, String tagName, String certificateName, String certificateDescription) {
-        List<GiftCertificate> certificates = certificateRepository.find(tagName, certificateName, certificateDescription,
+    void testFindByParams(long expectedSize, List<String> tagNames, String certificateName, String certificateDescription) {
+        List<GiftCertificate> certificates = certificateRepository.find(tagNames, certificateName, certificateDescription,
                 null, null);
 
         boolean valid = certificates.stream()
@@ -142,8 +142,8 @@ class GiftCertificateRepositoryImplTest {
     private static Stream<Arguments> provideCertificateSearchParams() {
         return Stream.of(
                 Arguments.of(4, null, null, null),
-                Arguments.of(1, "tag1", null, null),
-                Arguments.of(0, "tag22", "name", "desc"),
+                Arguments.of(1, List.of("tag1", "tag2"), null, null),
+                Arguments.of(0, List.of("tag22"), "name", "desc"),
                 Arguments.of(2, null, null, "description"),
                 Arguments.of(1, null, "hello there", null)
         );

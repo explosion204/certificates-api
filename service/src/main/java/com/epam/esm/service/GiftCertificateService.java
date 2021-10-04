@@ -55,13 +55,13 @@ public class GiftCertificateService {
      * @return list of {@link GiftCertificateDto}
      */
     public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto) {
-        String tagName = searchParamsDto.getTagName();
+        List<String> tagNames = searchParamsDto.getTagNames();
         String certificateName = searchParamsDto.getCertificateName();
         String certificateDescription = searchParamsDto.getCertificateDescription();
         OrderingType orderByName = searchParamsDto.getOrderByName();
         OrderingType orderByCreateDate = searchParamsDto.getOrderByCreateDate();
 
-        List<GiftCertificate> certificates = certificateRepository.find(tagName, certificateName, certificateDescription,
+        List<GiftCertificate> certificates = certificateRepository.find(tagNames, certificateName, certificateDescription,
                 orderByName, orderByCreateDate);
 
         return certificates.stream()
