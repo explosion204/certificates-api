@@ -5,14 +5,11 @@ volumes:
 
 services:
   db:
-    container_name: db
-    image: 'mariadb:latest'
+    image: 'postgres:latest'
     volumes:
-      - 'db_data:/var/lib/mysql'
+      - db_data:/var/lib/postgresql/data
     env_file:
       - '.db.env'
-    ports:
-      - '3306:3306'
 
   certificates_api:
     image: 'certificates-api'

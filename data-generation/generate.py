@@ -106,7 +106,7 @@ def generate_data(file_name, certificates_total, tags_total, users_total):
         for _ in range(users_total):
             name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
 
-            user_statement = generate_insert('user', {
+            user_statement = generate_insert('app_user', {
                 'name': name
             })
 
