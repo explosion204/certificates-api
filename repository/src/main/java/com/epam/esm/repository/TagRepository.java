@@ -35,6 +35,13 @@ public interface TagRepository {
     Optional<Tag> findByName(String name);
 
     /**
+     * Retrieve the most widely used tag of a user with the highest cost of all orders.
+     *
+     * @return {@link Tag} wrapped by {@link Optional}
+     */
+    Optional<Tag> findMostWidelyUsedTag();
+
+    /**
      * Create a new tag in the storage.
      *
      * @param tag {@link Tag} instance

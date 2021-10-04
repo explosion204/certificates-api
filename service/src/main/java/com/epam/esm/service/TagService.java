@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This service class encapsulated business logic related to {@link Tag} entity.
@@ -51,6 +52,18 @@ public class TagService {
     public TagDto findById(long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Tag.class));
+        return TagDto.fromTag(tag);
+    }
+
+    /**
+     * Retrieve the most widely used tag of a user with the highest cost of all orders.
+     *
+     * @throws EntityNotFoundException in case when such tag does not exist
+     * @return {@link TagDto} object
+     */
+    public TagDto findMostWidelyUsedTag() {
+        Tag tag = tagRepository.findMostWidelyUsedTag()
+                .orElseThrow(() -> new EntityNotFoundException(Tag.class));
         return TagDto.fromTag(tag);
     }
 

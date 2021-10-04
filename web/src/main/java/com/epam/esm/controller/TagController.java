@@ -52,6 +52,18 @@ public class TagController {
     }
 
     /**
+     * Retrieve the most widely used tag of a user with the highest cost of all orders.
+     *
+     * @throws EntityNotFoundException in case when such tag does not exist
+     * @return JSON {@link ResponseEntity} object that contains {@link TagDto} object
+     */
+    @GetMapping("/most_used_tag")
+    public ResponseEntity<TagDto> getMostWidelyTag() {
+        TagDto tagDto = tagService.findMostWidelyUsedTag();
+        return new ResponseEntity<>(tagDto, OK);
+    }
+
+    /**
      * Create a new tag.
      *
      * @param tagDto {@link TagDto} instance
