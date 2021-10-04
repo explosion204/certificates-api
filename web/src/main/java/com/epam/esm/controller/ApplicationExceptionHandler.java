@@ -32,6 +32,10 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
     private static final String ENTITY_ALREADY_EXISTS_MESSAGE = "entity_already_exists";
     private static final String ENTITY_NOT_FOUND_MESSAGE = "entity_not_found";
+
+    // not found error when id is not passed to exception
+    private static final String ENTITY_NOT_FOUND_WITHOUT_ID_MESSAGE = "entity_not_found_without_id";
+
     private static final String INVALID_ENTITY_MESSAGE = "invalid_entity";
     private static final String INVALID_NAME_MESSAGE = "invalid_entity.name";
     private static final String INVALID_DESCRIPTION_MESSAGE = "invalid_entity.description";
@@ -63,8 +67,10 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException e) {
         String entityName = e.getCauseEntity().getSimpleName();
-        long entityId = e.getEntityId();
-        String errorMessage = String.format(getErrorMessage(ENTITY_NOT_FOUND_MESSAGE), entityName, entityId);
+        Long entityId = e.getEntityId();
+        String errorMessage = entityId != null
+                ? String.format(getErrorMessage(ENTITY_NOT_FOUND_MESSAGE), entityName, entityId)
+                : String.format(getErrorMessage(ENTITY_NOT_FOUND_WITHOUT_ID_MESSAGE), entityName);
 
         return buildErrorResponseEntity(NOT_FOUND, errorMessage);
     }
