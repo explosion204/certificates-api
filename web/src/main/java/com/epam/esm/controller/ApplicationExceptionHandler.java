@@ -62,7 +62,10 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException e) {
-        String errorMessage = String.format(getErrorMessage(ENTITY_NOT_FOUND_MESSAGE), e.getEntityId());
+        String entityName = e.getCauseEntity().getSimpleName();
+        long entityId = e.getEntityId();
+        String errorMessage = String.format(getErrorMessage(ENTITY_NOT_FOUND_MESSAGE), entityName, entityId);
+
         return buildErrorResponseEntity(NOT_FOUND, errorMessage);
     }
 
@@ -85,9 +88,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
             }
         }
 
-        Class<?> causeEntity = e.getCauseEntity();
-        String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), causeEntity.getSimpleName(),
-                errorDetails);
+        String entityName = e.getCauseEntity().getSimpleName();
+        String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), entityName, errorDetails);
         return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 

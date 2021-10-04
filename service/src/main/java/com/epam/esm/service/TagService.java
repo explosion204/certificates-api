@@ -49,7 +49,8 @@ public class TagService {
      * @return {@link TagDto} object
      */
     public TagDto findById(long id) {
-        Tag tag = tagRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(id, Tag.class));
         return TagDto.fromTag(tag);
     }
 
@@ -88,7 +89,7 @@ public class TagService {
     @Transactional
     public void delete(long id) {
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(id, Tag.class));
 
         // remove target tag from associated certificates manually
         List<GiftCertificate> associatedCertificates = tag.getCertificates();

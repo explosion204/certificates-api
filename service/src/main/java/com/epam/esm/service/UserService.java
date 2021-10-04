@@ -41,7 +41,8 @@ public class UserService {
      * @return {@link UserDto} object
      */
     public UserDto find(long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(id, User.class));
         return UserDto.fromUser(user);
     }
 }

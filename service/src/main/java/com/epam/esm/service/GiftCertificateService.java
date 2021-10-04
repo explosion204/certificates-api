@@ -78,7 +78,7 @@ public class GiftCertificateService {
      */
     public GiftCertificateDto findById(long id) {
         GiftCertificate certificate = certificateRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(id));
+                new EntityNotFoundException(id, GiftCertificate.class));
 
         return GiftCertificateDto.fromCertificate(certificate);
     }
@@ -133,7 +133,7 @@ public class GiftCertificateService {
     public GiftCertificateDto update(GiftCertificateDto certificateDto) {
         long certificateId = certificateDto.getId();
         GiftCertificate certificate = certificateRepository.findById(certificateId)
-                .orElseThrow(() -> new EntityNotFoundException(certificateId));
+                .orElseThrow(() -> new EntityNotFoundException(certificateId, GiftCertificate.class));
 
         if (certificateDto.getName() != null) {
             certificate.setName(certificateDto.getName());
@@ -183,7 +183,7 @@ public class GiftCertificateService {
     @Transactional
     public void delete(long id) {
         GiftCertificate certificate = certificateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(id, GiftCertificate.class));
         certificateRepository.delete(certificate);
     }
 

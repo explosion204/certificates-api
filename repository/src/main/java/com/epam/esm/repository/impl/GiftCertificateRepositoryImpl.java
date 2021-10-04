@@ -87,7 +87,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                             certificateRoot.get(CREATE_DATE),
                             certificateRoot.get(LAST_UPDATE_DATE)
                     )
-                    // groups that fulfill that condition are sought-for
+                    // groups (i.e. certificates) that fulfill that condition are sought-for
                     .having(
                             criteriaBuilder.equal(
                                     criteriaBuilder.countDistinct(join.get(ID)),
