@@ -11,7 +11,7 @@ import java.util.List;
 
 @Aspect
 @Component
-public class UserControllerHateoasAspect extends BaseHateoasAspect<UserDto> {
+class UserControllerHateoasAspect extends BaseHateoasAspect<UserDto> {
     UserControllerHateoasAspect() {
         super(UserControllerHateoasAspect.class);
     }

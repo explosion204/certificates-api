@@ -1,5 +1,6 @@
 package com.epam.esm.controller.hateoas;
 
+import com.epam.esm.controller.OrderController;
 import com.epam.esm.dto.OrderDto;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,9 +12,9 @@ import java.util.List;
 
 @Aspect
 @Component
-public class OrderControllerHateoasAspect extends BaseHateoasAspect<OrderDto> {
+class OrderControllerHateoasAspect extends BaseHateoasAspect<OrderDto> {
     OrderControllerHateoasAspect() {
-        super(OrderDto.class);
+        super(OrderController.class);
     }
 
     @AfterReturning(pointcut = SINGLE_ENTITY_POINTCUT_PATTERN, returning = RETURN_VALUE_NAME)

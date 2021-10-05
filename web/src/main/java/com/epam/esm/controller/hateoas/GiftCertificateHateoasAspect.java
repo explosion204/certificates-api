@@ -27,7 +27,7 @@ class GiftCertificateHateoasAspect extends BaseHateoasAspect<GiftCertificateDto>
     }
 
     @Override
-    public void processModel(GiftCertificateDto model) {
+    void processModel(GiftCertificateDto model) {
         Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
         Link listLink = LinkConstructor.constructListLink(controllerClass);
         Link createLink = LinkConstructor.constructCreateLink(controllerClass, model);

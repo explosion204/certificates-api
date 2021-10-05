@@ -14,7 +14,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Aspect
 @Component
-public class TagControllerHateoasAspect extends BaseHateoasAspect<TagDto> {
+class TagControllerHateoasAspect extends BaseHateoasAspect<TagDto> {
     private static final String MOST_USED_TAG_REL = "most used tag";
     private static final String MOST_USED_TAG = "most_used_tag";
 
