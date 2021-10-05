@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.service.UserService;
@@ -11,6 +12,7 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
+@Hateoas
 @RequestMapping("/api/users")
 public class UserController {
     private UserService userService;

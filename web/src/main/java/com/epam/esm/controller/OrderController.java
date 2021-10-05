@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -18,6 +19,7 @@ import static org.springframework.http.HttpStatus.OK;
  * @author Dmitry Karnyshov
  */
 @RestController
+@Hateoas
 @RequestMapping("/api/orders")
 public class OrderController {
     private OrderService orderService;

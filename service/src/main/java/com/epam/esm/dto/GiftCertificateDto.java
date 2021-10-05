@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class GiftCertificateDto {
-    private long id;
+public class GiftCertificateDto extends IdentifiableDto<GiftCertificateDto> {
     private String name;
     private String description;
     private BigDecimal price;
@@ -39,7 +40,7 @@ public class GiftCertificateDto {
     public GiftCertificate toCertificate() {
         GiftCertificate certificate = new GiftCertificate();
 
-        certificate.setId(id);
+        certificate.setId(getId());
         certificate.setName(name);
         certificate.setDescription(description);
         certificate.setPrice(price);

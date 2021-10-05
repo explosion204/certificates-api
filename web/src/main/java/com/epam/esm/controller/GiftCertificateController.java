@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
@@ -20,6 +21,7 @@ import static org.springframework.http.HttpStatus.*;
  * @author Dmitry Karnyshov
  */
 @RestController
+@Hateoas
 @RequestMapping("/api/certificates")
 public class GiftCertificateController {
     private GiftCertificateService certificateService;

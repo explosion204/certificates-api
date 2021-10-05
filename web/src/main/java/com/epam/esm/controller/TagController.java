@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -19,6 +20,7 @@ import static org.springframework.http.HttpStatus.*;
  * @author Dmitry Karnyshov
  */
 @RestController
+@Hateoas
 @RequestMapping("/api/tags")
 public class TagController {
     private TagService tagService;
