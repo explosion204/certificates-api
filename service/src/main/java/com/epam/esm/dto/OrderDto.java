@@ -13,13 +13,15 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class OrderDto extends IdentifiableDto<OrderDto> {
+    private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String UTC_ZONE = "UTC";
+
     private long id;
     private long userId;
     private long certificateId;
     private BigDecimal cost;
 
-    // TODO: 10/5/2021
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
     private LocalDateTime purchaseDate;
 
     public static OrderDto fromOrder(Order order) {

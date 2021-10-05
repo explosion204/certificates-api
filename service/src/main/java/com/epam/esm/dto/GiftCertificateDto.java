@@ -21,6 +21,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class GiftCertificateDto extends IdentifiableDto<GiftCertificateDto> {
+    private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String UTC_ZONE = "UTC";
+
     private String name;
     private String description;
     private BigDecimal price;
@@ -29,10 +32,10 @@ public class GiftCertificateDto extends IdentifiableDto<GiftCertificateDto> {
     @JsonDeserialize(using = DayDurationDeserializer.class)
     private Duration duration;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
     private LocalDateTime createDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
     private LocalDateTime lastUpdateDate;
 
     private List<String> tags = new ArrayList<>();
