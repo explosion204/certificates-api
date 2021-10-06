@@ -21,9 +21,9 @@ import java.util.Objects;
  */
 abstract class BaseHateoasAspect<T extends IdentifiableDto<T>> {
     static final String LIST_POINTCUT_PATTERN
-            = "execution(public org.springframework.http.ResponseEntity<java.util.List+> *(*)) && within(@Hateoas *)";
+            = "execution(public org.springframework.http.ResponseEntity<java.util.List+> *(..)) && within(@Hateoas *)";
     static final String SINGLE_ENTITY_POINTCUT_PATTERN
-            = "execution(public org.springframework.http.ResponseEntity+ *(*)) && " +
+            = "execution(public org.springframework.http.ResponseEntity+ *(..)) && " +
               "within(@Hateoas *)";
     static final String RETURN_VALUE_NAME = "responseEntity";
     final Class<?> controllerClass;
