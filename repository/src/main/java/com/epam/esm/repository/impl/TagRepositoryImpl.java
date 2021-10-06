@@ -1,6 +1,7 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
 import org.springframework.stereotype.Repository;
 
@@ -43,13 +44,16 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> findAll() {
+    public List<Tag> findAll(PageContext pageContext) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
         Root<Tag> tagRoot = criteriaQuery.from(Tag.class);
 
         criteriaQuery = criteriaQuery.select(tagRoot);
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(pageContext.getStart())
+                .setMaxResults(pageContext.getLength())
+                .getResultList();
     }
 
     @Override

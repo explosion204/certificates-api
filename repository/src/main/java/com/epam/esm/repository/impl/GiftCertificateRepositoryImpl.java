@@ -4,6 +4,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
+import com.epam.esm.repository.PageContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -31,8 +32,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificate> find(List<String> tagNames, String certificateName, String certificateDescription,
-                OrderingType orderByName, OrderingType orderByCreateDate) {
+    public List<GiftCertificate> find(PageContext pageContext, List<String> tagNames, String certificateName,
+                String certificateDescription, OrderingType orderByName, OrderingType orderByCreateDate) {
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
         Root<GiftCertificate> certificateRoot = criteriaQuery.from(GiftCertificate.class);
@@ -100,6 +102,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         }
 
         return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(pageContext.getStart())
+                .setMaxResults(pageContext.getLength())
                 .getResultList();
     }
 

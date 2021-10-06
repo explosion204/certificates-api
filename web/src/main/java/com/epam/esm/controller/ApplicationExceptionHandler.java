@@ -3,6 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.validator.ValidationError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     private static final String INVALID_DESCRIPTION_MESSAGE = "invalid_entity.description";
     private static final String INVALID_PRICE_MESSAGE = "invalid_entity.price";
     private static final String INVALID_DURATION_MESSAGE = "invalid_entity.duration";
+    private static final String INVALID_PAGE_NUMBER_MESSAGE = "invalid_page_number";
+    private static final String INVALID_PAGE_SIZE_MESSAGE = "invalid_page_size";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "internal_server_error";
 
     private static final String ERROR_SEPARATOR = ", ";
@@ -97,6 +100,19 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         String entityName = e.getCauseEntity().getSimpleName();
         String errorMessage = String.format(getErrorMessage(INVALID_ENTITY_MESSAGE), entityName, errorDetails);
         return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(InvalidPageContextException.class)
+    public ResponseEntity<Object> handleInvalidPageContext(InvalidPageContextException e) {
+        InvalidPageContextException.ErrorType errorType = e.getErrorType();
+        int invalidValue = e.getInvalidValue();
+
+        String errorMessage = switch (errorType) {
+            case INVALID_PAGE_NUMBER -> getErrorMessage(INVALID_PAGE_NUMBER_MESSAGE);
+            case INVALID_PAGE_SIZE -> getErrorMessage(INVALID_PAGE_SIZE_MESSAGE);
+        };
+
+        return buildErrorResponseEntity(BAD_REQUEST, String.format(errorMessage, invalidValue));
     }
 
     @ExceptionHandler(Exception.class)

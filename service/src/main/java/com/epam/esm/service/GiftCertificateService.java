@@ -8,7 +8,9 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
@@ -52,17 +54,19 @@ public class GiftCertificateService {
      * All parameters are optional, so if they are not present, all certificates will be retrieved.
      *
      * @param searchParamsDto {@link GiftCertificateSearchParamsDto} object with specified search parameters
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link GiftCertificateDto}
      */
-    public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto) {
+    public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto, PageContext pageContext) {
         List<String> tagNames = searchParamsDto.getTagNames();
         String certificateName = searchParamsDto.getCertificateName();
         String certificateDescription = searchParamsDto.getCertificateDescription();
         OrderingType orderByName = searchParamsDto.getOrderByName();
         OrderingType orderByCreateDate = searchParamsDto.getOrderByCreateDate();
 
-        List<GiftCertificate> certificates = certificateRepository.find(tagNames, certificateName, certificateDescription,
-                orderByName, orderByCreateDate);
+        List<GiftCertificate> certificates = certificateRepository.find(pageContext, tagNames, certificateName,
+                certificateDescription, orderByName, orderByCreateDate);
 
         return certificates.stream()
                 .map(GiftCertificateDto::fromCertificate)

@@ -5,6 +5,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
@@ -41,10 +42,11 @@ class TagServiceImplTest {
 
     @Test
     void testFindAll() {
-        when(tagRepository.findAll()).thenReturn(provideTagsList());
+        PageContext pageContext = new PageContext();
+        when(tagRepository.findAll(pageContext)).thenReturn(provideTagsList());
 
         List<TagDto> expectedDtoList = provideTagDtoList();
-        List<TagDto> actualDtoList = tagService.findAll();
+        List<TagDto> actualDtoList = tagService.findAll(pageContext);
 
         assertEquals(expectedDtoList, actualDtoList);
     }

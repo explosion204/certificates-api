@@ -8,6 +8,7 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
@@ -67,18 +68,19 @@ class GiftCertificateServiceTest {
             add(provideCertificateDto());
         }};
 
+        PageContext pageContext = new PageContext();
         List<String> tagNames = List.of("tag1", "tag2");
         String certificateName = "certificate";
         String certificateDescription = "description";
         OrderingType orderByName = OrderingType.ASC;
         OrderingType orderByCreateDate = OrderingType.DESC;
-        when(certificateRepository.find(tagNames, certificateName, certificateDescription, orderByName,
+        when(certificateRepository.find(pageContext, tagNames, certificateName, certificateDescription, orderByName,
                 orderByCreateDate)).thenReturn(certificateList);
 
         GiftCertificateSearchParamsDto searchParamsDto = provideSearchParamsDto();
-        List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto);
+        List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto, pageContext);
 
-        verify(certificateRepository).find(tagNames, certificateName, certificateDescription,
+        verify(certificateRepository).find(pageContext, tagNames, certificateName, certificateDescription,
                orderByName, orderByCreateDate);
 
         assertEquals(certificateDtoList, actualDtoList);

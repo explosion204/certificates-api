@@ -4,6 +4,7 @@ import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +36,11 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link OrderDto}
      */
     @GetMapping
-    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam(required = false) Long userId) {
+    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam(required = false) Long userId,
+                @ModelAttribute PageContext pageContext) {
         List<OrderDto> orders = userId != null
-                ? orderService.findByUser(userId)
-                : orderService.findAll();
+                ? orderService.findByUser(userId, pageContext)
+                : orderService.findAll(pageContext);
         return new ResponseEntity<>(orders, OK);
     }
 

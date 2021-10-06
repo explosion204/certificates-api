@@ -6,6 +6,7 @@ import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.service.GiftCertificateService;
 
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,10 @@ public class GiftCertificateController {
      */
     @GetMapping
     public ResponseEntity<List<GiftCertificateDto>> getCertificates(
-                @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto) {
-        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto);
+            @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto,
+            @ModelAttribute PageContext pageContext
+    ) {
+        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, pageContext);
         return new ResponseEntity<>(certificates, OK);
     }
 

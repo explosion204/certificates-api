@@ -8,7 +8,9 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +43,12 @@ public class OrderService {
     /**
      * Retrieve all orders.
      *
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link OrderDto}
      */
-    public List<OrderDto> findAll() {
-        return orderRepository.findAll()
+    public List<OrderDto> findAll(PageContext pageContext) {
+        return orderRepository.findAll(pageContext)
                 .stream()
                 .map(OrderDto::fromOrder)
                 .toList();
@@ -55,13 +59,18 @@ public class OrderService {
      * Retrieve all orders of specified user.
      *
      * @param userId user id
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
+     * @throws EntityNotFoundException in case when user with this id does not exist
      * @return list of {@link OrderDto}
      */
-    public List<OrderDto> findByUser(long userId) {
+    public List<OrderDto> findByUser(long userId, PageContext pageContext) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         return user.getOrders()
                 .stream()
+                .skip(pageContext.getStart())
+                .limit(pageContext.getLength())
                 .map(OrderDto::fromOrder)
                 .toList();
     }

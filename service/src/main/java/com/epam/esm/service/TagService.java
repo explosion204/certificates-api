@@ -6,14 +6,15 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This service class encapsulated business logic related to {@link Tag} entity.
@@ -33,10 +34,12 @@ public class TagService {
     /**
      * Retrieve all tags.
      *
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link TagDto}
      */
-    public List<TagDto> findAll() {
-        return tagRepository.findAll()
+    public List<TagDto> findAll(PageContext pageContext) {
+        return tagRepository.findAll(pageContext)
                 .stream()
                 .map(TagDto::fromTag)
                 .toList();

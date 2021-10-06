@@ -2,6 +2,7 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.PageContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,13 +21,16 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<Order> findAll(PageContext pageContext) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
         Root<Order> orderRoot = criteriaQuery.from(Order.class);
 
         criteriaQuery = criteriaQuery.select(orderRoot);
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(pageContext.getStart())
+                .setMaxResults(pageContext.getLength())
+                .getResultList();
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,8 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link TagDto}
      */
     @GetMapping
-    public ResponseEntity<List<TagDto>> getTags() {
-        List<TagDto> tags = tagService.findAll();
+    public ResponseEntity<List<TagDto>> getTags(@ModelAttribute PageContext pageContext) {
+        List<TagDto> tags = tagService.findAll(pageContext);
         return new ResponseEntity<>(tags, OK);
     }
 

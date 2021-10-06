@@ -1,6 +1,7 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Order;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +16,11 @@ public interface OrderRepository {
     /**
      * Retrieve all orders from storage.
      *
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link Order}
      */
-    List<Order> findAll();
+    List<Order> findAll(PageContext pageContext);
 
     /**
      * Retrieve order by its unique id.

@@ -4,6 +4,7 @@ import com.epam.esm.TestConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
+import com.epam.esm.repository.PageContext;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,9 +38,10 @@ class GiftCertificateRepositoryImplTest {
 
     @ParameterizedTest
     @MethodSource("provideCertificateSearchParams")
-    void testFindByParams(long expectedSize, List<String> tagNames, String certificateName, String certificateDescription) {
-        List<GiftCertificate> certificates = certificateRepository.find(tagNames, certificateName, certificateDescription,
-                null, null);
+    void testFindByParams(long expectedSize, PageContext pageContext, List<String> tagNames, String certificateName,
+                String certificateDescription) {
+        List<GiftCertificate> certificates = certificateRepository.find(pageContext, tagNames, certificateName,
+                certificateDescription, null, null);
 
         boolean valid = certificates.stream()
                 .allMatch(cert -> {
@@ -56,7 +58,8 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByNameAscending() {
-        List<GiftCertificate> actual = certificateRepository.find(null, null, null,
+        PageContext pageContext = provideAllPagesContext();
+        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
                 OrderingType.ASC, null);
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Comparator.comparing(GiftCertificate::getName))
@@ -67,7 +70,8 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByNameDescending() {
-        List<GiftCertificate> actual = certificateRepository.find(null, null, null,
+        PageContext pageContext = provideAllPagesContext();
+        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
                 OrderingType.DESC, null);
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Collections.reverseOrder(Comparator.comparing(GiftCertificate::getName)))
@@ -78,7 +82,8 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByCreateDateAscending() {
-        List<GiftCertificate> actual = certificateRepository.find(null, null, null,
+        PageContext pageContext = provideAllPagesContext();
+        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
                 null, OrderingType.ASC);
 
         List<GiftCertificate> expected = actual.stream()
@@ -90,7 +95,8 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByCreateDateDescending() {
-        List<GiftCertificate> actual = certificateRepository.find(null, null, null,
+        PageContext pageContext = provideAllPagesContext();
+        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
                 null, OrderingType.DESC);
 
         List<GiftCertificate> expected = actual.stream()
@@ -140,12 +146,16 @@ class GiftCertificateRepositoryImplTest {
     }
 
     private static Stream<Arguments> provideCertificateSearchParams() {
+        PageContext allItems = provideAllPagesContext();
+        PageContext notAllItems = provideOnePageContext();
+
         return Stream.of(
-                Arguments.of(4, null, null, null),
-                Arguments.of(1, List.of("tag1", "tag2"), null, null),
-                Arguments.of(0, List.of("tag22"), "name", "desc"),
-                Arguments.of(2, null, null, "description"),
-                Arguments.of(1, null, "hello there", null)
+                Arguments.of(4, allItems, null, null, null),
+                Arguments.of(1, notAllItems, null, null, null),
+                Arguments.of(1, allItems, List.of("tag1", "tag2"), null, null),
+                Arguments.of(0, allItems, List.of("tag22"), "name", "desc"),
+                Arguments.of(2, allItems, null, null, "description"),
+                Arguments.of(1, allItems, null, "hello there", null)
         );
     }
 
@@ -159,5 +169,13 @@ class GiftCertificateRepositoryImplTest {
         certificate.setLastUpdateDate(LocalDateTime.now(UTC));
 
         return certificate;
+    }
+
+    private static PageContext provideAllPagesContext() {
+        return new PageContext(1, 100);
+    }
+
+    private static PageContext provideOnePageContext() {
+        return new PageContext(1, 1);
     }
 }

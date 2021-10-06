@@ -3,6 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.controller.hateoas.Hateoas;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,8 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link UserDto}
      */
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers() {
-        List<UserDto> users = userService.findAll();
+    public ResponseEntity<List<UserDto>> getUsers(@ModelAttribute PageContext pageContext) {
+        List<UserDto> users = userService.findAll(pageContext);
         return new ResponseEntity<>(users, OK);
     }
 

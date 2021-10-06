@@ -1,9 +1,11 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,10 +26,12 @@ public class UserService {
     /**
      * Retrieve all users.
      *
+     * @param pageContext {@link PageContext} object with pagination logic
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link UserDto}
      */
-    public List<UserDto> findAll() {
-        return userRepository.findAll()
+    public List<UserDto> findAll(PageContext pageContext) {
+        return userRepository.findAll(pageContext)
                 .stream()
                 .map(UserDto::fromUser)
                 .toList();

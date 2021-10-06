@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import org.springframework.stereotype.Repository;
@@ -20,13 +21,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll(PageContext pageContext) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
         Root<User> userRoot = criteriaQuery.from(User.class);
 
         criteriaQuery = criteriaQuery.select(userRoot);
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(pageContext.getStart())
+                .setMaxResults(pageContext.getLength())
+                .getResultList();
     }
 
     @Override
