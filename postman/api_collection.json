@@ -12,9 +12,15 @@
 					"name": "Get certificates by params",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "ru",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/?tagName=tag1&certificateName=cert&certificateDescription=desc&orderByName=asc&orderByCreateDate=desc",
+							"raw": "http://localhost:8080/api/certificates/?tagNames=tag1,tag2&page=1&pageSize=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -27,24 +33,36 @@
 							],
 							"query": [
 								{
-									"key": "tagName",
-									"value": "tag1"
+									"key": "tagNames",
+									"value": "tag1,tag2"
 								},
 								{
 									"key": "certificateName",
-									"value": "cert"
+									"value": "test",
+									"disabled": true
 								},
 								{
 									"key": "certificateDescription",
-									"value": "desc"
+									"value": "desc",
+									"disabled": true
 								},
 								{
 									"key": "orderByName",
-									"value": "asc"
+									"value": "desc",
+									"disabled": true
 								},
 								{
 									"key": "orderByCreateDate",
-									"value": "desc"
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
 								}
 							]
 						}
@@ -63,7 +81,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/2",
+							"raw": "http://localhost:8080/api/certificates/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -72,7 +90,7 @@
 							"path": [
 								"api",
 								"certificates",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -85,7 +103,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"certificate name\",\r\n    \"description\": \"certificate description\",\r\n    \"price\": 1.0,\r\n    \"duration\": 4.0\r\n}",
+							"raw": "{\r\n    \"name\": \"a certificate name\",\r\n    \"description\": \"certificate description\",\r\n    \"price\": 1.0,\r\n    \"duration\": 4.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -93,7 +111,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/",
+							"raw": "http://localhost:8080/api/certificates",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -101,8 +119,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"certificates",
-								""
+								"certificates"
 							]
 						}
 					},
@@ -115,7 +132,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"certificate name\",\r\n    \"description\": \"certificate description\",\r\n    \"price\": 1.0,\r\n    \"duration\": 4.0,\r\n    \"tags\": [\r\n        \"tag1\", \"tag2\", \"tag3\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"name\": \"a certificate\",\r\n    \"description\": \"certificate description\",\r\n    \"price\": 1.0,\r\n    \"duration\": 4.0,\r\n    \"tags\": [\r\n        \"tag1\", \"tag2\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -145,7 +162,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"привет\",\r\n    \"tags\": [\"tag1111\"]\r\n}",
+							"raw": "{\r\n    \"tags\": [\r\n        \"tag1\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -153,7 +170,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/2",
+							"raw": "http://localhost:8080/api/certificates/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -162,7 +179,7 @@
 							"path": [
 								"api",
 								"certificates",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -174,7 +191,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/certificates/2",
+							"raw": "http://localhost:8080/api/certificates/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -183,7 +200,7 @@
 							"path": [
 								"api",
 								"certificates",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -200,7 +217,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/tags/1",
+							"raw": "http://localhost:8080/api/tags/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -209,7 +226,7 @@
 							"path": [
 								"api",
 								"tags",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -221,7 +238,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/tags/11",
+							"raw": "http://localhost:8080/api/tags/4",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -230,7 +247,7 @@
 							"path": [
 								"api",
 								"tags",
-								"11"
+								"4"
 							]
 						}
 					},
@@ -243,7 +260,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"tag1111\"\r\n}",
+							"raw": "{\r\n    \"name\": \"newtag\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -272,7 +289,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/tags/",
+							"raw": "http://localhost:8080/api/tags/?page=1&pageSize=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -282,6 +299,194 @@
 								"api",
 								"tags",
 								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get the most widely used tag",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/tags/most_used_tag",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tags",
+								"most_used_tag"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "Get users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/?page=1&pageSize=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "orders",
+			"item": [
+				{
+					"name": "Make order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 1,\r\n    \"certificateId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/orders/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"orders",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/orders/?page=1&pageSize=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"orders",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orders by user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/orders?userId=1&page=1&pageSize=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "1"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								}
 							]
 						}
 					},
