@@ -30,7 +30,7 @@ class GiftCertificateHateoasAspect extends BaseHateoasAspect<GiftCertificateDto>
     void processModel(GiftCertificateDto model) {
         Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
         Link listLink = LinkConstructor.constructListLink(controllerClass);
-        Link createLink = LinkConstructor.constructCreateLink(controllerClass, model);
+        Link createLink = LinkConstructor.constructCreateLink(controllerClass);
         Link updateLink = LinkConstructor.constructUpdateLink(controllerClass, model);
         Link deleteLink = LinkConstructor.constructDeleteLink(controllerClass, model);
 

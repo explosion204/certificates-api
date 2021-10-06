@@ -34,10 +34,9 @@ class LinkConstructor {
                 .slash(model.getId())
                 .withSelfRel();
     }
-
-    static <T extends RepresentationModel<T>> Link constructCreateLink(Class<?> controllerClass,
-                IdentifiableDto<T> model) {
-        return constructLinkWithId(controllerClass, model, CREATE_REL);
+    
+    static Link constructCreateLink(Class<?> controllerClass) {
+        return linkTo(controllerClass).withRel(CREATE_REL);
     }
 
     static <T extends RepresentationModel<T>> Link constructUpdateLink(Class<?> controllerClass,

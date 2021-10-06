@@ -36,7 +36,7 @@ class TagControllerHateoasAspect extends BaseHateoasAspect<TagDto> {
     void processModel(TagDto model) {
         Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
         Link listLink = LinkConstructor.constructListLink(controllerClass);
-        Link createLink = LinkConstructor.constructCreateLink(controllerClass, model);
+        Link createLink = LinkConstructor.constructCreateLink(controllerClass);
         Link deleteLink = LinkConstructor.constructDeleteLink(controllerClass, model);
         Link mostUsedTagLink = constructWidelyUsedTagLink();
 
