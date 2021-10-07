@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TagServiceImplTest {
+class TagServiceTest {
     @InjectMocks
     private TagService tagService;
 
@@ -37,7 +37,7 @@ class TagServiceImplTest {
 
     @BeforeAll
     static void setUp() {
-        MockitoAnnotations.openMocks(TagServiceImplTest.class);
+        MockitoAnnotations.openMocks(TagServiceTest.class);
     }
 
     @Test

@@ -61,7 +61,6 @@ public class OrderService {
      * @param userId user id
      * @param pageContext {@link PageContext} object with pagination logic
      * @throws InvalidPageContextException if passed page or page size values are invalid
-     * @throws EntityNotFoundException in case when user with this id does not exist
      * @return list of {@link OrderDto}
      */
     public List<OrderDto> findByUser(long userId, PageContext pageContext) {
@@ -104,13 +103,13 @@ public class OrderService {
         BigDecimal cost = certificate.getPrice();
         LocalDateTime purchaseDate = LocalDateTime.now(UTC);
 
-        Order order = new Order();
-        order.setCost(cost);
-        order.setPurchaseDate(purchaseDate);
-        order.setUser(user);
-        order.setCertificate(certificate);
+        Order newOrder = new Order();
+        newOrder.setCost(cost);
+        newOrder.setPurchaseDate(purchaseDate);
+        newOrder.setUser(user);
+        newOrder.setCertificate(certificate);
 
-        orderRepository.create(order);
-        return OrderDto.fromOrder(order);
+        Order createdOrder = orderRepository.create(newOrder);
+        return OrderDto.fromOrder(createdOrder);
     }
 }
