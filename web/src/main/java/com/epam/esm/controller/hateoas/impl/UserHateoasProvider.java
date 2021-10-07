@@ -11,12 +11,14 @@ import java.util.List;
 
 @Component
 public class UserHateoasProvider implements HateoasProvider<UserDto> {
+    private static final String ALL_USERS_REL = "allUsers";
+
     @Override
     public List<Link> provide(UserDto model) {
         Class<?> controllerClass = UserController.class;
 
         Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
-        Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass);
+        Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass, ALL_USERS_REL);
 
         return List.of(selfLink, allResourcesLink);
     }

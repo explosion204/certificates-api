@@ -13,6 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 public class TagHateoasProvider implements HateoasProvider<TagDto> {
+    private static final String ALL_TAGS_REL = "allTags";
     private static final String MOST_WIDELY_USED_TAG_REL = "mostWidelyUsedTag";
     private static final String MOST_WIDELY_USED_TAG_URI = "most_used_tag";
 
@@ -21,7 +22,7 @@ public class TagHateoasProvider implements HateoasProvider<TagDto> {
         Class<?> controllerClass = TagController.class;
 
         Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
-        Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass);
+        Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass, ALL_TAGS_REL);
         Link mostWidelyUsedTagLink = constructWidelyUsedTagLink(controllerClass);
 
         return List.of(selfLink, allResourcesLink, mostWidelyUsedTagLink);

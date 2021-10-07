@@ -93,21 +93,26 @@ public class OrderService {
     @Transactional
     public OrderDto makeOrder(OrderDto orderDto) {
         long userId = orderDto.getUserId();
-        long certificateId = orderDto.getCertificateId();
+        List<Long> certificateIds = orderDto.getCertificateIds();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-        GiftCertificate certificate = certificateRepository.findById(certificateId)
-                .orElseThrow(() -> new EntityNotFoundException(certificateId, GiftCertificate.class));
 
-        BigDecimal cost = certificate.getPrice();
+        List<GiftCertificate> certificates = certificateIds.stream()
+                .map(id -> certificateRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException(id, User.class)))
+                .toList();
+
         LocalDateTime purchaseDate = LocalDateTime.now(UTC);
+        BigDecimal cost = certificates.stream()
+                .map(GiftCertificate::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Order newOrder = new Order();
-        newOrder.setCost(cost);
         newOrder.setPurchaseDate(purchaseDate);
+        newOrder.setCost(cost);
         newOrder.setUser(user);
-        newOrder.setCertificate(certificate);
+        newOrder.setCertificates(certificates);
 
         Order createdOrder = orderRepository.create(newOrder);
         return OrderDto.fromOrder(createdOrder);

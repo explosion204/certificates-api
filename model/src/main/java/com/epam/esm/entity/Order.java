@@ -9,6 +9,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,9 +30,11 @@ public class Order {
     @EqualsAndHashCode.Exclude
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "id_certificate", referencedColumnName = "id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private GiftCertificate certificate;
+    @ManyToMany
+    @JoinTable(
+            name = "certificate_order",
+            joinColumns = @JoinColumn(name = "id_order"),
+            inverseJoinColumns = @JoinColumn(name = "id_certificate")
+    )
+    private List<GiftCertificate> certificates;
 }

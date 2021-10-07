@@ -1,5 +1,6 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -18,7 +20,7 @@ public class OrderDto extends IdentifiableDto {
 
     private long id;
     private long userId;
-    private long certificateId;
+    private List<Long> certificateIds;
     private BigDecimal cost;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
@@ -29,9 +31,14 @@ public class OrderDto extends IdentifiableDto {
 
         orderDto.setId(order.getId());
         orderDto.setUserId(order.getUser().getId());
-        orderDto.setCertificateId(order.getCertificate().getId());
         orderDto.setCost(order.getCost());
         orderDto.setPurchaseDate(order.getPurchaseDate());
+
+        List<Long> certificates = order.getCertificates()
+                .stream()
+                .map(GiftCertificate::getId)
+                .toList();
+        orderDto.setCertificateIds(certificates);
 
         return orderDto;
     }

@@ -7,8 +7,6 @@ import org.springframework.hateoas.Link;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 public class LinkConstructor {
-    private static final String ALL_RESOURCES_REL = "allResources";
-
     private LinkConstructor() {
 
     }
@@ -19,9 +17,9 @@ public class LinkConstructor {
                 .withSelfRel();
     }
 
-    public static Link constructControllerLink(Class<?> controllerClass) {
+    public static Link constructControllerLink(Class<?> controllerClass, String rel) {
         return linkTo(controllerClass)
-                .withRel(ALL_RESOURCES_REL);
+                .withRel(rel);
     }
 
     public static Link constructControllerLinkWithId(Class<?> controllerClass, long id, String rel) {
