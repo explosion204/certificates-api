@@ -29,7 +29,7 @@ public class Order {
     @EqualsAndHashCode.Exclude
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_certificate", referencedColumnName = "id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

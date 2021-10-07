@@ -39,4 +39,7 @@ public class GiftCertificate {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Tag> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "certificate", cascade = CascadeType.REMOVE)
+    private List<Order> orders;
 }

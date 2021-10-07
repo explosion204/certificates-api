@@ -15,7 +15,7 @@ public class AuditEntity {
     @GeneratedValue
     private long id;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Operation operation;
     private String entityName;
     private LocalDateTime timestamp;

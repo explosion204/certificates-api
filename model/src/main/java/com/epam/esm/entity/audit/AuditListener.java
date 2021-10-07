@@ -2,7 +2,9 @@ package com.epam.esm.entity.audit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 import static com.epam.esm.entity.audit.AuditEntity.Operation.*;
 import static java.time.ZoneOffset.UTC;
 
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AuditListener {
     private static final Logger logger = LogManager.getLogger();
 
@@ -20,7 +23,7 @@ public class AuditListener {
 
     private EntityManager entityManager;
 
-    public AuditListener(EntityManager entityManager) {
+    public AuditListener(@Lazy EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
