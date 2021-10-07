@@ -44,7 +44,7 @@ public class UserService {
      * @throws EntityNotFoundException in case when user with this id does not exist
      * @return {@link UserDto} object
      */
-    public UserDto find(long id) {
+    public UserDto findById(long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, User.class));
         return UserDto.fromUser(user);

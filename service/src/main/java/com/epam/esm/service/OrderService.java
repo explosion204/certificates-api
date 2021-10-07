@@ -65,12 +65,8 @@ public class OrderService {
      * @return list of {@link OrderDto}
      */
     public List<OrderDto> findByUser(long userId, PageContext pageContext) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-        return user.getOrders()
+        return orderRepository.findByUser(pageContext, userId)
                 .stream()
-                .skip(pageContext.getStart())
-                .limit(pageContext.getLength())
                 .map(OrderDto::fromOrder)
                 .toList();
     }
