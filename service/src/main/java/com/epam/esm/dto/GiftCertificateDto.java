@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class GiftCertificateDto extends IdentifiableDto<GiftCertificateDto> {
+public class GiftCertificateDto extends IdentifiableDto {
     private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     private static final String UTC_ZONE = "UTC";
 

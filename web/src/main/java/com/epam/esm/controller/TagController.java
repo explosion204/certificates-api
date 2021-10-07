@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.Hateoas;
+import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -21,24 +22,26 @@ import static org.springframework.http.HttpStatus.*;
  * @author Dmitry Karnyshov
  */
 @RestController
-@Hateoas
 @RequestMapping("/api/tags")
 public class TagController {
     private TagService tagService;
+    private HateoasProvider<TagDto> hateoasProvider;
 
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, HateoasProvider<TagDto> hateoasProvider) {
         this.tagService = tagService;
+        this.hateoasProvider = hateoasProvider;
     }
 
     /**
      * Retrieve all tags.
      *
-     * @return JSON {@link ResponseEntity} object that contains list of {@link TagDto}
+     * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<TagDto>> getTags(@ModelAttribute PageContext pageContext) {
+    public ResponseEntity<List<HateoasModel>> getTags(@ModelAttribute PageContext pageContext) {
         List<TagDto> tags = tagService.findAll(pageContext);
-        return new ResponseEntity<>(tags, OK);
+        List<HateoasModel> models = HateoasModel.build(hateoasProvider, tags);
+        return new ResponseEntity<>(models, OK);
     }
 
     /**
@@ -46,24 +49,26 @@ public class TagController {
      *
      * @param id tag id
      * @throws EntityNotFoundException in case when tag with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link TagDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<TagDto> getTag(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel> getTag(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findById(id);
-        return new ResponseEntity<>(tagDto, OK);
+        HateoasModel model = HateoasModel.build(hateoasProvider, tagDto);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
      * Retrieve the most widely used tag of a user with the highest cost of all orders.
      *
      * @throws EntityNotFoundException in case when such tag does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link TagDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/most_used_tag")
-    public ResponseEntity<TagDto> getMostWidelyTag() {
+    public ResponseEntity<HateoasModel> getMostWidelyTag() {
         TagDto tagDto = tagService.findMostWidelyUsedTag();
-        return new ResponseEntity<>(tagDto, OK);
+        HateoasModel model = HateoasModel.build(hateoasProvider, tagDto);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
@@ -72,12 +77,13 @@ public class TagController {
      * @param tagDto {@link TagDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      * @throws EntityAlreadyExistsException in case when tag with specified name already exists
-     * @return JSON {@link ResponseEntity} object that contains created {@link TagDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
-    public ResponseEntity<TagDto> createTag(@RequestBody TagDto tagDto) {
+    public ResponseEntity<HateoasModel> createTag(@RequestBody TagDto tagDto) {
         TagDto createdTagDto = tagService.create(tagDto);
-        return new ResponseEntity<>(createdTagDto, CREATED);
+        HateoasModel model = HateoasModel.build(hateoasProvider, createdTagDto);
+        return new ResponseEntity<>(model, CREATED);
     }
 
     /**

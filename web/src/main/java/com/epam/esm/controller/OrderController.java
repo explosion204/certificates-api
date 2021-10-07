@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.Hateoas;
+import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -20,28 +21,30 @@ import static org.springframework.http.HttpStatus.OK;
  * @author Dmitry Karnyshov
  */
 @RestController
-@Hateoas
 @RequestMapping("/api/orders")
 public class OrderController {
     private OrderService orderService;
+    private HateoasProvider<OrderDto> hateoasProvider;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, HateoasProvider<OrderDto> hateoasProvider) {
         this.orderService = orderService;
+        this.hateoasProvider = hateoasProvider;
     }
 
     /**
      * Retrieve all orders or orders of specified user.
      *
      * @param userId user id (optional)
-     * @return JSON {@link ResponseEntity} object that contains list of {@link OrderDto}
+     * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam(required = false) Long userId,
+    public ResponseEntity<List<HateoasModel>> getOrders(@RequestParam(required = false) Long userId,
                 @ModelAttribute PageContext pageContext) {
         List<OrderDto> orders = userId != null
                 ? orderService.findByUser(userId, pageContext)
                 : orderService.findAll(pageContext);
-        return new ResponseEntity<>(orders, OK);
+        List<HateoasModel> models = HateoasModel.build(hateoasProvider, orders);
+        return new ResponseEntity<>(models, OK);
     }
 
     /**
@@ -49,12 +52,13 @@ public class OrderController {
      *
      * @param id order id
      * @throws EntityNotFoundException in case when order with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link OrderDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDto> getOrder(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel> getOrder(@PathVariable("id") long id) {
         OrderDto orderDto = orderService.findById(id);
-        return new ResponseEntity<>(orderDto, OK);
+        HateoasModel model = HateoasModel.build(hateoasProvider, orderDto);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
@@ -62,11 +66,12 @@ public class OrderController {
      *
      * @param orderDto {@link OrderDto} instance (only {@code userId} and {@code certificateId} are required)
      * @throws EntityNotFoundException in case when user or (and) certificate with specified ids do not exist
-     * @return JSON {@link ResponseEntity} object that contains created {@link OrderDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
-    public ResponseEntity<OrderDto> makeOrder(@RequestBody OrderDto orderDto) {
+    public ResponseEntity<HateoasModel> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto createdOrderDto = orderService.makeOrder(orderDto);
-        return new ResponseEntity<>(createdOrderDto, CREATED);
+        HateoasModel model = HateoasModel.build(hateoasProvider, createdOrderDto);
+        return new ResponseEntity<>(model, CREATED);
     }
 }

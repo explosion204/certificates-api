@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.Hateoas;
+import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
@@ -13,24 +14,26 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@Hateoas
 @RequestMapping("/api/users")
 public class UserController {
     private UserService userService;
+    private HateoasProvider<UserDto> hateoasProvider;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, HateoasProvider<UserDto> hateoasProvider) {
         this.userService = userService;
+        this.hateoasProvider = hateoasProvider;
     }
 
     /**
      * Retrieve all users.
      *
-     * @return JSON {@link ResponseEntity} object that contains list of {@link UserDto}
+     * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers(@ModelAttribute PageContext pageContext) {
+    public ResponseEntity<List<HateoasModel>> getUsers(@ModelAttribute PageContext pageContext) {
         List<UserDto> users = userService.findAll(pageContext);
-        return new ResponseEntity<>(users, OK);
+        List<HateoasModel> models = HateoasModel.build(hateoasProvider, users);
+        return new ResponseEntity<>(models, OK);
     }
 
     /**
@@ -38,11 +41,12 @@ public class UserController {
      *
      * @param id user id
      * @throws EntityNotFoundException in case when user with this id does not exist
-     * @return JSON {@link ResponseEntity} object that contains {@link UserDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel> getUser(@PathVariable("id") long id) {
         UserDto userDto = userService.findById(id);
-        return new ResponseEntity<>(userDto, OK);
+        HateoasModel model = HateoasModel.build(hateoasProvider, userDto);
+        return new ResponseEntity<>(model, OK);
     }
 }

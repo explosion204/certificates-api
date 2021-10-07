@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TagDto extends IdentifiableDto<TagDto> {
+public class TagDto extends IdentifiableDto {
     private long id;
     private String name;
 

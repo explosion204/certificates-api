@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class OrderDto extends IdentifiableDto<OrderDto> {
+public class OrderDto extends IdentifiableDto {
     private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     private static final String UTC_ZONE = "UTC";
 
