@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
@@ -44,6 +45,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     private static final String INVALID_DURATION_MESSAGE = "invalid_entity.duration";
     private static final String INVALID_PAGE_NUMBER_MESSAGE = "invalid_page_number";
     private static final String INVALID_PAGE_SIZE_MESSAGE = "invalid_page_size";
+    private static final String EMPTY_ORDER_MESSAGE = "empty_order";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "internal_server_error";
 
     private static final String ERROR_SEPARATOR = ", ";
@@ -113,6 +115,12 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         };
 
         return buildErrorResponseEntity(BAD_REQUEST, String.format(errorMessage, invalidValue));
+    }
+
+    @ExceptionHandler(EmptyOrderException.class)
+    public ResponseEntity<Object> handleEmptyOrder() {
+        String errorMessage = getErrorMessage(EMPTY_ORDER_MESSAGE);
+        return buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(Exception.class)

@@ -5,6 +5,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
@@ -87,6 +88,7 @@ public class OrderService {
      * Make an order.
      *
      * @param orderDto {@link OrderDto} instance (only {@code userId} and {@code certificateId} are required)
+     * @throws EmptyOrderException in case when passed list of certificate ids is empty
      * @throws EntityNotFoundException in case when user or (and) certificate with specified ids do not exist
      * @return {@link OrderDto} object that represents created order
      */
@@ -95,8 +97,13 @@ public class OrderService {
         long userId = orderDto.getUserId();
         List<Long> certificateIds = orderDto.getCertificateIds();
 
+        if (certificateIds.isEmpty()) {
+            throw new EmptyOrderException();
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+
 
         List<GiftCertificate> certificates = certificateIds.stream()
                 .map(id -> certificateRepository.findById(id)

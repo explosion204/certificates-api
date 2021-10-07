@@ -36,5 +36,7 @@ public class Order {
             joinColumns = @JoinColumn(name = "id_order"),
             inverseJoinColumns = @JoinColumn(name = "id_certificate")
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<GiftCertificate> certificates;
 }

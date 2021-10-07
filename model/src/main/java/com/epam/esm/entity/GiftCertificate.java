@@ -41,5 +41,7 @@ public class GiftCertificate {
     private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(mappedBy = "certificates")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Order> orders;
 }

@@ -4,6 +4,7 @@ import com.epam.esm.controller.hateoas.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
+import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.service.OrderService;
@@ -65,6 +66,7 @@ public class OrderController {
      * Make an order.
      *
      * @param orderDto {@link OrderDto} instance (only {@code userId} and {@code certificateId} are required)
+     * @throws EmptyOrderException in case when passed list of certificate ids is empty
      * @throws EntityNotFoundException in case when user or (and) certificate with specified ids do not exist
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
