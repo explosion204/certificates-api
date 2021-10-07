@@ -21,10 +21,9 @@ class LinkConstructor {
                 .withRel(LIST_REL);
     }
 
-    static <T extends RepresentationModel<T>> Link constructLinkWithId(Class<?> controllerClass,
-                IdentifiableDto<T> model, String rel) {
+    static <T extends RepresentationModel<T>> Link constructLinkWithId(Class<?> controllerClass, long id, String rel) {
         return linkTo(controllerClass)
-                .slash(model.getId())
+                .slash(id)
                 .withRel(rel);
     }
 
@@ -41,11 +40,11 @@ class LinkConstructor {
 
     static <T extends RepresentationModel<T>> Link constructUpdateLink(Class<?> controllerClass,
                 IdentifiableDto<T> model) {
-        return constructLinkWithId(controllerClass, model, UPDATE_REL);
+        return constructLinkWithId(controllerClass, model.getId(), UPDATE_REL);
     }
 
     static <T extends RepresentationModel<T>> Link constructDeleteLink(Class<?> controllerClass,
                 IdentifiableDto<T> model) {
-        return constructLinkWithId(controllerClass, model, DELETE_REL);
+        return constructLinkWithId(controllerClass, model.getId(), DELETE_REL);
     }
 }
