@@ -7,16 +7,17 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
     private static final String NAME = "name";
+
+    private static final String SELECT_ALL = "SELECT t FROM Tag t";
+    private static final String SELECT_BY_NAME = "SELECT t FROM Tag t WHERE t.name = :name";
+
     private static final String SELECT_MOST_WIDELY_USED_TAG = """
             SELECT t.id, t.name
             FROM app_user AS u
@@ -45,12 +46,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public List<Tag> findAll(PageContext pageContext) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
-        Root<Tag> tagRoot = criteriaQuery.from(Tag.class);
-
-        criteriaQuery = criteriaQuery.select(tagRoot);
-        return entityManager.createQuery(criteriaQuery)
+        return entityManager.createQuery(SELECT_ALL, Tag.class)
                 .setFirstResult(pageContext.getStart())
                 .setMaxResults(pageContext.getLength())
                 .getResultList();
@@ -64,16 +60,9 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findByName(String name) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
-        Root<Tag> tagRoot = criteriaQuery.from(Tag.class);
-
-        Predicate namePredicate = criteriaBuilder.equal(tagRoot.get(NAME), name);
-        criteriaQuery = criteriaQuery.select(tagRoot)
-                .where(namePredicate);
-
-        return entityManager.createQuery(criteriaQuery)
-                .getResultList()
+        TypedQuery<Tag> tagQuery = entityManager.createQuery(SELECT_BY_NAME, Tag.class);
+        tagQuery.setParameter(NAME, name);
+        return tagQuery.getResultList()
                 .stream()
                 .findFirst();
     }

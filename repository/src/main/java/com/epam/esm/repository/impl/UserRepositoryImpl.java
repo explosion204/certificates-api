@@ -6,14 +6,13 @@ import com.epam.esm.entity.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
+    private static final String SELECT_ALL = "SELECT u FROM User u";
+
     private EntityManager entityManager;
 
     public UserRepositoryImpl(EntityManager entityManager) {
@@ -22,12 +21,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findAll(PageContext pageContext) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
-        Root<User> userRoot = criteriaQuery.from(User.class);
-
-        criteriaQuery = criteriaQuery.select(userRoot);
-        return entityManager.createQuery(criteriaQuery)
+        return entityManager.createQuery(SELECT_ALL, User.class)
                 .setFirstResult(pageContext.getStart())
                 .setMaxResults(pageContext.getLength())
                 .getResultList();

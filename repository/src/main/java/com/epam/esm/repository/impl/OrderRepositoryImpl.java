@@ -6,17 +6,16 @@ import com.epam.esm.repository.PageContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
-    private static final String USER = "user";
     private static final String ID = "id";
+
+    private static final String SELECT_ALL = "SELECT o FROM Order o";
+    private static final String SELECT_BY_USER = "SELECT o FROM Order o WHERE o.user.id = :id";
 
     private EntityManager entityManager;
 
@@ -26,12 +25,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findAll(PageContext pageContext) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
-        Root<Order> orderRoot = criteriaQuery.from(Order.class);
-
-        criteriaQuery = criteriaQuery.select(orderRoot);
-        return entityManager.createQuery(criteriaQuery)
+        return entityManager.createQuery(SELECT_ALL, Order.class)
                 .setFirstResult(pageContext.getStart())
                 .setMaxResults(pageContext.getLength())
                 .getResultList();
@@ -45,17 +39,10 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findByUser(PageContext pageContext, long userId) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
-        Root<Order> orderRoot = criteriaQuery.from(Order.class);
+        TypedQuery<Order> orderQuery = entityManager.createQuery(SELECT_BY_USER, Order.class);
+        orderQuery.setParameter(ID, userId);
 
-        // TODO: 10/7/2021
-        Predicate userPredicate = criteriaBuilder.equal(orderRoot.get(USER).get(ID), userId);
-        criteriaQuery = criteriaQuery.select(orderRoot)
-                .where(userPredicate);
-
-        return entityManager.createQuery(criteriaQuery)
-                .setFirstResult(pageContext.getStart())
+        return orderQuery.setFirstResult(pageContext.getStart())
                 .setMaxResults(pageContext.getLength())
                 .getResultList();
     }
