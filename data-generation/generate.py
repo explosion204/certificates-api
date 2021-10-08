@@ -2,6 +2,7 @@ import string
 import requests
 import random
 import datetime
+import time
 
 from ordered_set import OrderedSet
 
@@ -29,8 +30,12 @@ def fetch_word(min_length, max_length):
 
     while True:
         # call an external API
-        r = requests.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
-        word = r.json()[0]
+        try:
+            r = requests.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
+            word = r.json()[0]
+        except:
+            time.sleep(2)
+            continue
 
         if len(word) >= min_length and len(word) <= max_length:
             break
@@ -69,107 +74,117 @@ def generate_insert(table_name, cols_vals):
         values=values_statement
     )
 
+def dump(file_name, lines):
+    with open(file_name, 'w') as file:
+        file.writelines(lines)
+
 def generate_data(file_name, certificates_total, tags_total, users_total, orders_total):
     '''
     Generate init data
     '''
     lines = OrderedSet()
 
-    # certificates
-    for i in range(certificates_total):
-        name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
-        description = fetch_word(MIN_DESC_LENGTH, MAX_DESC_LENGTH)
-        price = random.uniform(MIN_PRICE, MAX_PRICE)
-        duration = random.randrange(MIN_DURATION, MAX_DURATION)
-        create_date = last_update_date = generate_date(MIN_DATE, MAX_DATE)
+    try:
+        # certificates
+        for i in range(certificates_total):
+            name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
+            description = fetch_word(MIN_DESC_LENGTH, MAX_DESC_LENGTH)
+            price = random.uniform(MIN_PRICE, MAX_PRICE)
+            duration = random.randrange(MIN_DURATION, MAX_DURATION)
+            create_date = last_update_date = generate_date(MIN_DATE, MAX_DATE)
 
-        certificate_statement = generate_insert('gift_certificate', {
-            'name': name, 
-            'description': description, 
-            'price': price, 
-            'duration': duration, 
-            'create_date': create_date, 
-            'last_update_date': last_update_date
-        })
-
-        lines.add(certificate_statement + '\n')
-        print('Certificates generated: ', i + 1)
-
-    # tags
-    for i in range(tags_total):
-        name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
-
-        tag_statement = generate_insert('tag', {
-            'name': name
-        })
-
-        lines.add(tag_statement + '\n')
-        print('Tags generated: ', i + 1)
-
-    # users
-    for i in range(users_total):
-        name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
-
-        user_statement = generate_insert('app_user', {
-            'name': name
-        })
-
-        lines.add(user_statement + '\n')
-        print('Users generated: ', i + 1)
-
-    # orders
-    for i in range(orders_total):
-        cost = random.uniform(MIN_PRICE, MAX_PRICE)
-        purchase_date = generate_date(MIN_DATE, MAX_DATE)
-        user_id = random.randrange(0, users_total) + 1
-
-        order_statement = generate_insert('app_order', {
-            'cost': cost,
-            'purchase_date': purchase_date,
-            'id_user': user_id,
-        })
-
-        lines.add(order_statement + '\n')
-        print('Orders generated: ', i + 1)
-
-    # link tags to certificates
-    max_tags = MAX_TAGS_PER_CERTIFICATE if tags_total >= MAX_TAGS_PER_CERTIFICATE else tags_total
-    for i in range(certificates_total):
-        certificate_id = i + 1
-        tags_num = random.randrange(MIN_TAGS_PER_CERTIFICATE, max_tags)
-
-        for _ in range(tags_num):
-            tag_id = random.randrange(0, tags_total) + 1
-            
-            certificate_tag_statement = generate_insert('certificate_tag', {
-                'id_certificate': certificate_id,
-                'id_tag': tag_id
+            certificate_statement = generate_insert('gift_certificate', {
+                'name': name, 
+                'description': description, 
+                'price': price, 
+                'duration': duration, 
+                'create_date': create_date, 
+                'last_update_date': last_update_date
             })
 
-            lines.add(certificate_tag_statement + '\n')
+            lines.add(certificate_statement + '\n')
+            print('Certificates generated: ', i + 1)
 
-    print('Tags successfully linked to certificates')
+        # tags
+        tags_generated = 0
+        for i in range(tags_total):
+            name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
 
-    # link certificates to orders
-    max_certificates = MAX_CERTIFICATES_PER_ORDER if tags_total >= MAX_CERTIFICATES_PER_ORDER else certificates_total
-    for i in range(orders_total):
-        order_id = i + 1
-        certificates_num = random.randrange(MIN_CERTIFICATES_PER_ORDER, max_certificates)
-
-        for _ in range(certificates_num):
-            certificate_id = random.randrange(0, certificates_total) + 1
-
-            certificate_order_statement = generate_insert('certificate_order', {
-                'id_order': order_id,
-                'id_certificate': certificate_id
+            tag_statement = generate_insert('tag', {
+                'name': name
             })
 
-            lines.add(certificate_order_statement + '\n')
+            if lines.add(tag_statement + '\n') == len(lines) - 1:
+                tags_generated += 1
+                print('Tags generated: ', tags_generated)
 
-    print('Certificates successfully linked to orders')
+        # users
+        users_generated = 0
+        for i in range(users_total):
+            name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
 
-    with open(file_name, 'w') as file:
-        file.writelines(lines)
-            
+            user_statement = generate_insert('app_user', {
+                'name': name
+            })
+
+            if lines.add(user_statement + '\n') == len(lines) - 1:
+                users_generated += 1
+                print('Users generated: ', users_generated)
+
+        # orders
+        for i in range(orders_total):
+            cost = random.uniform(MIN_PRICE, MAX_PRICE)
+            purchase_date = generate_date(MIN_DATE, MAX_DATE)
+            user_id = random.randrange(0, users_generated) + 1
+
+            order_statement = generate_insert('app_order', {
+                'cost': cost,
+                'purchase_date': purchase_date,
+                'id_user': user_id,
+            })
+
+            lines.add(order_statement + '\n')
+            print('Orders generated: ', i + 1)
+
+        # link tags to certificates
+        max_tags = MAX_TAGS_PER_CERTIFICATE if tags_generated >= MAX_TAGS_PER_CERTIFICATE else tags_generated
+        for i in range(certificates_total):
+            certificate_id = i + 1
+            tags_num = random.randrange(MIN_TAGS_PER_CERTIFICATE, max_tags)
+
+            for _ in range(tags_num):
+                tag_id = random.randrange(0, tags_generated) + 1
+                
+                certificate_tag_statement = generate_insert('certificate_tag', {
+                    'id_certificate': certificate_id,
+                    'id_tag': tag_id
+                })
+
+                lines.add(certificate_tag_statement + '\n')
+
+        print('Tags successfully linked to certificates')
+
+        # link certificates to orders
+        max_certificates = MAX_CERTIFICATES_PER_ORDER if certificates_total >= MAX_CERTIFICATES_PER_ORDER else certificates_total
+        for i in range(orders_total):
+            order_id = i + 1
+            certificates_num = random.randrange(MIN_CERTIFICATES_PER_ORDER, max_certificates)
+
+            for _ in range(certificates_num):
+                certificate_id = random.randrange(0, certificates_total) + 1
+
+                certificate_order_statement = generate_insert('certificate_order', {
+                    'id_order': order_id,
+                    'id_certificate': certificate_id
+                })
+
+                lines.add(certificate_order_statement + '\n')
+
+        print('Certificates successfully linked to orders')
+    except:
+        pass
+    finally:
+        dump(file_name, lines)
+
 # execute
-generate_data('data.sql', 10, 10, 10, 10)
+generate_data('data.sql', 10000, 1000, 1000, 1000)
