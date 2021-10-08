@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,12 +91,12 @@ class OrderServiceTest {
     @Test
     void testMakeOrder() {
         User user = provideUser();
-        GiftCertificate certificate = provideCertificate();
+        GiftCertificate certificate = provideCertificates().get(0);
         OrderDto orderDto = provideOrderDtoList().get(0);
         Order order = provideOrders().get(0);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(certificateRepository.findById(certificate.getId())).thenReturn(Optional.of(certificate));
+        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
         when(orderRepository.create(any(Order.class))).thenReturn(order);
 
         orderService.makeOrder(orderDto);
@@ -118,54 +118,57 @@ class OrderServiceTest {
     @Test
     void testMakeOrderWhenCertificateNotFound() {
         User user = provideUser();
-        GiftCertificate certificate = provideCertificate();
         OrderDto orderDto = provideOrderDtoList().get(0);
+
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(certificateRepository.findById(certificate.getId())).thenReturn(Optional.empty());
+        when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> orderService.makeOrder(orderDto));
     }
 
     private List<Order> provideOrders() {
         User user = provideUser();
-        GiftCertificate certificate = provideCertificate();
+        List<GiftCertificate> certificates = provideCertificates();
 
         Order firstOrder = new Order();
         firstOrder.setId(1);
         firstOrder.setUser(user);
-        firstOrder.setCertificate(certificate);
+        firstOrder.setCertificates(certificates);
 
         Order secondOder = new Order();
         secondOder.setId(2);
         secondOder.setUser(user);
-        secondOder.setCertificate(certificate);
+        secondOder.setCertificates(certificates);
 
         Order thirdOrder = new Order();
         thirdOrder.setId(3);
         thirdOrder.setUser(user);
-        thirdOrder.setCertificate(certificate);
+        thirdOrder.setCertificates(certificates);
 
         return List.of(firstOrder, secondOder, thirdOrder);
     }
 
     private List<OrderDto> provideOrderDtoList() {
         User user = provideUser();
-        GiftCertificate certificate = provideCertificate();
+        List<Long> certificateIds = provideCertificates()
+                .stream()
+                .map(GiftCertificate::getId)
+                .toList();
 
         OrderDto firstDto = new OrderDto();
         firstDto.setId(1);
         firstDto.setUserId(user.getId());
-        firstDto.setCertificateId(certificate.getId());
+        firstDto.setCertificateIds(certificateIds);
 
         OrderDto secondDto = new OrderDto();
         secondDto.setId(2);
         secondDto.setUserId(user.getId());
-        secondDto.setCertificateId(certificate.getId());
+        secondDto.setCertificateIds(certificateIds);
 
         OrderDto thirdDto = new OrderDto();
         thirdDto.setId(3);
         thirdDto.setUserId(user.getId());
-        thirdDto.setCertificateId(certificate.getId());
+        thirdDto.setCertificateIds(certificateIds);
 
         return List.of(firstDto, secondDto, thirdDto);
     }
@@ -177,11 +180,19 @@ class OrderServiceTest {
         return user;
     }
 
-    private GiftCertificate provideCertificate() {
-        GiftCertificate certificate = new GiftCertificate();
-        certificate.setId(1);
-        certificate.setPrice(BigDecimal.TEN);
+    private List<GiftCertificate> provideCertificates() {
+        GiftCertificate firstCertificate = new GiftCertificate();
+        firstCertificate.setId(1);
+        firstCertificate.setPrice(BigDecimal.TEN);
 
-        return certificate;
+        GiftCertificate secondCertificate = new GiftCertificate();
+        secondCertificate.setId(2);
+        secondCertificate.setPrice(BigDecimal.TEN);
+
+        GiftCertificate thirdCertificate = new GiftCertificate();
+        thirdCertificate.setId(3);
+        thirdCertificate.setPrice(BigDecimal.TEN);
+
+        return List.of(firstCertificate, secondCertificate, thirdCertificate);
     }
 }

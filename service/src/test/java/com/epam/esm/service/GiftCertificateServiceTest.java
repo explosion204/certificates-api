@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
@@ -27,8 +28,7 @@ import java.util.Optional;
 
 import static com.epam.esm.validator.ValidationError.INVALID_NAME;
 import static java.time.ZoneOffset.UTC;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -205,7 +205,6 @@ class GiftCertificateServiceTest {
         when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
 
         certificateService.delete(certificateId);
-
         verify(certificateRepository).delete(certificate);
     }
 
@@ -229,6 +228,7 @@ class GiftCertificateServiceTest {
         certificate.setLastUpdateDate(INITIAL_DATE);
 
         certificate.setTags(provideTags());
+        certificate.setOrders(List.of(mock(Order.class)));
 
         return certificate;
     }
