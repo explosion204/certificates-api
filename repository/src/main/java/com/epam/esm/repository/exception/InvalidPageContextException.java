@@ -1,8 +1,8 @@
 package com.epam.esm.repository.exception;
 
 public class InvalidPageContextException extends RuntimeException {
-    private ErrorType errorType;
-    private int invalidValue;
+    private final ErrorType errorType;
+    private final int invalidValue;
 
     public enum ErrorType {
         INVALID_PAGE_NUMBER,
