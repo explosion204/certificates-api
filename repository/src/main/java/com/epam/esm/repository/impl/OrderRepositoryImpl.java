@@ -6,6 +6,7 @@ import com.epam.esm.repository.PageContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     private static final String SELECT_ALL = "SELECT o FROM Order o";
     private static final String SELECT_BY_USER = "SELECT o FROM Order o WHERE o.user.id = :id";
 
+    @PersistenceContext
     private EntityManager entityManager;
 
     public OrderRepositoryImpl(EntityManager entityManager) {

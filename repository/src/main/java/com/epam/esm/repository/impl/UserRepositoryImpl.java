@@ -6,6 +6,7 @@ import com.epam.esm.entity.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
     private static final String SELECT_ALL = "SELECT u FROM User u";
 
+    @PersistenceContext
     private EntityManager entityManager;
 
     public UserRepositoryImpl(EntityManager entityManager) {

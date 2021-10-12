@@ -8,6 +8,7 @@ import com.epam.esm.repository.PageContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String LAST_UPDATE_DATE = "lastUpdateDate";
     private static final String PARTIAL_STRING = "%%%s%%";
 
+    @PersistenceContext
     private EntityManager entityManager;
 
     public GiftCertificateRepositoryImpl(EntityManager entityManager) {
