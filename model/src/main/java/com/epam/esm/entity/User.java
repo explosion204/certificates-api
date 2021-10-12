@@ -21,9 +21,4 @@ public class User {
 
     @Column(unique = true)
     private String name;
-
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Order> orders;
 }
