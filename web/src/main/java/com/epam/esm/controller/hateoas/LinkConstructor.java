@@ -3,7 +3,6 @@ package com.epam.esm.controller.hateoas;
 import com.epam.esm.dto.IdentifiableDto;
 import org.springframework.hateoas.Link;
 
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 public class LinkConstructor {
