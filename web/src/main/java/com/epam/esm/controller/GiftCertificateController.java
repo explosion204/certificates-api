@@ -1,7 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
+import com.epam.esm.controller.model.ListModel;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
@@ -46,14 +47,14 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<HateoasModel>> getCertificates(
+    public ResponseEntity<ListModel<GiftCertificateDto>> getCertificates(
             @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize
     ) {
         List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, PageContext.of(page, pageSize));
-        List<HateoasModel> models = HateoasModel.build(hateoasProvider, certificates);
-        return new ResponseEntity<>(models, OK);
+        ListModel<GiftCertificateDto> model = ListModel.build(certificates);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
@@ -64,9 +65,9 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<HateoasModel> getCertificate(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel<GiftCertificateDto>> getCertificate(@PathVariable("id") long id) {
         GiftCertificateDto certificateDto = certificateService.findById(id);
-        HateoasModel model = HateoasModel.build(hateoasProvider, certificateDto);
+        HateoasModel<GiftCertificateDto> model = HateoasModel.build(hateoasProvider, certificateDto);
         return new ResponseEntity<>(model, OK);
     }
 
@@ -78,9 +79,9 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
-    public ResponseEntity<HateoasModel> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
+    public ResponseEntity<HateoasModel<GiftCertificateDto>> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
         GiftCertificateDto createdDto = certificateService.create(certificateDto);
-        HateoasModel model = HateoasModel.build(hateoasProvider, createdDto);
+        HateoasModel<GiftCertificateDto> model = HateoasModel.build(hateoasProvider, createdDto);
         return new ResponseEntity<>(model, CREATED);
     }
 
@@ -94,11 +95,11 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<HateoasModel> updateCertificate(@PathVariable("id") long id,
+    public ResponseEntity<HateoasModel<GiftCertificateDto>> updateCertificate(@PathVariable("id") long id,
                 @RequestBody GiftCertificateDto certificateDto) {
         certificateDto.setId(id);
         GiftCertificateDto updatedDto = certificateService.update(certificateDto);
-        HateoasModel model = HateoasModel.build(hateoasProvider, updatedDto);
+        HateoasModel<GiftCertificateDto> model = HateoasModel.build(hateoasProvider, updatedDto);
         return new ResponseEntity<>(model, OK);
     }
 

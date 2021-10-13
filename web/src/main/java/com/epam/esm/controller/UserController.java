@@ -1,7 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
+import com.epam.esm.controller.model.ListModel;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
@@ -32,11 +33,11 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<HateoasModel>> getUsers(@RequestParam(required = false) Integer page,
-                @RequestParam(required = false) Integer pageSize) {
+    public ResponseEntity<ListModel<UserDto>> getUsers(@RequestParam(required = false) Integer page,
+                                                       @RequestParam(required = false) Integer pageSize) {
         List<UserDto> users = userService.findAll(PageContext.of(page, pageSize));
-        List<HateoasModel> models = HateoasModel.build(hateoasProvider, users);
-        return new ResponseEntity<>(models, OK);
+        ListModel<UserDto> model = ListModel.build(users);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
@@ -47,9 +48,9 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<HateoasModel> getUser(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel<UserDto>> getUser(@PathVariable("id") long id) {
         UserDto userDto = userService.findById(id);
-        HateoasModel model = HateoasModel.build(hateoasProvider, userDto);
+        HateoasModel<UserDto> model = HateoasModel.build(hateoasProvider, userDto);
         return new ResponseEntity<>(model, OK);
     }
 }

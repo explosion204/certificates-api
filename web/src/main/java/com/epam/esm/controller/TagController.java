@@ -1,7 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.hateoas.HateoasModel;
+import com.epam.esm.controller.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
+import com.epam.esm.controller.model.ListModel;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -42,11 +43,11 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<HateoasModel>> getTags(@RequestParam(required = false) Integer page,
-                @RequestParam(required = false) Integer pageSize) {
+    public ResponseEntity<ListModel<TagDto>> getTags(@RequestParam(required = false) Integer page,
+                                                     @RequestParam(required = false) Integer pageSize) {
         List<TagDto> tags = tagService.findAll(PageContext.of(page, pageSize));
-        List<HateoasModel> models = HateoasModel.build(hateoasProvider, tags);
-        return new ResponseEntity<>(models, OK);
+        ListModel<TagDto> model = ListModel.build(tags);
+        return new ResponseEntity<>(model, OK);
     }
 
     /**
@@ -57,9 +58,9 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<HateoasModel> getTag(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel<TagDto>> getTag(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findById(id);
-        HateoasModel model = HateoasModel.build(hateoasProvider, tagDto);
+        HateoasModel<TagDto> model = HateoasModel.build(hateoasProvider, tagDto);
         return new ResponseEntity<>(model, OK);
     }
 
@@ -70,9 +71,9 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/most_used_tag")
-    public ResponseEntity<HateoasModel> getMostWidelyTag() {
+    public ResponseEntity<HateoasModel<TagDto>> getMostWidelyTag() {
         TagDto tagDto = tagService.findMostWidelyUsedTag();
-        HateoasModel model = HateoasModel.build(hateoasProvider, tagDto);
+        HateoasModel<TagDto> model = HateoasModel.build(hateoasProvider, tagDto);
         return new ResponseEntity<>(model, OK);
     }
 
@@ -85,9 +86,9 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
-    public ResponseEntity<HateoasModel> createTag(@RequestBody TagDto tagDto) {
+    public ResponseEntity<HateoasModel<TagDto>> createTag(@RequestBody TagDto tagDto) {
         TagDto createdTagDto = tagService.create(tagDto);
-        HateoasModel model = HateoasModel.build(hateoasProvider, createdTagDto);
+        HateoasModel<TagDto> model = HateoasModel.build(hateoasProvider, createdTagDto);
         return new ResponseEntity<>(model, CREATED);
     }
 
