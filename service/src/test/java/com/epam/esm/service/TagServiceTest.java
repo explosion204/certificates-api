@@ -45,7 +45,7 @@ class TagServiceTest {
 
     @Test
     void testFindAll() {
-        PageContext pageContext = new PageContext();
+        PageContext pageContext = PageContext.of(null, null);
         when(tagRepository.findAll(pageContext)).thenReturn(provideTagsList());
 
         List<TagDto> expectedDtoList = provideTagDtoList();

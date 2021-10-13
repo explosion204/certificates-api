@@ -55,7 +55,7 @@ class OrderServiceTest {
 
     @Test
     void testFindAll() {
-        PageContext pageContext = new PageContext();
+        PageContext pageContext = PageContext.of(null, null);
         when(orderRepository.findAll(pageContext)).thenReturn(provideOrders());
 
         List<OrderDto> expectedDtoList = provideOrderDtoList();
@@ -66,7 +66,7 @@ class OrderServiceTest {
 
     @Test
     void testFindByUser() {
-        PageContext pageContext = new PageContext();
+        PageContext pageContext = PageContext.of(null, null);
         long userId = 1;
         when(orderRepository.findByUser(pageContext, userId)).thenReturn(provideOrders());
 

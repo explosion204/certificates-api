@@ -35,7 +35,7 @@ class UserServiceTest {
 
     @Test
     void testFindAll() {
-        PageContext pageContext = new PageContext();
+        PageContext pageContext = PageContext.of(null, null);
         when(userRepository.findAll(pageContext)).thenReturn(provideUsers());
 
         List<UserDto> expectedDtoList = provideUserDtoList();

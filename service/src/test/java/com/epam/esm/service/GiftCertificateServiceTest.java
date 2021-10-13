@@ -23,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -78,7 +79,7 @@ class GiftCertificateServiceTest {
             add(provideCertificateDto());
         }};
 
-        PageContext pageContext = new PageContext();
+        PageContext pageContext = PageContext.of(null, null);
         List<String> tagNames = List.of("tag1", "tag2");
         String certificateName = "certificate";
         String certificateDescription = "description";
