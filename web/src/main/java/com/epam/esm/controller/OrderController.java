@@ -4,6 +4,7 @@ import com.epam.esm.controller.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.controller.model.ListModel;
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.OrderPartialDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -69,8 +70,15 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<HateoasModel<OrderDto>> getOrder(@PathVariable("id") long id) {
+    public ResponseEntity<HateoasModel<OrderDto>> getOrder(@PathVariable("id") long id,
+                @RequestParam(value = "shortened", required = false) boolean shortened) {
         OrderDto orderDto = orderService.findById(id);
+
+        if (shortened) {
+            // if flag is present we create a shortened model of order
+            orderDto = new OrderPartialDto(orderDto);
+        }
+
         HateoasModel<OrderDto> model = HateoasModel.build(hateoasProvider, orderDto);
         return new ResponseEntity<>(model, OK);
     }
