@@ -72,16 +72,16 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findMostWidelyUsedTag() {
-        Tag tag;
-
         try {
-            tag = (Tag) entityManager.createNativeQuery(SELECT_MOST_WIDELY_USED_TAG, Tag.class)
+            Tag tag = (Tag) entityManager.createNativeQuery(SELECT_MOST_WIDELY_USED_TAG, Tag.class)
                     .getSingleResult();
+
+            return Optional.of(tag);
         } catch (NoResultException e) {
-            tag = null;
+           // we don't need to process this exception
         }
 
-        return Optional.ofNullable(tag);
+        return Optional.empty();
     }
 
     @Override
