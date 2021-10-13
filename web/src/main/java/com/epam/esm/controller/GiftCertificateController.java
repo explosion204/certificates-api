@@ -8,18 +8,11 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PageContext;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.GiftCertificateService;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,14 +42,16 @@ public class GiftCertificateController {
      * All parameters are optional, so if they are not present, all certificates will be retrieved.
      *
      * @param searchParamsDto {@link GiftCertificateSearchParamsDto} instance
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
     public ResponseEntity<List<HateoasModel>> getCertificates(
             @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto,
-            @ModelAttribute PageContext pageContext
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize
     ) {
-        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, pageContext);
+        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, PageContext.of(page, pageSize));
         List<HateoasModel> models = HateoasModel.build(hateoasProvider, certificates);
         return new ResponseEntity<>(models, OK);
     }

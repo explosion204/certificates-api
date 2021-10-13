@@ -5,13 +5,10 @@ import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,11 +28,13 @@ public class UserController {
     /**
      * Retrieve all users.
      *
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<HateoasModel>> getUsers(@ModelAttribute PageContext pageContext) {
-        List<UserDto> users = userService.findAll(pageContext);
+    public ResponseEntity<List<HateoasModel>> getUsers(@RequestParam(required = false) Integer page,
+                @RequestParam(required = false) Integer pageSize) {
+        List<UserDto> users = userService.findAll(PageContext.of(page, pageSize));
         List<HateoasModel> models = HateoasModel.build(hateoasProvider, users);
         return new ResponseEntity<>(models, OK);
     }

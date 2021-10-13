@@ -1,7 +1,6 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.repository.exception.InvalidPageContextException;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,6 @@ public interface GiftCertificateRepository {
      * @param certificateDescription certificate description (can be partly qualified)
      * @param orderByName            name ordering approach
      * @param orderByCreateDate      creation date ordering approach
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link GiftCertificate}
      */
     List<GiftCertificate> find(PageContext pageContext, List<String> tagNames, String certificateName,

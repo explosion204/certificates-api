@@ -7,10 +7,10 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
+import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,11 +43,15 @@ public class OrderController {
      * Retrieve all orders or orders of specified user.
      *
      * @param userId user id (optional)
+     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<List<HateoasModel>> getOrders(@RequestParam(required = false) Long userId,
-                @ModelAttribute PageContext pageContext) {
+    public ResponseEntity<List<HateoasModel>> getOrders(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) {
+        PageContext pageContext = PageContext.of(page, pageSize);
         List<OrderDto> orders = userId != null
                 ? orderService.findByUser(userId, pageContext)
                 : orderService.findAll(pageContext);

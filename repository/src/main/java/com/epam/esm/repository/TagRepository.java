@@ -1,7 +1,6 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.repository.exception.InvalidPageContextException;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,6 @@ public interface TagRepository {
      * Retrieve all tags from storage.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link Tag}
      */
     List<Tag> findAll(PageContext pageContext);

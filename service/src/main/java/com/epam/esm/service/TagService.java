@@ -8,7 +8,6 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ public class TagService {
      * Retrieve all tags.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link TagDto}
      */
     public List<TagDto> findAll(PageContext pageContext) {

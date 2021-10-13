@@ -11,7 +11,6 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
-import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
@@ -56,7 +55,6 @@ public class GiftCertificateService {
      *
      * @param searchParamsDto {@link GiftCertificateSearchParamsDto} object with specified search parameters
      * @param pageContext {@link PageContext} object with pagination logic
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link GiftCertificateDto}
      */
     public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto, PageContext pageContext) {

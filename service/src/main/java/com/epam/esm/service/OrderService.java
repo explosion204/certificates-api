@@ -11,7 +11,6 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
-import com.epam.esm.repository.exception.InvalidPageContextException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +44,6 @@ public class OrderService {
      * Retrieve all orders.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link OrderDto}
      */
     public List<OrderDto> findAll(PageContext pageContext) {
@@ -61,7 +59,6 @@ public class OrderService {
      *
      * @param userId user id
      * @param pageContext {@link PageContext} object with pagination logic
-     * @throws InvalidPageContextException if passed page or page size values are invalid
      * @return list of {@link OrderDto}
      */
     public List<OrderDto> findByUser(long userId, PageContext pageContext) {
