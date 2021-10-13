@@ -100,25 +100,28 @@ public class OrderService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-
-
         List<GiftCertificate> certificates = certificateIds.stream()
                 .map(id -> certificateRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException(id, User.class)))
                 .toList();
 
+        Order preparedOrder = prepareOrder(certificates, user);
+        Order createdOrder = orderRepository.create(preparedOrder);
+        return OrderDto.fromOrder(createdOrder);
+    }
+
+    private Order prepareOrder(List<GiftCertificate> certificates, User user) {
         LocalDateTime purchaseDate = LocalDateTime.now(UTC);
         BigDecimal cost = certificates.stream()
                 .map(GiftCertificate::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Order newOrder = new Order();
-        newOrder.setPurchaseDate(purchaseDate);
-        newOrder.setCost(cost);
-        newOrder.setUser(user);
-        newOrder.setCertificates(certificates);
+        Order order = new Order();
+        order.setPurchaseDate(purchaseDate);
+        order.setCost(cost);
+        order.setUser(user);
+        order.setCertificates(certificates);
 
-        Order createdOrder = orderRepository.create(newOrder);
-        return OrderDto.fromOrder(createdOrder);
+        return order;
     }
 }
