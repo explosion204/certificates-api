@@ -112,12 +112,7 @@ public class GiftCertificateService {
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
-            // it's important to make an ArrayList object: Hibernate requires MODIFIABLE collection
-            // so .toList() is erroneous solution!
-            List<Tag> tags = certificateDto.getTags()
-                    .stream()
-                    .map(this::processTag)
-                    .collect(Collectors.toCollection(ArrayList::new));
+            List<Tag> tags = processTags(certificateDto.getTags());
             certificate.setTags(tags);
         }
 
@@ -166,10 +161,7 @@ public class GiftCertificateService {
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
-            List<Tag> tags = certificateDto.getTags()
-                    .stream()
-                    .map(this::processTag)
-                    .collect(Collectors.toCollection(ArrayList::new));
+            List<Tag> tags = processTags(certificateDto.getTags());
             certificate.setTags(tags);
         }
 
@@ -194,24 +186,30 @@ public class GiftCertificateService {
         certificateRepository.delete(certificate);
     }
 
-    private Tag processTag(String tagName) {
-        List<ValidationError> validationErrors = tagValidator.validate(tagName);
+    private List<Tag> processTags(List<String> tagNames) {
+        return tagNames.stream()
+                .map(tagName -> {
+                    List<ValidationError> validationErrors = tagValidator.validate(tagName);
 
-        if (!validationErrors.isEmpty()) {
-            throw new InvalidEntityException(validationErrors, Tag.class);
-        }
+                    if (!validationErrors.isEmpty()) {
+                        throw new InvalidEntityException(validationErrors, Tag.class);
+                    }
 
-        Optional<Tag> optionalTag = tagRepository.findByName(tagName);
-        Tag tag;
+                    Optional<Tag> optionalTag = tagRepository.findByName(tagName);
+                    Tag tag;
 
-        if (optionalTag.isEmpty()) {
-            tag = new Tag();
-            tag.setName(tagName);
-            tagRepository.create(tag);
-        } else {
-            tag = optionalTag.get();
-        }
+                    if (optionalTag.isEmpty()) {
+                        tag = new Tag();
+                        tag.setName(tagName);
+                        tagRepository.create(tag);
+                    } else {
+                        tag = optionalTag.get();
+                    }
 
-        return tag;
+                    return tag;
+                })
+                // it's important to make an ArrayList object: Hibernate requires MODIFIABLE collection
+                // so .toList() is erroneous solution!
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
