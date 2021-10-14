@@ -66,15 +66,15 @@ class UserServiceTest {
     private List<User> provideUsers() {
         User firstUser = new User();
         firstUser.setId(1);
-        firstUser.setName("user1");
+        firstUser.setUsername("user1");
 
         User secondUser = new User();
         secondUser.setId(2);
-        secondUser.setName("user2");
+        secondUser.setUsername("user2");
 
         User thirdUser = new User();
         thirdUser.setId(3);
-        thirdUser.setName("user3");
+        thirdUser.setUsername("user3");
 
         return List.of(firstUser, secondUser, thirdUser);
     }
@@ -82,15 +82,15 @@ class UserServiceTest {
     private List<UserDto> provideUserDtoList() {
         UserDto firstDto = new UserDto();
         firstDto.setId(1);
-        firstDto.setName("user1");
+        firstDto.setUsername("user1");
 
         UserDto secondDto = new UserDto();
         secondDto.setId(2);
-        secondDto.setName("user2");
+        secondDto.setUsername("user2");
 
         UserDto thirdDto = new UserDto();
         thirdDto.setId(3);
-        thirdDto.setName("user3");
+        thirdDto.setUsername("user3");
 
         return List.of(firstDto, secondDto, thirdDto);
     }

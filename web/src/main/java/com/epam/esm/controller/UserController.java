@@ -3,6 +3,8 @@ package com.epam.esm.controller;
 import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.controller.hateoas.model.ListHateoasModel;
+import com.epam.esm.controller.model.ListModel;
+import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PageContext;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -60,5 +63,17 @@ public class UserController {
         UserDto userDto = userService.findById(id);
         HateoasModel<UserDto> model = HateoasModel.build(modelHateoasProvider, userDto);
         return new ResponseEntity<>(model, OK);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<TokenDto> signup(@RequestBody UserDto userDto) {
+        TokenDto tokenDto = userService.signup(userDto);
+        return new ResponseEntity<>(tokenDto, CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDto> login(@RequestBody UserDto userDto) {
+        TokenDto tokenDto = userService.login(userDto);
+        return new ResponseEntity<>(tokenDto, OK);
     }
 }

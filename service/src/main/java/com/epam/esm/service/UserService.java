@@ -1,13 +1,21 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.exception.ApplicationAuthenticationException;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.service.util.JwtUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.epam.esm.exception.ApplicationAuthenticationException.ErrorType.INVALID_CREDENTIALS;
 
 /**
  * This service class encapsulated business logic related to {@link User} entity.
@@ -16,10 +24,16 @@ import java.util.List;
  */
 @Service
 public class UserService {
-    private UserRepository userRepository;
+    private static final String ID_CLAIM = "id";
 
-    public UserService(UserRepository userRepository) {
+    private UserRepository userRepository;
+    private JwtUtil jwtUtil;
+    private PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -46,5 +60,48 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, User.class));
         return UserDto.fromUser(user);
+    }
+
+    @Transactional
+    public TokenDto signup(UserDto userDto) {
+        String username = userDto.getUsername();
+        String password = userDto.getPassword();
+        String encodedPassword = passwordEncoder.encode(password);
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new EntityNotFoundException(User.class);
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encodedPassword);
+
+        User createdUser = userRepository.create(user);
+        return buildTokenDto(createdUser);
+    }
+
+    @Transactional
+    public TokenDto login(UserDto userDto) {
+        String username = userDto.getUsername();
+        String password = userDto.getPassword();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApplicationAuthenticationException(INVALID_CREDENTIALS));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new ApplicationAuthenticationException(INVALID_CREDENTIALS);
+        }
+
+        return buildTokenDto(user);
+    }
+
+    private TokenDto buildTokenDto(User user) {
+        Map<String, Object> claims = Map.of(ID_CLAIM, user.getId());
+        String accessToken = jwtUtil.generateJwt(claims);
+
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setAccessToken(accessToken);
+
+        return tokenDto;
     }
 }

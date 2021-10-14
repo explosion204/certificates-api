@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class UserDto extends IdentifiableDto {
-    private String name;
+    private String username;
+    private String password;
 
     public static UserDto fromUser(User user) {
         UserDto userDto = new UserDto();
 
         userDto.setId(user.getId());
-        userDto.setName(user.getName());
+        userDto.setUsername(user.getUsername());
+        userDto.setPassword(user.getPassword());
 
         return userDto;
     }

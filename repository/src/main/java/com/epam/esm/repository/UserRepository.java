@@ -26,4 +26,8 @@ public interface UserRepository {
      * @return {@link User} wrapped by {@link Optional}
      */
     Optional<User> findById(long id);
+
+    Optional<User> findByUsername(String username);
+
+    User create(User user);
 }
