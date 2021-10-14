@@ -3,7 +3,6 @@ package com.epam.esm.service;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -179,10 +178,6 @@ public class GiftCertificateService {
     public void delete(long id) {
         GiftCertificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, GiftCertificate.class));
-
-        // remove target certificate from associated orders manually
-        List<Order> associatedOrder = certificate.getOrders();
-        associatedOrder.forEach(order -> order.getCertificates().remove(certificate));
         certificateRepository.delete(certificate);
     }
 

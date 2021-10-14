@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "app_user") // "user" is reserved
+@Table(name = "app_user")
 @EntityListeners(AuditListener.class)
 public class User {
     @Id

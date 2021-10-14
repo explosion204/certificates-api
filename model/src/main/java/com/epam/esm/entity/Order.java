@@ -23,7 +23,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "app_order") // "order" is reserved
+@Table(name = "app_order")
 @EntityListeners(AuditListener.class)
 public class Order {
     @Id

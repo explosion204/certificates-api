@@ -1,7 +1,6 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -104,10 +103,6 @@ public class TagService {
     public void delete(long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Tag.class));
-
-        // remove target tag from associated certificates manually
-        List<GiftCertificate> associatedCertificates = tag.getCertificates();
-        associatedCertificates.forEach(certificate -> certificate.getTags().remove(tag));
         tagRepository.delete(tag);
     }
 }
