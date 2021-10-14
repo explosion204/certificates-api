@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class TagDto extends IdentifiableDto {
-    private long id;
     private String name;
 
     public Tag toTag() {
         Tag tag = new Tag();
 
-        tag.setId(id);
+        tag.setId(getId());
         tag.setName(name);
 
         return tag;

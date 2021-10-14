@@ -19,13 +19,9 @@ public class OrderDto extends IdentifiableDto {
     private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     private static final String UTC_ZONE = "UTC";
 
-    public static final String ID_PROPERTY_NAME = "id";
     public static final String USER_ID_PROPERTY_NAME = "userId";
     public static final String CERTIFICATE_IDS_PROPERTY_NAME = "certificateIds";
     public static final String COST_PROPERTY_NAME = "cost";
-
-    @JsonProperty(ID_PROPERTY_NAME)
-    private long id;
 
     @JsonProperty(USER_ID_PROPERTY_NAME)
     private long userId;
