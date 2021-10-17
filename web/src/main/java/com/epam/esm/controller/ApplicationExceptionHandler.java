@@ -10,14 +10,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,7 +27,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestControllerAdvice
-public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApplicationExceptionHandler {
     private static final Logger applicationLogger = LogManager.getLogger();
 
     private static final String ERROR_MESSAGE = "errorMessage";
@@ -59,9 +56,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         this.messageSource = messageSource;
     }
 
-    @Override
-    public ResponseEntity<Object> handleNoHandlerFoundException(
-                NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Object> handleNoHandlerFoundException() {
         String errorMessage = getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
         return buildErrorResponseEntity(NOT_FOUND, errorMessage);
     }
