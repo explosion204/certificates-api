@@ -3,11 +3,15 @@ package com.epam.esm.service;
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.ApplicationAuthenticationException;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.service.util.JwtUtil;
+import com.epam.esm.validator.UserValidator;
+import com.epam.esm.validator.ValidationError;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +31,17 @@ public class UserService {
     private static final String ID_CLAIM = "id";
 
     private UserRepository userRepository;
+    private UserValidator userValidator;
     private JwtUtil jwtUtil;
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            UserValidator userValidator,
+            JwtUtil jwtUtil,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userValidator = userValidator;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
     }
@@ -64,16 +74,18 @@ public class UserService {
 
     @Transactional
     public TokenDto signup(UserDto userDto) {
-        String username = userDto.getUsername();
-        String password = userDto.getPassword();
-        String encodedPassword = passwordEncoder.encode(password);
+        User user = userDto.toUser();
+        List<ValidationError> validationErrors = userValidator.validate(user);
 
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new EntityNotFoundException(User.class);
+        if (!validationErrors.isEmpty()) {
+            throw new InvalidEntityException(validationErrors, User.class);
         }
 
-        User user = new User();
-        user.setUsername(username);
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new EntityAlreadyExistsException();
+        }
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
         User createdUser = userRepository.create(user);

@@ -41,6 +41,8 @@ public class ApplicationExceptionHandler {
     private static final String INVALID_DESCRIPTION_MESSAGE = "invalid_entity.description";
     private static final String INVALID_PRICE_MESSAGE = "invalid_entity.price";
     private static final String INVALID_DURATION_MESSAGE = "invalid_entity.duration";
+    private static final String INVALID_USERNAME_MESSAGE = "invalid_entity.invalid_username";
+    private static final String INVALID_PASSWORD_MESSAGE = "invalid_entity.invalid_password";
     private static final String INVALID_PAGE_NUMBER_MESSAGE = "invalid_page_number";
     private static final String INVALID_PAGE_SIZE_MESSAGE = "invalid_page_size";
     private static final String EMPTY_ORDER_MESSAGE = "empty_order";
@@ -90,6 +92,8 @@ public class ApplicationExceptionHandler {
                 case INVALID_DESCRIPTION -> responseUtil.getErrorMessage(INVALID_DESCRIPTION_MESSAGE);
                 case INVALID_PRICE -> responseUtil.getErrorMessage(INVALID_PRICE_MESSAGE);
                 case INVALID_DURATION -> responseUtil.getErrorMessage(INVALID_DURATION_MESSAGE);
+                case INVALID_USERNAME -> responseUtil.getErrorMessage(INVALID_USERNAME_MESSAGE);
+                case INVALID_PASSWORD -> responseUtil.getErrorMessage(INVALID_PASSWORD_MESSAGE);
             });
 
             if (iterator.hasNext()) {
