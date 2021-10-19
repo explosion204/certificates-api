@@ -102,7 +102,7 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         List<GiftCertificate> certificates = certificateIds.stream()
                 .map(id -> certificateRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(id, User.class)))
+                        .orElseThrow(() -> new EntityNotFoundException(id, GiftCertificate.class)))
                 .toList();
 
         Order preparedOrder = prepareOrder(certificates, user);
