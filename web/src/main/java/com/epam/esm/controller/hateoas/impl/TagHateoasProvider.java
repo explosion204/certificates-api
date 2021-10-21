@@ -1,31 +1,37 @@
 package com.epam.esm.controller.hateoas.impl;
 
 import com.epam.esm.controller.TagController;
-import com.epam.esm.controller.hateoas.HateoasProvider;
-import com.epam.esm.controller.hateoas.LinkConstructor;
+import com.epam.esm.controller.hateoas.ModelHateoasProvider;
 import com.epam.esm.dto.TagDto;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.ALL_TAGS_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.MOST_WIDELY_USED_TAG_REL;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
-public class TagHateoasProvider implements HateoasProvider<TagDto> {
-    private static final String ALL_TAGS_REL = "allTags";
-    private static final String MOST_WIDELY_USED_TAG_REL = "mostWidelyUsedTag";
+public class TagHateoasProvider extends ModelHateoasProvider<TagDto> {
     private static final String MOST_WIDELY_USED_TAG_URI = "most_used_tag";
 
     @Override
-    public List<Link> provide(TagDto model) {
-        Class<?> controllerClass = TagController.class;
+    protected List<Link> addSpecificLinks(List<Link> baseLinks, TagDto model) {
+        Link mostWidelyUsedTagLink = constructWidelyUsedTagLink(getControllerClass());
+        baseLinks.add(mostWidelyUsedTagLink);
 
-        Link selfLink = LinkConstructor.constructSelfLink(controllerClass, model);
-        Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass, ALL_TAGS_REL);
-        Link mostWidelyUsedTagLink = constructWidelyUsedTagLink(controllerClass);
+        return baseLinks;
+    }
 
-        return List.of(selfLink, allResourcesLink, mostWidelyUsedTagLink);
+    @Override
+    protected Class<?> getControllerClass() {
+        return TagController.class;
+    }
+
+    @Override
+    protected String getAllResourcesRel() {
+        return ALL_TAGS_REL;
     }
 
     private Link constructWidelyUsedTagLink(Class<?> controllerClass) {

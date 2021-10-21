@@ -1,8 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.model.HateoasModel;
+import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
-import com.epam.esm.controller.model.ListModel;
+import com.epam.esm.controller.hateoas.model.ListHateoasModel;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.OrderPartialDto;
 import com.epam.esm.entity.Order;
@@ -34,11 +34,14 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/orders")
 public class OrderController {
     private OrderService orderService;
-    private HateoasProvider<OrderDto> hateoasProvider;
+    private HateoasProvider<OrderDto> modelHateoasProvider;
+    private HateoasProvider<List<OrderDto>> listHateoasProvider;
 
-    public OrderController(OrderService orderService, HateoasProvider<OrderDto> hateoasProvider) {
+    public OrderController(OrderService orderService, HateoasProvider<OrderDto> modelHateoasProvider,
+                HateoasProvider<List<OrderDto>> listHateoasProvider) {
         this.orderService = orderService;
-        this.hateoasProvider = hateoasProvider;
+        this.modelHateoasProvider = modelHateoasProvider;
+        this.listHateoasProvider = listHateoasProvider;
     }
 
     /**
@@ -46,10 +49,10 @@ public class OrderController {
      *
      * @param userId user id (optional)
      * @throws InvalidPageContextException if passed page or page size values are invalid
-     * @return JSON {@link ResponseEntity} object that contains list of {@link HateoasModel} objects
+     * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<ListModel<OrderDto>> getOrders(
+    public ResponseEntity<ListHateoasModel<OrderDto>> getOrders(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) {
@@ -57,7 +60,7 @@ public class OrderController {
         List<OrderDto> orders = userId != null
                 ? orderService.findByUser(userId, pageContext)
                 : orderService.findAll(pageContext);
-        ListModel<OrderDto> model = ListModel.build(orders);
+        ListHateoasModel<OrderDto> model = ListHateoasModel.build(listHateoasProvider, orders);
 
         return new ResponseEntity<>(model, OK);
     }
@@ -79,7 +82,7 @@ public class OrderController {
             orderDto = new OrderPartialDto(orderDto);
         }
 
-        HateoasModel<OrderDto> model = HateoasModel.build(hateoasProvider, orderDto);
+        HateoasModel<OrderDto> model = HateoasModel.build(modelHateoasProvider, orderDto);
         return new ResponseEntity<>(model, OK);
     }
 
@@ -94,7 +97,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<HateoasModel<OrderDto>> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto createdOrderDto = orderService.makeOrder(orderDto);
-        HateoasModel<OrderDto> model = HateoasModel.build(hateoasProvider, createdOrderDto);
+        HateoasModel<OrderDto> model = HateoasModel.build(modelHateoasProvider, createdOrderDto);
         return new ResponseEntity<>(model, CREATED);
     }
 }

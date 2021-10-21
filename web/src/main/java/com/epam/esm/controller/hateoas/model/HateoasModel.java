@@ -1,4 +1,4 @@
-package com.epam.esm.controller.model;
+package com.epam.esm.controller.hateoas.model;
 
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.dto.IdentifiableDto;
