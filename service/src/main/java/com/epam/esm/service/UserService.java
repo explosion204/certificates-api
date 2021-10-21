@@ -9,7 +9,7 @@ import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.service.util.JwtUtil;
+import com.epam.esm.security.KeycloakUtil;
 import com.epam.esm.validator.UserValidator;
 import com.epam.esm.validator.ValidationError;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.epam.esm.exception.ApplicationAuthenticationException.ErrorType.INVALID_CREDENTIALS;
 
@@ -28,21 +27,19 @@ import static com.epam.esm.exception.ApplicationAuthenticationException.ErrorTyp
  */
 @Service
 public class UserService {
-    private static final String ID_CLAIM = "id";
-
     private UserRepository userRepository;
     private UserValidator userValidator;
-    private JwtUtil jwtUtil;
+    private KeycloakUtil keycloakUtil;
     private PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
             UserValidator userValidator,
-            JwtUtil jwtUtil,
+            KeycloakUtil keycloakUtil,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
-        this.jwtUtil = jwtUtil;
+        this.keycloakUtil = keycloakUtil;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -108,8 +105,17 @@ public class UserService {
     }
 
     private TokenDto buildTokenDto(User user) {
-        Map<String, Object> claims = Map.of(ID_CLAIM, user.getId());
-        String accessToken = jwtUtil.generateJwt(claims);
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+        if (!keycloakUtil.keycloakUserExists(username)) {
+            String keycloakUserId = keycloakUtil.createKeycloakUser(user);
+            keycloakUtil.attachRoleToUser(user.getRole(), keycloakUserId);
+        } else {
+            keycloakUtil.resetPassword(username, password);
+        }
+
+        String accessToken = keycloakUtil.obtainAccessToken(username, password);
 
         TokenDto tokenDto = new TokenDto();
         tokenDto.setAccessToken(accessToken);

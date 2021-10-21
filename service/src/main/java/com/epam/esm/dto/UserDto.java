@@ -15,6 +15,8 @@ public class UserDto extends IdentifiableDto {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    private String role;
+
     public User toUser() {
         User user = new User();
 
@@ -31,6 +33,7 @@ public class UserDto extends IdentifiableDto {
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setPassword(user.getPassword());
+        userDto.setRole(user.getRole().name());
 
         return userDto;
     }

@@ -15,8 +15,9 @@ CREATE TABLE tag (
 
 CREATE TABLE app_user (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(32) UNIQUE
-    password VARCHAR(60)
+    username VARCHAR(32) UNIQUE,
+    password VARCHAR(60),
+    role SMALLINT
 );
 
 CREATE TABLE app_order (

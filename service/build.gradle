@@ -3,9 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwtVersion
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jjwtVersion
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jjwtVersion
+    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: keycloakVersion
 
     api project(':repository')
 }

@@ -12,7 +12,7 @@ import static com.epam.esm.validator.ValidationError.INVALID_USERNAME;
 
 @Component
 public class UserValidator {
-    private static final String USERNAME_REGEX = "^[\\p{LD}_]{8,50}$";
+    private static final String USERNAME_REGEX = "^[\\p{LD}_]{8,32}$";
     private static final String PASSWORD_REGEX = "^(?=.*\\p{Alpha})(?=.*\\d)[\\p{Alnum}]{8,32}$";
 
     public List<ValidationError> validate(User user) {
