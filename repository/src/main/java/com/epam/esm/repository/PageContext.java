@@ -8,6 +8,7 @@ import static com.epam.esm.repository.exception.InvalidPageContextException.Erro
 public class PageContext {
     private static final int MIN_PAGE = 1;
     private static final int MIN_PAGE_SIZE = 0;
+    private static final int MAX_PAGE_SIZE = 50;
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -32,7 +33,7 @@ public class PageContext {
             throw new InvalidPageContextException(INVALID_PAGE_NUMBER, page);
         }
 
-        if (pageSize < MIN_PAGE_SIZE) {
+        if (pageSize < MIN_PAGE_SIZE || pageSize > MAX_PAGE_SIZE) {
             throw new InvalidPageContextException(INVALID_PAGE_SIZE, pageSize);
         }
 
