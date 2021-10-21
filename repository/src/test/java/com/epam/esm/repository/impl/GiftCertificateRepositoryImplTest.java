@@ -174,7 +174,7 @@ class GiftCertificateRepositoryImplTest {
     }
 
     private static PageContext provideAllPagesContext() {
-        return PageContext.of(1, 100);
+        return PageContext.of(1, 50);
     }
 
     private static PageContext provideOnePageContext() {
