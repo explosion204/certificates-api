@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.exception.ApplicationAuthenticationException;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -12,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -133,14 +133,9 @@ public class ApplicationExceptionHandler {
         return responseUtil.buildErrorResponseEntity(BAD_REQUEST, errorMessage);
     }
 
-    @ExceptionHandler(ApplicationAuthenticationException.class)
-    public ResponseEntity<Object> handleApplicationAuthenticationException(ApplicationAuthenticationException e) {
-        ApplicationAuthenticationException.ErrorType errorType = e.getErrorType();
-
-        String errorMessage = switch (errorType) {
-            case INVALID_CREDENTIALS -> responseUtil.getErrorMessage(INVALID_CREDENTIALS_MESSAGE);
-        };
-
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleApplicationAuthenticationException() {
+        String errorMessage = responseUtil.getErrorMessage(INVALID_CREDENTIALS_MESSAGE);
         return responseUtil.buildErrorResponseEntity(UNAUTHORIZED, errorMessage);
     }
 

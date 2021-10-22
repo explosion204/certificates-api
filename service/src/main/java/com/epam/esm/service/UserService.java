@@ -2,7 +2,6 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.exception.ApplicationAuthenticationException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PageContext;
@@ -12,13 +11,13 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.security.KeycloakUtil;
 import com.epam.esm.validator.UserValidator;
 import com.epam.esm.validator.ValidationError;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.epam.esm.exception.ApplicationAuthenticationException.ErrorType.INVALID_CREDENTIALS;
 
 /**
  * This service class encapsulated business logic related to {@link User} entity.
@@ -95,10 +94,10 @@ public class UserService {
         String password = userDto.getPassword();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ApplicationAuthenticationException(INVALID_CREDENTIALS));
+                .orElseThrow(() -> new BadCredentialsException(StringUtils.EMPTY));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new ApplicationAuthenticationException(INVALID_CREDENTIALS);
+            throw new BadCredentialsException(StringUtils.EMPTY);
         }
 
         return buildTokenDto(user);

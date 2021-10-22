@@ -27,6 +27,7 @@ public interface UserRepository {
      */
     Optional<User> findById(long id);
 
+    // TODO: 10/22/2021 DOCS
     Optional<User> findByUsername(String username);
 
     User create(User user);
