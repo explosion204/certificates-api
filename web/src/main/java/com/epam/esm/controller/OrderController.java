@@ -12,6 +12,8 @@ import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.epam.esm.security.KeycloakAuthority.ORDERS_GET;
+import static com.epam.esm.security.KeycloakAuthority.ORDERS_GET_ALL;
+import static com.epam.esm.security.KeycloakAuthority.ORDERS_SAVE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -52,6 +57,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('" + ORDERS_GET_ALL + "')")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrders(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Integer page,
@@ -73,6 +79,11 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + ORDERS_GET + "')")
+    @PostAuthorize(
+            "hasAuthority('" + ORDERS_GET_ALL + "') or " +
+            "authentication.name eq T(String).valueOf(returnObject.body.data.userId)"
+    )
     public ResponseEntity<HateoasModel<OrderDto>> getOrder(@PathVariable("id") long id,
                 @RequestParam(value = "shortened", required = false) boolean shortened) {
         OrderDto orderDto = orderService.findById(id);
@@ -95,6 +106,10 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
+    @PreAuthorize(
+            "hasAuthority('" + ORDERS_GET_ALL + "') or " +
+            "hasAuthority('" + ORDERS_SAVE + "') and authentication.name eq T(String).valueOf(#orderDto.userId)"
+    )
     public ResponseEntity<HateoasModel<OrderDto>> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto createdOrderDto = orderService.makeOrder(orderDto);
         HateoasModel<OrderDto> model = HateoasModel.build(modelHateoasProvider, createdOrderDto);

@@ -12,6 +12,7 @@ import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.TagService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.epam.esm.security.KeycloakAuthority.TAGS_DELETE;
+import static com.epam.esm.security.KeycloakAuthority.TAGS_GET;
+import static com.epam.esm.security.KeycloakAuthority.TAGS_GET_ALL;
+import static com.epam.esm.security.KeycloakAuthority.TAGS_SAVE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -53,6 +58,7 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('" + TAGS_GET_ALL + "')")
     public ResponseEntity<ListHateoasModel<TagDto>> getTags(@RequestParam(required = false) Integer page,
                                                             @RequestParam(required = false) Integer pageSize) {
         List<TagDto> tags = tagService.findAll(PageContext.of(page, pageSize));
@@ -68,6 +74,7 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + TAGS_GET + "')")
     public ResponseEntity<HateoasModel<TagDto>> getTag(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findById(id);
         HateoasModel<TagDto> model = HateoasModel.build(modelHateoasProvider, tagDto);
@@ -81,6 +88,7 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/most_used_tag")
+    @PreAuthorize("hasAuthority('" + TAGS_GET + "')")
     public ResponseEntity<HateoasModel<TagDto>> getMostWidelyTag() {
         TagDto tagDto = tagService.findMostWidelyUsedTag();
         HateoasModel<TagDto> model = HateoasModel.build(modelHateoasProvider, tagDto);
@@ -96,6 +104,7 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('" + TAGS_SAVE + "')")
     public ResponseEntity<HateoasModel<TagDto>> createTag(@RequestBody TagDto tagDto) {
         TagDto createdTagDto = tagService.create(tagDto);
         HateoasModel<TagDto> model = HateoasModel.build(modelHateoasProvider, createdTagDto);
@@ -110,6 +119,7 @@ public class TagController {
      * @return empty {@link ResponseEntity}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + TAGS_DELETE + "')")
     public ResponseEntity<Void> deleteTag(@PathVariable("id") long id) {
         tagService.delete(id);
         return new ResponseEntity<>(NO_CONTENT);

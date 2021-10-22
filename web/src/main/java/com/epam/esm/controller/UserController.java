@@ -3,7 +3,6 @@ package com.epam.esm.controller;
 import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.controller.hateoas.model.ListHateoasModel;
-import com.epam.esm.controller.model.ListModel;
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -11,14 +10,19 @@ import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.epam.esm.security.KeycloakAuthority.USERS_GET;
+import static com.epam.esm.security.KeycloakAuthority.USERS_GET_ALL;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -28,7 +32,6 @@ public class UserController {
     private UserService userService;
     private HateoasProvider<UserDto> modelHateoasProvider;
     private HateoasProvider<List<UserDto>> listHateoasProvider;
-
 
     public UserController(UserService userService, HateoasProvider<UserDto> modelHateoasProvider,
                 HateoasProvider<List<UserDto>> listHateoasProvider) {
@@ -44,8 +47,9 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('" + USERS_GET_ALL + "')")
     public ResponseEntity<ListHateoasModel<UserDto>> getUsers(@RequestParam(required = false) Integer page,
-                                                              @RequestParam(required = false) Integer pageSize) {
+                @RequestParam(required = false) Integer pageSize) {
         List<UserDto> users = userService.findAll(PageContext.of(page, pageSize));
         ListHateoasModel<UserDto> model = ListHateoasModel.build(listHateoasProvider, users);
         return new ResponseEntity<>(model, OK);
@@ -59,6 +63,10 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize(
+            "hasAuthority('" + USERS_GET_ALL + "') or " +
+            "hasAuthority('" + USERS_GET + "') and authentication.name eq T(String).valueOf(#id)"
+    )
     public ResponseEntity<HateoasModel<UserDto>> getUser(@PathVariable("id") long id) {
         UserDto userDto = userService.findById(id);
         HateoasModel<UserDto> model = HateoasModel.build(modelHateoasProvider, userDto);

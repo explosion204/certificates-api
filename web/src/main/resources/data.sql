@@ -18,6 +18,8 @@ INSERT INTO tag (name) VALUES ('preschool');
 INSERT INTO tag (name) VALUES ('ahistoric');
 INSERT INTO tag (name) VALUES ('guanosine');
 INSERT INTO tag (name) VALUES ('deemed');
+INSERT INTO app_user (username, password, role) VALUES ('admin_user', '$2a$10$OM3brwSQYsRy6aqRvupaTuaNh8to6rnq0BrlwhvtJGttrZRNZk03O', '1');
+INSERT INTO app_user (username, password, role) VALUES ('plain_user', '$2a$10$OM3brwSQYsRy6aqRvupaTuaNh8to6rnq0BrlwhvtJGttrZRNZk03O', '0');
 INSERT INTO app_user (username, password, role) VALUES ('classify', '$2a$12$xKPnRQjvcaI7otzmjburzuIRu4kGqSXTkAwckVQBY4l7BI6XP1A8S', '0');
 INSERT INTO app_user (username, password, role) VALUES ('jaguarundi', '$2a$12$xKPnRQjvcaI7otzmjburzuIRu4kGqSXTkAwckVQBY4l7BI6XP1A8S', '0');
 INSERT INTO app_user (username, password, role) VALUES ('sportswoman', '$2a$12$xKPnRQjvcaI7otzmjburzuIRu4kGqSXTkAwckVQBY4l7BI6XP1A8S', '0');

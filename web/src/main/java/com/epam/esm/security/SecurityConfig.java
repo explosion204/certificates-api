@@ -1,9 +1,11 @@
-package com.epam.esm.config;
+package com.epam.esm.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -18,9 +20,11 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String SIGNUP_ENDPOINT = "/api/users/signup";
     private static final String LOGIN_ENDPOINT = "/api/users/login";
+    private static final String MAIN_ENTITY_ENDPOINT = "/api/certificates/**";
 
     private AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -34,17 +38,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .sessionManagement()
-                .sessionCreationPolicy(STATELESS)
-                .and()
+                    .sessionCreationPolicy(STATELESS)
+                    .and()
                 .authorizeRequests()
-                .antMatchers(SIGNUP_ENDPOINT, LOGIN_ENDPOINT).permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-                .anyRequest().authenticated()
-                // .antMatchers("/api/users/**").hasRole("user") // TODO: 10/21/2021
-                .and()
+                    .antMatchers(SIGNUP_ENDPOINT, LOGIN_ENDPOINT).permitAll()
+                    .antMatchers(HttpMethod.GET, MAIN_ENTITY_ENDPOINT).permitAll()
+                    .anyRequest().authenticated()
+                    .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .and()
                 .oauth2ResourceServer(
                         configurer -> configurer.jwt(
                                 jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())

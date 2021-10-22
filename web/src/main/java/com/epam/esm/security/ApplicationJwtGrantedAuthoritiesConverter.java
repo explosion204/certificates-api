@@ -1,4 +1,4 @@
-package com.epam.esm.config;
+package com.epam.esm.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

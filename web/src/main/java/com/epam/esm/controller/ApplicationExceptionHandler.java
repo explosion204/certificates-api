@@ -10,9 +10,8 @@ import com.epam.esm.util.ResponseUtil;
 import com.epam.esm.validator.ValidationError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -21,6 +20,7 @@ import java.util.Iterator;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -36,6 +36,7 @@ public class ApplicationExceptionHandler {
     // not found error when id is not passed to exception
     private static final String ENTITY_NOT_FOUND_WITHOUT_ID_MESSAGE = "entity_not_found_without_id";
 
+    private static final String ACCESS_DENIED_MESSAGE = "access_denied";
     private static final String INVALID_ENTITY_MESSAGE = "invalid_entity";
     private static final String INVALID_NAME_MESSAGE = "invalid_entity.name";
     private static final String INVALID_DESCRIPTION_MESSAGE = "invalid_entity.description";
@@ -58,9 +59,15 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Object> handleNoHandlerFoundException() {
+    public ResponseEntity<Object> handleNoHandlerFound() {
         String errorMessage = responseUtil.getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
         return responseUtil.buildErrorResponseEntity(NOT_FOUND, errorMessage);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDenied() {
+        String errorMessage = responseUtil.getErrorMessage(ACCESS_DENIED_MESSAGE);
+        return responseUtil.buildErrorResponseEntity(FORBIDDEN, errorMessage);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)

@@ -13,6 +13,7 @@ import com.epam.esm.repository.exception.InvalidPageContextException;
 import com.epam.esm.service.GiftCertificateService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.epam.esm.security.KeycloakAuthority.CERTIFICATES_DELETE;
+import static com.epam.esm.security.KeycloakAuthority.CERTIFICATES_SAVE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -92,6 +95,7 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('" + CERTIFICATES_SAVE + "')")
     public ResponseEntity<HateoasModel<GiftCertificateDto>> createCertificate(@RequestBody GiftCertificateDto certificateDto) {
         GiftCertificateDto createdDto = certificateService.create(certificateDto);
         HateoasModel<GiftCertificateDto> model = HateoasModel.build(modelHateoasProvider, createdDto);
@@ -108,6 +112,7 @@ public class GiftCertificateController {
      * @return JSON {@link ResponseEntity} object that contains {@link HateoasModel} object
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + CERTIFICATES_SAVE + "')")
     public ResponseEntity<HateoasModel<GiftCertificateDto>> updateCertificate(@PathVariable("id") long id,
                 @RequestBody GiftCertificateDto certificateDto) {
         certificateDto.setId(id);
@@ -124,6 +129,7 @@ public class GiftCertificateController {
      * @return empty {@link ResponseEntity}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('" + CERTIFICATES_DELETE + "')")
     public ResponseEntity<Void> deleteCertificate(@PathVariable("id") long id) {
         certificateService.delete(id);
         return new ResponseEntity<>(NO_CONTENT);

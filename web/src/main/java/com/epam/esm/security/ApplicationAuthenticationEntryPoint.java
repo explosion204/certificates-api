@@ -1,4 +1,4 @@
-package com.epam.esm.config;
+package com.epam.esm.security;
 
 import com.epam.esm.util.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
