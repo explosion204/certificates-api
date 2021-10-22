@@ -57,13 +57,13 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('" + ORDERS_GET_ALL + "')")
+    @PreAuthorize("hasAuthority('" + ORDERS_GET_ALL + "') or authentication.name eq T(String).valueOf(#userId)")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrders(
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false, defaultValue = "0") long userId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) {
         PageContext pageContext = PageContext.of(page, pageSize);
-        List<OrderDto> orders = userId != null
+        List<OrderDto> orders = userId != 0
                 ? orderService.findByUser(userId, pageContext)
                 : orderService.findAll(pageContext);
         ListHateoasModel<OrderDto> model = ListHateoasModel.build(listHateoasProvider, orders);
