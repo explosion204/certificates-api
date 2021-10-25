@@ -1,9 +1,10 @@
-package com.epam.esm.repository;
+package com.epam.esm.pagination;
 
-import com.epam.esm.repository.exception.InvalidPageContextException;
+import com.epam.esm.exception.InvalidPageContextException;
+import org.springframework.data.domain.PageRequest;
 
-import static com.epam.esm.repository.exception.InvalidPageContextException.ErrorType.INVALID_PAGE_NUMBER;
-import static com.epam.esm.repository.exception.InvalidPageContextException.ErrorType.INVALID_PAGE_SIZE;
+import static com.epam.esm.exception.InvalidPageContextException.ErrorType.INVALID_PAGE_NUMBER;
+import static com.epam.esm.exception.InvalidPageContextException.ErrorType.INVALID_PAGE_SIZE;
 
 public class PageContext {
     private static final int MIN_PAGE = 1;
@@ -40,11 +41,7 @@ public class PageContext {
         return new PageContext(page, pageSize);
     }
 
-    public int getStart() {
-        return pageSize * (page - 1);
-    }
-
-    public int getLength() {
-        return pageSize;
+    public PageRequest toPageRequest() {
+        return PageRequest.of(page - 1, pageSize);
     }
 }

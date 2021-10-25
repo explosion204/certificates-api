@@ -20,6 +20,10 @@ allprojects {
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: bootVersion
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: bootVersion
+        implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: securityOauth2Version
+        implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: securityOauth2Version
+
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: bootVersion
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: bootVersion
     }

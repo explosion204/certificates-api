@@ -1,3 +1,4 @@
+# TODO fix generator
 import string
 import requests
 import random
@@ -16,6 +17,8 @@ MIN_DURATION = 1
 MAX_DURATION = 60
 MIN_DATE = '01-01-2019 00:00:00'
 MAX_DATE = '31-12-2020 23:59:59'
+MIN_USERNAME_LENGTH = 8
+MAX_USERNAME_LENGTH = 32
 
 MIN_TAGS_PER_CERTIFICATE = 0
 MAX_TAGS_PER_CERTIFICATE = 3
@@ -121,10 +124,14 @@ def generate_data(file_name, certificates_total, tags_total, users_total, orders
         # users
         users_generated = 0
         for i in range(users_total):
-            name = fetch_word(MIN_NAME_LENGTH, MAX_NAME_LENGTH)
+            username = fetch_word(MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH)
+            password = '$2a$12$xKPnRQjvcaI7otzmjburzuIRu4kGqSXTkAwckVQBY4l7BI6XP1A8S'
+            role = 0
 
             user_statement = generate_insert('app_user', {
-                'name': name
+                'username': username,
+                'password': password,
+                'role': role
             })
 
             if lines.add(user_statement + '\n') == len(lines) - 1:
@@ -187,4 +194,4 @@ def generate_data(file_name, certificates_total, tags_total, users_total, orders
         dump(file_name, lines)
 
 # execute
-generate_data('data.sql', 10000, 1000, 1000, 1000)
+generate_data('data.sql', 10, 10, 10, 10)

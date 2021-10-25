@@ -7,12 +7,12 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
-import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,13 +44,11 @@ public class OrderService {
      * Retrieve all orders.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link OrderDto}
+     * @return {@link Page<OrderDto>} object
      */
-    public List<OrderDto> findAll(PageContext pageContext) {
-        return orderRepository.findAll(pageContext)
-                .stream()
-                .map(OrderDto::fromOrder)
-                .toList();
+    public Page<OrderDto> findAll(PageContext pageContext) {
+        return orderRepository.findAll(pageContext.toPageRequest())
+                .map(OrderDto::fromOrder);
     }
 
 
@@ -59,13 +57,11 @@ public class OrderService {
      *
      * @param userId user id
      * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link OrderDto}
+     * @return {@link Page<OrderDto>} object
      */
-    public List<OrderDto> findByUser(long userId, PageContext pageContext) {
-        return orderRepository.findByUser(pageContext, userId)
-                .stream()
-                .map(OrderDto::fromOrder)
-                .toList();
+    public Page<OrderDto> findByUser(long userId, PageContext pageContext) {
+        return orderRepository.findByUserId(userId, pageContext.toPageRequest())
+                .map(OrderDto::fromOrder);
     }
 
     /**
@@ -89,7 +85,6 @@ public class OrderService {
      * @throws EntityNotFoundException in case when user or (and) certificate with specified ids do not exist
      * @return {@link OrderDto} object that represents created order
      */
-    @Transactional
     public OrderDto makeOrder(OrderDto orderDto) {
         long userId = orderDto.getUserId();
         List<Long> certificateIds = orderDto.getCertificateIds();
@@ -106,7 +101,7 @@ public class OrderService {
                 .toList();
 
         Order preparedOrder = prepareOrder(certificates, user);
-        Order createdOrder = orderRepository.create(preparedOrder);
+        Order createdOrder = orderRepository.save(preparedOrder);
         return OrderDto.fromOrder(createdOrder);
     }
 

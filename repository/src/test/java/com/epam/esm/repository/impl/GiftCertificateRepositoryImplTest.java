@@ -3,8 +3,8 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.TestConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.GiftCertificateSpecificationBuilder;
 import com.epam.esm.repository.OrderingType;
-import com.epam.esm.repository.PageContext;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
@@ -40,10 +41,14 @@ class GiftCertificateRepositoryImplTest {
 
     @ParameterizedTest
     @MethodSource("provideCertificateSearchParams")
-    void testFindByParams(long expectedSize, PageContext pageContext, List<String> tagNames, String certificateName,
-                String certificateDescription) {
-        List<GiftCertificate> certificates = certificateRepository.find(pageContext, tagNames, certificateName,
-                certificateDescription, null, null);
+    void testFindByParams(long expectedSize, List<String> tagNames, String certificateName,
+                          String certificateDescription) {
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .certificateName(certificateName)
+                .certificateDescription(certificateDescription)
+                .tagNames(tagNames)
+                .build();
+        List<GiftCertificate> certificates = certificateRepository.findAll(specification);
 
         boolean valid = certificates.stream()
                 .allMatch(cert -> {
@@ -60,9 +65,10 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByNameAscending() {
-        PageContext pageContext = provideAllPagesContext();
-        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
-                OrderingType.ASC, null);
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .orderByCertificateName(OrderingType.ASC)
+                .build();
+        List<GiftCertificate> actual = certificateRepository.findAll(specification);
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Comparator.comparing(GiftCertificate::getName))
                 .toList();
@@ -72,9 +78,10 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByNameDescending() {
-        PageContext pageContext = provideAllPagesContext();
-        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
-                OrderingType.DESC, null);
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .orderByCertificateName(OrderingType.DESC)
+                .build();
+        List<GiftCertificate> actual = certificateRepository.findAll(specification);
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Collections.reverseOrder(Comparator.comparing(GiftCertificate::getName)))
                 .toList();
@@ -84,10 +91,10 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByCreateDateAscending() {
-        PageContext pageContext = provideAllPagesContext();
-        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
-                null, OrderingType.ASC);
-
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .orderByCreateDate(OrderingType.ASC)
+                .build();
+        List<GiftCertificate> actual = certificateRepository.findAll(specification);
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Comparator.comparing(GiftCertificate::getCreateDate))
                 .toList();
@@ -97,9 +104,10 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testSortByCreateDateDescending() {
-        PageContext pageContext = provideAllPagesContext();
-        List<GiftCertificate> actual = certificateRepository.find(pageContext, null, null, null,
-                null, OrderingType.DESC);
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .orderByCreateDate(OrderingType.DESC)
+                .build();
+        List<GiftCertificate> actual = certificateRepository.findAll(specification);
 
         List<GiftCertificate> expected = actual.stream()
                 .sorted(Collections.reverseOrder(Comparator.comparing(GiftCertificate::getCreateDate)))
@@ -110,13 +118,13 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void testFindById() {
-        Optional<GiftCertificate> certificate = certificateRepository.findById(1);
+        Optional<GiftCertificate> certificate = certificateRepository.findById(1L);
         assertTrue(certificate.isPresent() && certificate.get().getId() == 1);
     }
 
     @Test
     void testFindByIdNotFound() {
-        Optional<GiftCertificate> certificate = certificateRepository.findById(0);
+        Optional<GiftCertificate> certificate = certificateRepository.findById(0L);
         assertTrue(certificate.isEmpty());
     }
 
@@ -124,7 +132,7 @@ class GiftCertificateRepositoryImplTest {
     void testCreate() {
         GiftCertificate expectedCertificate = provideCertificate();
 
-        GiftCertificate actualCertificate = certificateRepository.create(expectedCertificate);
+        GiftCertificate actualCertificate = certificateRepository.save(expectedCertificate);
 
         assertEquals(expectedCertificate, actualCertificate);
     }
@@ -134,30 +142,26 @@ class GiftCertificateRepositoryImplTest {
         GiftCertificate expectedCertificate = provideCertificate();
         expectedCertificate.setId(1);
 
-        GiftCertificate actualCertificate = certificateRepository.update(expectedCertificate);
+        GiftCertificate actualCertificate = certificateRepository.save(expectedCertificate);
 
         assertEquals(expectedCertificate, actualCertificate);
     }
 
     @Test
     void testDelete() {
-        GiftCertificate certificate = certificateRepository.findById(1).get();
+        GiftCertificate certificate = certificateRepository.findById(1L).get();
         certificateRepository.delete(certificate);
 
-        assertTrue(certificateRepository.findById(1).isEmpty());
+        assertTrue(certificateRepository.findById(1L).isEmpty());
     }
 
     private static Stream<Arguments> provideCertificateSearchParams() {
-        PageContext allItems = provideAllPagesContext();
-        PageContext notAllItems = provideOnePageContext();
-
         return Stream.of(
-                Arguments.of(4, allItems, null, null, null),
-                Arguments.of(1, notAllItems, null, null, null),
-                Arguments.of(1, allItems, List.of("tag1", "tag2"), null, null),
-                Arguments.of(0, allItems, List.of("tag22"), "name", "desc"),
-                Arguments.of(2, allItems, null, null, "description"),
-                Arguments.of(1, allItems, null, "hello there", null)
+                Arguments.of(4, null, null, null),
+                Arguments.of(1, List.of("tag1", "tag2"), null, null),
+                Arguments.of(0, List.of("tag22"), "name", "desc"),
+                Arguments.of(2, null, null, "description"),
+                Arguments.of(1, null, "hello there", null)
         );
     }
 
@@ -171,13 +175,5 @@ class GiftCertificateRepositoryImplTest {
         certificate.setLastUpdateDate(LocalDateTime.now(UTC));
 
         return certificate;
-    }
-
-    private static PageContext provideAllPagesContext() {
-        return PageContext.of(1, 50);
-    }
-
-    private static PageContext provideOnePageContext() {
-        return PageContext.of(1, 1);
     }
 }

@@ -5,12 +5,12 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.repository.PageContext;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,13 +33,11 @@ public class TagService {
      * Retrieve all tags.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link TagDto}
+     * @return {@link Page<TagDto>} object
      */
-    public List<TagDto> findAll(PageContext pageContext) {
-        return tagRepository.findAll(pageContext)
-                .stream()
-                .map(TagDto::fromTag)
-                .toList();
+    public Page<TagDto> findAll(PageContext pageContext) {
+        return tagRepository.findAll(pageContext.toPageRequest())
+                .map(TagDto::fromTag);
     }
 
     /**
@@ -75,7 +73,6 @@ public class TagService {
      * @throws EntityAlreadyExistsException in case when tag with specified name already exists
      * @return {@link TagDto} object that represents created tag
      */
-    @Transactional
     public TagDto create(TagDto tagDto) {
         Tag tag = tagDto.toTag();
         List<ValidationError> validationErrors = tagValidator.validate(tag.getName());
@@ -89,7 +86,7 @@ public class TagService {
             throw new EntityAlreadyExistsException();
         }
 
-        Tag createdTag = tagRepository.create(tag);
+        Tag createdTag = tagRepository.save(tag);
         return TagDto.fromTag(createdTag);
     }
 
@@ -99,7 +96,6 @@ public class TagService {
      * @param id tag id
      * @throws EntityNotFoundException in case when tag with this id does not exist
      */
-    @Transactional
     public void delete(long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Tag.class));

@@ -5,9 +5,9 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderRepository;
-import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,6 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,22 +59,27 @@ class OrderServiceTest {
     @Test
     void testFindAll() {
         PageContext pageContext = PageContext.of(null, null);
-        when(orderRepository.findAll(pageContext)).thenReturn(provideOrders());
+        PageRequest pageRequest = pageContext.toPageRequest();
+        Page<Order> resultPage = new PageImpl<>(provideOrders());
+        when(orderRepository.findAll(pageRequest)).thenReturn(resultPage);
 
         List<OrderDto> expectedDtoList = provideOrderDtoList();
-        List<OrderDto> actualDtoList = orderService.findAll(pageContext);
+        List<OrderDto> actualDtoList = orderService.findAll(pageContext).getContent();
 
         assertEquals(expectedDtoList, actualDtoList);
     }
 
     @Test
-    void testFindByUser() {
+    void testFindByUserId() {
         PageContext pageContext = PageContext.of(null, null);
+        PageRequest pageRequest = pageContext.toPageRequest();
         long userId = 1;
-        when(orderRepository.findByUser(pageContext, userId)).thenReturn(provideOrders());
+
+        Page<Order> resultPage = new PageImpl<>(provideOrders());
+        when(orderRepository.findByUserId(userId, pageRequest)).thenReturn(resultPage);
 
         List<OrderDto> expectedDtoList = provideOrderDtoList();
-        List<OrderDto> actualDtoList = orderService.findByUser(userId, pageContext);
+        List<OrderDto> actualDtoList = orderService.findByUser(userId, pageContext).getContent();
 
         assertEquals(expectedDtoList, actualDtoList);
     }
@@ -104,11 +112,11 @@ class OrderServiceTest {
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(orderRepository.create(any(Order.class))).thenReturn(order);
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
 
         orderService.makeOrder(orderDto);
 
-        verify(orderRepository).create(orderCaptor.capture());
+        verify(orderRepository).save(orderCaptor.capture());
         Order capturedOrder = orderCaptor.getValue();
         assertTrue(capturedOrder.getCost() != null && capturedOrder.getPurchaseDate() != null);
     }

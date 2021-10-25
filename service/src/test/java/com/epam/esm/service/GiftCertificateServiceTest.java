@@ -8,7 +8,7 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
-import com.epam.esm.repository.PageContext;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
@@ -17,11 +17,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -77,19 +82,16 @@ class GiftCertificateServiceTest {
         }};
 
         PageContext pageContext = PageContext.of(null, null);
-        List<String> tagNames = List.of("tag1", "tag2");
-        String certificateName = "certificate";
-        String certificateDescription = "description";
-        OrderingType orderByName = OrderingType.ASC;
-        OrderingType orderByCreateDate = OrderingType.DESC;
-        when(certificateRepository.find(pageContext, tagNames, certificateName, certificateDescription, orderByName,
-                orderByCreateDate)).thenReturn(certificateList);
+        PageRequest pageRequest = pageContext.toPageRequest();
+
+        Page<GiftCertificate> resultPage = new PageImpl<>(certificateList);
+        when(certificateRepository.findAll(ArgumentMatchers.<Specification<GiftCertificate>>any(), eq(pageRequest)))
+                .thenReturn(resultPage);
 
         GiftCertificateSearchParamsDto searchParamsDto = provideSearchParamsDto();
-        List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto, pageContext);
+        List<GiftCertificateDto> actualDtoList = certificateService.find(searchParamsDto, pageContext).getContent();
 
-        verify(certificateRepository).find(pageContext, tagNames, certificateName, certificateDescription,
-               orderByName, orderByCreateDate);
+        verify(certificateRepository).findAll(ArgumentMatchers.<Specification<GiftCertificate>>any(), eq(pageRequest));
 
         assertEquals(certificateDtoList, actualDtoList);
     }
@@ -120,11 +122,11 @@ class GiftCertificateServiceTest {
         GiftCertificateDto expectedDto = provideCertificateDto();
         GiftCertificate certificate = provideCertificate();
 
-        when(certificateRepository.create(any(GiftCertificate.class))).thenReturn(certificate);
+        when(certificateRepository.save(any(GiftCertificate.class))).thenReturn(certificate);
         GiftCertificateDto actualDto = certificateService.create(expectedDto);
 
         verify(certificateValidator).validate(certificateCaptor.capture(), eq(false));
-        verify(certificateRepository).create(certificateCaptor.getValue());
+        verify(certificateRepository).save(certificateCaptor.getValue());
         assertEquals(expectedDto, actualDto);
     }
 
@@ -156,14 +158,14 @@ class GiftCertificateServiceTest {
         newTag.setName(tagName);
 
         when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
-        when(certificateRepository.update(certificate)).thenReturn(certificate);
+        when(certificateRepository.save(certificate)).thenReturn(certificate);
         when(tagRepository.findByName(tagName)).thenReturn(Optional.empty());
-        when(tagRepository.create(newTag)).thenReturn(newTag);
+        when(tagRepository.save(newTag)).thenReturn(newTag);
 
         certificateService.update(updatedCertificateDto);
 
         verify(certificateValidator).validate(certificateCaptor.capture(), eq(true));
-        verify(certificateRepository).update(certificateCaptor.getValue());
+        verify(certificateRepository).save(certificateCaptor.getValue());
         verify(tagValidator).validate(tagName);
         verify(tagRepository).findByName(tagName);
     }
