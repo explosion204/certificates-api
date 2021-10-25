@@ -4,7 +4,7 @@ import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.repository.exception.InvalidPageContextException;
+import com.epam.esm.exception.InvalidPageContextException;
 import com.epam.esm.util.ResponseUtil;
 import com.epam.esm.validator.ValidationError;
 import org.apache.logging.log4j.LogManager;

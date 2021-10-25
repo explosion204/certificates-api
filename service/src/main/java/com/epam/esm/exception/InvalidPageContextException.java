@@ -1,4 +1,4 @@
-package com.epam.esm.repository.exception;
+package com.epam.esm.exception;
 
 public class InvalidPageContextException extends RuntimeException {
     private final ErrorType errorType;

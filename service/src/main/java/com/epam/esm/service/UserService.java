@@ -4,14 +4,15 @@ import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.repository.PageContext;
-import com.epam.esm.repository.UserRepository;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.UserRepository;
 import com.epam.esm.security.KeycloakUtil;
 import com.epam.esm.validator.UserValidator;
 import com.epam.esm.validator.ValidationError;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,8 @@ public class UserService {
             UserRepository userRepository,
             UserValidator userValidator,
             KeycloakUtil keycloakUtil,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
         this.keycloakUtil = keycloakUtil;
@@ -46,13 +48,11 @@ public class UserService {
      * Retrieve all users.
      *
      * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link UserDto}
+     * @return {@link Page<UserDto>} object
      */
-    public List<UserDto> findAll(PageContext pageContext) {
-        return userRepository.findAll(pageContext)
-                .stream()
-                .map(UserDto::fromUser)
-                .toList();
+    public Page<UserDto> findAll(PageContext pageContext) {
+        return userRepository.findAll(pageContext.toPageRequest())
+                .map(UserDto::fromUser);
     }
 
     /**
@@ -68,6 +68,14 @@ public class UserService {
         return UserDto.fromUser(user);
     }
 
+    /**
+     * Create a new user.
+     *
+     * @param userDto {@link UserDto} instance
+     * @throws InvalidEntityException in case when passed DTO object contains invalid data
+     * @throws EntityAlreadyExistsException in case when user with specified username already exists
+     * @return {@link TokenDto} object
+     */
     @Transactional
     public TokenDto signup(UserDto userDto) {
         User user = userDto.toUser();
@@ -84,11 +92,17 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        User createdUser = userRepository.create(user);
+        User createdUser = userRepository.save(user);
         return buildTokenDto(createdUser);
     }
 
-    @Transactional
+    /**
+     * Authenticate with provided credentials.
+     *
+     * @param userDto {@link UserDto} instance
+     * @throws BadCredentialsException in case when provided credentials are wrong
+     * @return {@link TokenDto} object
+     */
     public TokenDto login(UserDto userDto) {
         String username = userDto.getUsername();
         String password = userDto.getPassword();

@@ -6,13 +6,17 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.OrderingType;
-import com.epam.esm.repository.PageContext;
+import com.epam.esm.pagination.PageContext;
+import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.GiftCertificateSpecificationBuilder;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,21 +58,26 @@ public class GiftCertificateService {
      *
      * @param searchParamsDto {@link GiftCertificateSearchParamsDto} object with specified search parameters
      * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link GiftCertificateDto}
+     * @return {@link Page<GiftCertificate>} object
      */
-    public List<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto, PageContext pageContext) {
+    public Page<GiftCertificateDto> find(GiftCertificateSearchParamsDto searchParamsDto, PageContext pageContext) {
         List<String> tagNames = searchParamsDto.getTagNames();
         String certificateName = searchParamsDto.getCertificateName();
         String certificateDescription = searchParamsDto.getCertificateDescription();
-        OrderingType orderByName = searchParamsDto.getOrderByName();
-        OrderingType orderByCreateDate = searchParamsDto.getOrderByCreateDate();
+        OrderingType nameOrderingType = searchParamsDto.getOrderByName();
+        OrderingType createDateOrderingType = searchParamsDto.getOrderByCreateDate();
 
-        List<GiftCertificate> certificates = certificateRepository.find(pageContext, tagNames, certificateName,
-                certificateDescription, orderByName, orderByCreateDate);
+        Specification<GiftCertificate> specification = new GiftCertificateSpecificationBuilder()
+                .certificateName(certificateName)
+                .certificateDescription(certificateDescription)
+                .tagNames(tagNames)
+                .orderByCertificateName(nameOrderingType)
+                .orderByCreateDate(createDateOrderingType)
+                .build();
+        PageRequest pageRequest = pageContext.toPageRequest();
 
-        return certificates.stream()
-                .map(GiftCertificateDto::fromCertificate)
-                .toList();
+        return certificateRepository.findAll(specification, pageRequest)
+                .map(GiftCertificateDto::fromCertificate);
     }
 
     /**
@@ -107,7 +116,7 @@ public class GiftCertificateService {
         certificate.setCreateDate(createDate);
         certificate.setLastUpdateDate(createDate);
 
-        GiftCertificate createdCertificate = certificateRepository.create(certificate);
+        GiftCertificate createdCertificate = certificateRepository.save(certificate);
 
         // we do not update tags if it is not specified in request (i.e. tagNames == null)
         if (tagNames != null) {
@@ -164,7 +173,7 @@ public class GiftCertificateService {
             certificate.setTags(tags);
         }
 
-        GiftCertificate updatedCertificate = certificateRepository.update(certificate);
+        GiftCertificate updatedCertificate = certificateRepository.save(certificate);
         return GiftCertificateDto.fromCertificate(updatedCertificate);
     }
 
@@ -174,7 +183,6 @@ public class GiftCertificateService {
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
      */
-    @Transactional
     public void delete(long id) {
         GiftCertificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, GiftCertificate.class));
@@ -196,7 +204,7 @@ public class GiftCertificateService {
                     if (optionalTag.isEmpty()) {
                         tag = new Tag();
                         tag.setName(tagName);
-                        tagRepository.create(tag);
+                        tagRepository.save(tag);
                     } else {
                         tag = optionalTag.get();
                     }

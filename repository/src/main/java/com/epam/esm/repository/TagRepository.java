@@ -1,59 +1,33 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Tag;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
-/**
- * Implementors of the interface provide functionality for manipulating stored {@link Tag} entities.
- *
- * @author Dmitry Karnyshov
- */
-public interface TagRepository {
-    /**
-     * Retrieve all tags from storage.
-     *
-     * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link Tag}
-     */
-    List<Tag> findAll(PageContext pageContext);
-
-    /**
-     * Retrieve tag by its unique id.
-     *
-     * @param id tag id
-     * @return {@link Tag} wrapped by {@link Optional}
-     */
-    Optional<Tag> findById(long id);
-
-    /**
-     * Retrieve tag by its unique name.
-     *
-     * @param name tag name
-     * @return {@link Tag} wrapped by {@link Optional}
-     */
+public interface TagRepository extends JpaRepository<Tag, Long> {
     Optional<Tag> findByName(String name);
 
-    /**
-     * Retrieve the most widely used tag of a user with the highest cost of all orders.
-     *
-     * @return {@link Tag} wrapped by {@link Optional}
-     */
+    @Query(value = """
+        SELECT t.id, t.name
+        FROM app_user AS u
+        INNER JOIN app_order AS o ON o.id_user = u.id
+        INNER JOIN certificate_order AS co ON co.id_order = o.id
+        INNER JOIN gift_certificate AS c ON c.id = co.id_certificate
+        INNER JOIN certificate_tag AS ct ON ct.id_certificate = c.id
+        INNER JOIN tag AS t ON ct.id_tag = t.id
+        WHERE u.id = (
+            SELECT u.id
+            FROM app_user AS u
+            INNER JOIN app_order AS o ON o.id_user = u.id
+            GROUP BY u.id
+            ORDER BY SUM(o.cost) DESC
+            LIMIT 1
+        )
+        GROUP BY t.id, t.name
+        ORDER BY COUNT(t.name) DESC
+        LIMIT 1;
+    """, nativeQuery = true)
     Optional<Tag> findMostWidelyUsedTag();
-
-    /**
-     * Create a new tag in the storage.
-     *
-     * @param tag {@link Tag} instance
-     * @return created {@link Tag}
-     */
-    Tag create(Tag tag);
-
-    /**
-     * Delete an existing tag from the storage.
-     *
-     * @param tag entity to delete
-     */
-    void delete(Tag tag);
 }

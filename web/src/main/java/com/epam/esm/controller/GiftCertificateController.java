@@ -2,16 +2,17 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.HateoasProvider;
-import com.epam.esm.controller.hateoas.model.ListHateoasModel;
+import com.epam.esm.controller.hateoas.model.PageHateoasModel;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateSearchParamsDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.repository.PageContext;
-import com.epam.esm.repository.exception.InvalidPageContextException;
+import com.epam.esm.pagination.PageContext;
+import com.epam.esm.exception.InvalidPageContextException;
 import com.epam.esm.service.GiftCertificateService;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,24 +58,26 @@ public class GiftCertificateController {
     /**
      * Retrieve certificates according to specified parameters.
      * All parameters are optional, so if they are not present, all certificates will be retrieved.
+     * Access is allowed to everyone.
      *
      * @param searchParamsDto {@link GiftCertificateSearchParamsDto} instance
      * @throws InvalidPageContextException if passed page or page size values are invalid
-     * @return JSON {@link ResponseEntity} object that contains list of {@link ListHateoasModel} objects
+     * @return JSON {@link ResponseEntity} object that contains list of {@link PageHateoasModel} objects
      */
     @GetMapping
-    public ResponseEntity<ListHateoasModel<GiftCertificateDto>> getCertificates(
+    public ResponseEntity<PageHateoasModel<GiftCertificateDto>> getCertificates(
             @ModelAttribute GiftCertificateSearchParamsDto searchParamsDto,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize
     ) {
-        List<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, PageContext.of(page, pageSize));
-        ListHateoasModel<GiftCertificateDto> model = ListHateoasModel.build(listHateoasProvider, certificates);
+        Page<GiftCertificateDto> certificates = certificateService.find(searchParamsDto, PageContext.of(page, pageSize));
+        PageHateoasModel<GiftCertificateDto> model = PageHateoasModel.build(listHateoasProvider, certificates);
         return new ResponseEntity<>(model, OK);
     }
 
     /**
      * Retrieve certificate by its unique id.
+     * Access is allowed to everyone.
      *
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist
@@ -89,6 +92,7 @@ public class GiftCertificateController {
 
     /**
      * Create a new certificate.
+     * Access is allowed to users with 'certificates:save' authority (admin role).
      *
      * @param certificateDto {@link GiftCertificateDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
@@ -104,6 +108,7 @@ public class GiftCertificateController {
 
     /**
      * Update an existing certificate.
+     * Access is allowed to users with 'certificates:save' authority (admin role).
      *
      * @param id             certificate id
      * @param certificateDto {@link GiftCertificateDto} instance
@@ -123,6 +128,7 @@ public class GiftCertificateController {
 
     /**
      * Delete an existing certificate.
+     * Access is allowed to users with 'certificates:delete' authority (admin role).
      *
      * @param id certificate id
      * @throws EntityNotFoundException in case when certificate with this id does not exist

@@ -5,7 +5,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.repository.PageContext;
+import com.epam.esm.pagination.PageContext;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.TagValidator;
 import com.epam.esm.validator.ValidationError;
@@ -16,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +49,12 @@ class TagServiceTest {
     @Test
     void testFindAll() {
         PageContext pageContext = PageContext.of(null, null);
-        when(tagRepository.findAll(pageContext)).thenReturn(provideTagsList());
+        PageRequest pageRequest = pageContext.toPageRequest();
+        Page<Tag> resultPage = new PageImpl<>(provideTagsList());
+        when(tagRepository.findAll(pageRequest)).thenReturn(resultPage);
 
         List<TagDto> expectedDtoList = provideTagDtoList();
-        List<TagDto> actualDtoList = tagService.findAll(pageContext);
+        List<TagDto> actualDtoList = tagService.findAll(pageContext).getContent();
 
         assertEquals(expectedDtoList, actualDtoList);
     }
@@ -79,13 +84,13 @@ class TagServiceTest {
         Tag tag = provideTag();
 
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
-        when(tagRepository.create(tag)).thenReturn(tag);
+        when(tagRepository.save(tag)).thenReturn(tag);
 
         tagService.create(tagDto);
 
         verify(tagValidator).validate(tag.getName());
         verify(tagRepository).findByName(tag.getName());
-        verify(tagRepository).create(tag);
+        verify(tagRepository).save(tag);
     }
 
     @Test
@@ -114,7 +119,7 @@ class TagServiceTest {
     @Test
     void testDelete() {
         Tag tag = provideTag();
-        int tagId = 1;
+        long tagId = 1;
         when(tagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
         tagService.delete(tagId);
@@ -124,7 +129,7 @@ class TagServiceTest {
 
     @Test
     void testDeleteWhenTagNotFound() {
-        int tagId = 1;
+        long tagId = 1;
         when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> tagService.delete(tagId));
