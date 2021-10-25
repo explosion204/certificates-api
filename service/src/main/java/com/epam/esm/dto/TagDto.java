@@ -2,18 +2,19 @@ package com.epam.esm.dto;
 
 import com.epam.esm.entity.Tag;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TagDto {
-    private long id;
+public class TagDto extends IdentifiableDto {
     private String name;
 
     public Tag toTag() {
         Tag tag = new Tag();
 
-        tag.setId(id);
+        tag.setId(getId());
         tag.setName(name);
 
         return tag;

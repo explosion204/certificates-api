@@ -1,6 +1,5 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 
 import java.util.List;
@@ -15,9 +14,10 @@ public interface TagRepository {
     /**
      * Retrieve all tags from storage.
      *
+     * @param pageContext {@link PageContext} object with pagination logic
      * @return list of {@link Tag}
      */
-    List<Tag> findAll();
+    List<Tag> findAll(PageContext pageContext);
 
     /**
      * Retrieve tag by its unique id.
@@ -36,26 +36,24 @@ public interface TagRepository {
     Optional<Tag> findByName(String name);
 
     /**
-     * Retrieve all tags attached to a certain certificate.
+     * Retrieve the most widely used tag of a user with the highest cost of all orders.
      *
-     * @param certificateId certificate id
-     * @return list of {@link Tag} attached to the {@link GiftCertificate}
+     * @return {@link Tag} wrapped by {@link Optional}
      */
-    List<Tag> findByCertificate(long certificateId);
+    Optional<Tag> findMostWidelyUsedTag();
 
     /**
      * Create a new tag in the storage.
      *
      * @param tag {@link Tag} instance
-     * @return unique id of the saved {@link Tag}
+     * @return created {@link Tag}
      */
-    long create(Tag tag);
+    Tag create(Tag tag);
 
     /**
      * Delete an existing tag from the storage.
      *
-     * @param id tag id
-     * @return {@code true} if {@link Tag} existed and was deleted, otherwise {@code false}
+     * @param tag entity to delete
      */
-    boolean delete(long id);
+    void delete(Tag tag);
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -17,9 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class GiftCertificateDto {
-    private long id;
+public class GiftCertificateDto extends IdentifiableDto {
+    private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String UTC_ZONE = "UTC";
+
     private String name;
     private String description;
     private BigDecimal price;
@@ -28,10 +32,10 @@ public class GiftCertificateDto {
     @JsonDeserialize(using = DayDurationDeserializer.class)
     private Duration duration;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
     private LocalDateTime createDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ISO_8601_FORMAT, timezone = UTC_ZONE)
     private LocalDateTime lastUpdateDate;
 
     private List<String> tags = new ArrayList<>();
@@ -39,7 +43,7 @@ public class GiftCertificateDto {
     public GiftCertificate toCertificate() {
         GiftCertificate certificate = new GiftCertificate();
 
-        certificate.setId(id);
+        certificate.setId(getId());
         certificate.setName(name);
         certificate.setDescription(description);
         certificate.setPrice(price);
@@ -48,7 +52,7 @@ public class GiftCertificateDto {
         return certificate;
     }
 
-    public static GiftCertificateDto fromCertificate(GiftCertificate certificate, List<Tag> tags) {
+    public static GiftCertificateDto fromCertificate(GiftCertificate certificate) {
         GiftCertificateDto certificateDto = new GiftCertificateDto();
 
         certificateDto.setId(certificate.getId());
@@ -59,7 +63,10 @@ public class GiftCertificateDto {
         certificateDto.setCreateDate(certificate.getCreateDate());
         certificateDto.setLastUpdateDate(certificate.getLastUpdateDate());
 
-        List<String> tagNames = tags.stream().map(Tag::getName).toList();
+        List<String> tagNames = certificate.getTags()
+                .stream()
+                .map(Tag::getName)
+                .toList();
         certificateDto.setTags(tagNames);
 
         return certificateDto;

@@ -1,111 +1,97 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.PageContext;
 import com.epam.esm.repository.TagRepository;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
-    private static final String ID_PARAM = "id";
-    private static final String NAME_PARAM = "name";
-    private static final String CERTIFICATE_ID_PARAM = "certificate_id";
+    private static final String NAME = "name";
 
-    private static final String SELECT_ALL_TAGS = """
-            SELECT id, name
-            FROM tag;
+    private static final String SELECT_ALL = "SELECT t FROM Tag t";
+    private static final String SELECT_BY_NAME = "SELECT t FROM Tag t WHERE t.name = :name";
+
+    private static final String SELECT_MOST_WIDELY_USED_TAG = """
+            SELECT t.id, t.name
+            FROM app_user AS u
+            INNER JOIN app_order AS o ON o.id_user = u.id
+            INNER JOIN certificate_order AS co ON co.id_order = o.id
+            INNER JOIN gift_certificate AS c ON c.id = co.id_certificate
+            INNER JOIN certificate_tag AS ct ON ct.id_certificate = c.id
+            INNER JOIN tag AS t ON ct.id_tag = t.id
+            WHERE u.id = (
+                SELECT u.id
+                FROM app_user AS u
+                INNER JOIN app_order AS o ON o.id_user = u.id
+                GROUP BY u.id
+                ORDER BY SUM(o.cost) DESC
+                LIMIT 1
+            )
+            GROUP BY t.id, t.name
+            ORDER BY COUNT(t.name) DESC
+            LIMIT 1;
             """;
 
-    private static final String SELECT_TAG_BY_ID = """
-            SELECT id, name
-            FROM tag
-            WHERE id = :id;
-            """;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    private static final String SELECT_TAG_BY_NAME = """
-            SELECT id, name
-            FROM tag
-            WHERE name = :name;
-            """;
-
-    private static final String SELECT_TAGS_BY_CERTIFICATE = """
-            SELECT tag.id, tag.name
-            FROM tag
-            INNER JOIN certificate_tag AS ct
-            ON tag.id = ct.id_tag
-            WHERE ct.id_certificate = :certificate_id;
-            """;
-
-    private static final String INSERT_TAG = """
-            INSERT INTO tag (name)
-            VALUES (:name);
-            """;
-
-    private static final String DELETE_TAG = """
-            DELETE FROM tag
-            WHERE id = :id;
-            """;
-
-    private RowMapper<Tag> rowMapper;
-    private NamedParameterJdbcTemplate namedJdbcTemplate;
-
-    public TagRepositoryImpl(DataSource dataSource, RowMapper<Tag> rowMapper) {
-        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-        this.rowMapper = rowMapper;
+    public TagRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
-    public List<Tag> findAll() {
-        return namedJdbcTemplate.query(SELECT_ALL_TAGS, rowMapper);
+    public List<Tag> findAll(PageContext pageContext) {
+        return entityManager.createQuery(SELECT_ALL, Tag.class)
+                .setFirstResult(pageContext.getStart())
+                .setMaxResults(pageContext.getLength())
+                .getResultList();
     }
 
     @Override
     public Optional<Tag> findById(long id) {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID_PARAM, id);
-
-        List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_ID, parameters, rowMapper);
-        return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
+        Tag tag = entityManager.find(Tag.class, id);
+        return Optional.ofNullable(tag);
     }
 
     @Override
     public Optional<Tag> findByName(String name) {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME_PARAM, name);
-
-        List<Tag> tags = namedJdbcTemplate.query(SELECT_TAG_BY_NAME, parameters, rowMapper);
-        return Optional.ofNullable(tags.size() == 1 ? tags.get(0) : null);
+        TypedQuery<Tag> tagQuery = entityManager.createQuery(SELECT_BY_NAME, Tag.class);
+        tagQuery.setParameter(NAME, name);
+        return tagQuery.getResultList()
+                .stream()
+                .findFirst();
     }
 
     @Override
-    public List<Tag> findByCertificate(long certificateId) {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(CERTIFICATE_ID_PARAM, certificateId);
-        return namedJdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE, parameters, rowMapper);
+    public Optional<Tag> findMostWidelyUsedTag() {
+        try {
+            Tag tag = (Tag) entityManager.createNativeQuery(SELECT_MOST_WIDELY_USED_TAG, Tag.class)
+                    .getSingleResult();
+
+            return Optional.of(tag);
+        } catch (NoResultException e) {
+           // we don't need to process this exception
+        }
+
+        return Optional.empty();
     }
 
     @Override
-    public long create(Tag tag) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(NAME_PARAM, tag.getName());
-        namedJdbcTemplate.update(INSERT_TAG, parameters, keyHolder);
-
-        Number generatedKey = Objects.requireNonNull(keyHolder).getKey();
-        return Objects.requireNonNull(generatedKey).longValue();
+    public Tag create(Tag tag) {
+        entityManager.persist(tag);
+        return tag;
     }
 
     @Override
-    public boolean delete(long id) {
-        SqlParameterSource parameters = new MapSqlParameterSource().addValue(ID_PARAM, id);
-
-        return namedJdbcTemplate.update(DELETE_TAG, parameters) > 0;
+    public void delete(Tag tag) {
+        entityManager.remove(tag);
     }
 }
