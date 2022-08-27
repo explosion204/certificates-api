@@ -1,45 +1,13 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Optional;
-
-/**
- * Implementors of the interface provide functionality for manipulating stored {@link Order} entities.
- *
- * @author Dmitry Karnyshov
- */
-public interface OrderRepository {
-    /**
-     * Retrieve all orders from storage.
-     *
-     * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link Order}
-     */
-    List<Order> findAll(PageContext pageContext);
-
-    /**
-     * Retrieve order by its unique id.
-     *
-     * @param id order id
-     * @return {@link Order} wrapped by {@link Optional}
-     */
-    Optional<Order> findById(long id);
-
-    /**
-     * Retrieve all orders of specified user.
-     *
-     * @param pageContext {@link PageContext} object with pagination logic
-     * @return list of {@link Order}
-     */
-    List<Order> findByUser(PageContext pageContext, long userId);
-
-    /**
-     * Create a new order in the storage.
-     *
-     * @param order {@link Order} instance
-     * @return created {@link Order}
-     */
-    Order create(Order order);
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    @Query("FROM Order o WHERE o.user.id = :userId")
+    Page<Order> findByUserId(@Param("userId") long userId, Pageable pageable);
 }
